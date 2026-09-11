@@ -835,6 +835,11 @@ export function sortSymbolsByPosition(symbols, asset) {
 }
 
 export function calcEquityUSDT(asset, statsBySymbol = {}, walletCcy = "USDT") {
+  // ✅ 거래소 집계 평가액(Bybit totalEquity)이 발행돼 있으면 그대로 사용.
+  //    장부 평단×현재가 재계산은 부분청산 누적 시 거래소와 어긋남(2026-09-11: 앱 496 vs 거래소 511).
+  const exEquity = Number(asset?.equity);
+  if (Number.isFinite(exEquity) && exEquity > 0) return exEquity;
+
   const wallet = Number(asset?.wallet?.[walletCcy] ?? 0);
   const positions = asset?.positions || {};
 

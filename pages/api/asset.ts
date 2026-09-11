@@ -49,7 +49,7 @@ function parsePositionVal(
             v == null || (typeof v === "object" && Object.keys(v).length === 0);
 
         if (isEmpty(LONG) && isEmpty(SHORT)) return null;
-        return {LONG, SHORT};
+        return {LONG: stripLotIds(LONG), SHORT: stripLotIds(SHORT)};
     }
 
     if (typeof s !== "string") return null;
@@ -67,12 +67,25 @@ function parsePositionVal(
                 v == null || (typeof v === "object" && Object.keys(v).length === 0);
 
             if (isEmpty(LONG) && isEmpty(SHORT)) return null;
-            return {LONG, SHORT};
+            return {LONG: stripLotIds(LONG), SHORT: stripLotIds(SHORT)};
         }
     } catch {
     }
 
     return null;
+}
+
+/** 공개 응답에서 내부 lot id·거래소 주문 id 제거 (사이트/앱 UI 미사용, 주문 흐름 식별 노출 방지 — 2026-09-11 보안 검토) */
+function stripLotIds(side: any): any {
+    if (!side || typeof side !== "object") return side;
+    const entries = Array.isArray(side.entries)
+        ? side.entries.map((e: any) => {
+            if (!e || typeof e !== "object") return e;
+            const {lot_id, ex_lot_id, ...rest} = e;
+            return rest;
+        })
+        : side.entries;
+    return {...side, entries};
 }
 
 /* --------------------------- handler --------------------------- */
@@ -152,6 +165,20 @@ export default async function handler(req: Request): Promise<Response> {
             [walletCoin]: isFinite(walletVal) ? walletVal : 0,
         };
 
+        /* ---- 거래소 집계 평가액/미실현/갱신시각 (executor가 체결·5분 주기로 발행, 없으면 null) ---- */
+        const numOrNull = (v: unknown): number | null => {
+            const n = typeof v === "string" ? parseFloat(v) : Number(v);
+            return Number.isFinite(n) ? n : null;
+        };
+        const [equityStr, unrealStr, updatedStr] = await Promise.all([
+            (redis as any).hget(key, `equity.${walletCoin}`),
+            (redis as any).hget(key, `unrealised.${walletCoin}`),
+            (redis as any).hget(key, "updated_ms"),
+        ]);
+        const equity = numOrNull(equityStr);
+        const unrealised = numOrNull(unrealStr);
+        const updatedMs = numOrNull(updatedStr);
+
         /* ------------------- positions ------------------- */
         const positions: Record<string, any> = {};
 
@@ -202,19 +229,16 @@ export default async function handler(req: Request): Promise<Response> {
             } while (cursor !== 0);
         }
 
-        const payload: any = {retCode: 0, asset: {wallet, positions}};
+        const payload: any = {retCode: 0, asset: {wallet, positions, equity, unrealised, updatedMs}};
 
-        if (searchParams.get("debug") === "1") {
-            payload._debug = {
-                ns,
-                redisKey: key,
-                walletField: walletKey,
-                symbols: wantSymbols.length ? wantSymbols : Object.keys(positions),
-                includeEmpty,
-            };
-        }
-
-        return json(payload);
+        // 15초 엣지 캐시: 익명 폴링이 매번 홈 Redis(터널)까지 가지 않게. executor 발행 주기(5분)·프론트 폴링(30초)보다 짧아 신선도 손실 없음.
+        return new Response(JSON.stringify(payload), {
+            status: 200,
+            headers: {
+                "content-type": "application/json; charset=utf-8",
+                "cache-control": "public, s-maxage=15, stale-while-revalidate=60",
+            },
+        });
     } catch (e: any) {
         return json(
             {retCode: -1, retMsg: e?.message || "server error"},

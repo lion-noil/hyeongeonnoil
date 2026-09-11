@@ -61,7 +61,13 @@ export default function AssetPanel({asset, statsBySymbol, config, walletCcy = "U
                     <div style={{fontSize: 22, fontWeight: 800}}>{fmtComma(wallet, 1)}</div>
                 </div>
                 <div>
-                    <div style={{fontSize: 12, opacity: 0.8}}>평가액</div>
+                    <div style={{fontSize: 12, opacity: 0.8}}>
+                        평가액{Number.isFinite(+asset?.equity) && +asset.equity > 0 ? (
+                            <span style={{opacity: 0.7}}>
+                                {" "}(거래소{asset?.updatedMs ? ` ${new Date(+asset.updatedMs).toLocaleTimeString("ko-KR", {hour: "2-digit", minute: "2-digit"})}` : ""})
+                            </span>
+                        ) : null}
+                    </div>
                     <div style={{fontSize: 22, fontWeight: 800}}>{fmtComma(equity, 1)}</div>
                 </div>
             </div>
