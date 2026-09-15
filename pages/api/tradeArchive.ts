@@ -1,5 +1,5 @@
 // api/tradeArchive.ts — Supabase 영구 체결 아카이브 조회 (월별 전적용)
-// Redis trade_records 스트림은 10일 핫 데이터만 보존 — 장기본은 News_scrap persist.py가
+// Redis trade_records 스트림은 40일(2026-09-15 이전 10일) 핫 데이터만 보존 — 장기본은 News_scrap persist.py가
 // Supabase trade_records 테이블에 저장 (5월~, 전략 라벨 백필 완료분 포함).
 import { createClient } from "@supabase/supabase-js";
 import type { NextApiRequest, NextApiResponse } from "next";
@@ -47,6 +47,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     "signal_ns:raw_json->>signal_ns," +
                     "ts_ms:raw_json->>ts_ms," +
                     "entry_price:raw_json->>entry_price," +
+                    // 신호 조인용 id + 수수료 차감 실현손익(Redis trade_records와 동일 필드) —
+                    // 앱 이번달/지난달 전적이 Redis 핫 범위 밖 청산의 금액을 여기서 폴백(2026-09-15)
+                    "signal_id:raw_json->>signal_id," +
+                    "exit_signal_id:raw_json->>exit_signal_id," +
+                    "pnl_usdt:raw_json->>pnl_usdt," +
                     "pnl_pct:raw_json->source_signal->>pnl_pct"
                 )
                 .gte("day", from)
