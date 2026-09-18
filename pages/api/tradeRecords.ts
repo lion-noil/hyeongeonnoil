@@ -251,6 +251,24 @@ export async function GET(req: Request): Promise<Response> {
     const ns = safeNs(searchParams.get("ns") || DEFAULT_NS);
     const keyStream = `trading:${ns}:trade_records`;
 
+    // 정정값 오버레이(2026-09-18): MT5 청산 pnl_usdt 가 (가격차×랏수)로 기록돼 계약크기·손익통화 환산이 빠졌던 결함의
+    // 과거분 백필. 스트림은 제자리 수정이 안 되므로 `${keyStream}:override` 해시(field=스트림 entry id,
+    // value=JSON 부분필드)를 레코드에 덮어쓴다 — 생산자: tradingBot/tools/backfill_mt5_pnl.py
+    let overrides: Record<string, Record<string, any>> = {};
+    try {
+      const h = (await redis.hgetall<Record<string, any>>(`${keyStream}:override`)) || {};
+      for (const [k, v] of Object.entries(h)) {
+        try {
+          const o = typeof v === "string" ? JSON.parse(v) : v;
+          if (o && typeof o === "object") overrides[k] = o as Record<string, any>;
+        } catch {
+          /* skip malformed */
+        }
+      }
+    } catch {
+      overrides = {};
+    }
+
     const symbolParam = toUpperOrUndef(searchParams.get("symbol"));
     const sideParam = toUpperOrUndef(searchParams.get("side"));
     const kindParam = toUpperOrUndef(searchParams.get("kind"));
@@ -351,6 +369,8 @@ export async function GET(req: Request): Promise<Response> {
     for (const ent of entriesArr) {
       const id = ent.id;
       const msg = parseStreamEntryValue(ent.message);
+      const ov = overrides[id];
+      if (ov) Object.assign(msg, ov);  // 백필 정정값(pnl_usdt 등)이 원본 필드를 덮음 → 아래 resolve가 그대로 사용
 
       const symbol = msg.symbol ? String(msg.symbol).toUpperCase() : undefined;
       const side = msg.side ? String(msg.side).toUpperCase() : undefined;
