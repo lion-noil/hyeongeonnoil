@@ -13,6 +13,7 @@ const navItems = [
   { path: "/coin", label: "코인", emoji: "🪙" },
   { path: "/cfd", label: "CFD", emoji: "💹" },
   { path: "/archive", label: "아카이브", emoji: "🗂️" },
+  { path: "/reports", label: "보고서", emoji: "📑" },
   { path: "/updates", label: "업데이트", emoji: "🛠️" },
   { path: "/others", label: "기타", emoji: "🔧" },
 ];
@@ -74,6 +75,16 @@ const CONTACT_EMAIL = ["kiolswqa0987", "gmail.com"].join("@");
 export default function SiteLayout({ children }) {
   const currentTime = useCurrentTime();
   const isMobile = useIsMobile();
+  const { query } = useRouter();
+
+  // 앱 WebView 임베드(?embed=1): 내비·헤더·푸터 없이 본문만 (보고서 상세 등)
+  if (String(query?.embed || "") === "1") {
+    return (
+      <div style={{ backgroundColor: "#1a1a1a", minHeight: "100vh", color: "#fff", fontFamily: "Arial, sans-serif" }}>
+        <main style={{ padding: 0 }}>{children}</main>
+      </div>
+    );
+  }
 
   return (
     <div style={{ backgroundColor: "#1a1a1a", minHeight: "100vh", color: "#fff", fontFamily: "Arial, sans-serif" }}>

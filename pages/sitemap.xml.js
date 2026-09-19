@@ -2,7 +2,7 @@
 import { listAllDays } from "../src/lib/archiveDb";
 
 const SITE = "https://hyeongeonnoil.com";
-const STATIC_PATHS = ["", "/exchange", "/indexes", "/commodity", "/coin", "/cfd", "/archive", "/updates", "/others", "/privacy"];
+const STATIC_PATHS = ["", "/exchange", "/indexes", "/commodity", "/coin", "/cfd", "/archive", "/reports", "/updates", "/others", "/privacy"];
 
 export async function getServerSideProps({ res }) {
   let days = [];
