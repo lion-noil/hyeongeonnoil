@@ -5,6 +5,7 @@ import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { getReport, listReports, slugToId, KIND_KO } from "../../src/lib/reportsDb";
+import WeeklyReportView from "../../src/components/WeeklyReportView";
 
 const box = { maxWidth: 900, margin: "0 auto", padding: "8px 16px 40px", color: "#eee" };
 const card = { background: "#242424", borderRadius: 10, padding: "16px 18px", marginBottom: 16, overflowX: "auto" };
@@ -64,11 +65,28 @@ export default function ReportDetailPage({ report, prev, next }) {
         {"  ·  "}{kindKo} · {report.label} · 생성 {fmtTs(report.generated_at)}
       </p>
 
-      <article style={card}>
-        <ReactMarkdown remarkPlugins={[remarkGfm]} components={md}>
-          {report.md}
-        </ReactMarkdown>
-      </article>
+      {report.data?.cells ? (
+        <>
+          <h1 style={{ color: "#00bfff", fontSize: 22, margin: "4px 0 12px" }}>
+            {report.title}{report.data.partial ? <span style={{ color: "#ff9f5a", fontSize: 14 }}> · 진행중</span> : null}
+          </h1>
+          <WeeklyReportView data={report.data} />
+          <details style={{ marginTop: 16 }}>
+            <summary style={{ color: "#00ffcc", cursor: "pointer", fontSize: 14 }}>📄 전체 텍스트(마크다운) 보기</summary>
+            <article style={{ ...card, marginTop: 10 }}>
+              <ReactMarkdown remarkPlugins={[remarkGfm]} components={md}>
+                {report.md}
+              </ReactMarkdown>
+            </article>
+          </details>
+        </>
+      ) : (
+        <article style={card}>
+          <ReactMarkdown remarkPlugins={[remarkGfm]} components={md}>
+            {report.md}
+          </ReactMarkdown>
+        </article>
+      )}
 
       <nav style={{ display: "flex", justifyContent: "space-between", fontSize: 14 }}>
         <span>{prev && <Link href={`/reports/${prev.slug}`} style={{ color: "#00ffcc" }}>← {prev.title}</Link>}</span>

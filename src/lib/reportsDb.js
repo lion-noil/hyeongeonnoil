@@ -49,8 +49,8 @@ export async function listReports() {
   for (const v of Object.values(raw)) {
     const d = parse(v);
     if (!d || !KINDS.includes(d.kind) || !d.label) continue;
-    const { md, ...meta } = d;
-    out.push({ ...meta, slug: idToSlug(d.id), chars: (md || "").length });
+    const { md, data, ...meta } = d;   // 목록엔 본문(md)·구조화 데이터(data) 제외
+    out.push({ ...meta, slug: idToSlug(d.id), chars: (md || "").length, hasData: !!data });
   }
   return out.sort(sortMeta);
 }

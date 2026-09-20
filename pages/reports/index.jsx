@@ -48,7 +48,7 @@ export default function ReportsPage({ reports }) {
             <span style={{ color: "#00ffcc", fontSize: 16, fontWeight: 600 }}>{r.title}</span>
           </div>
           <div style={{ color: "#888", fontSize: 12, marginTop: 6 }}>
-            {r.label} · 생성 {fmtTs(r.generated_at)}
+            {r.subtitle ? `${r.subtitle} · ` : `${r.label} · `}생성 {fmtTs(r.generated_at)}
           </div>
         </Link>
       ))}
