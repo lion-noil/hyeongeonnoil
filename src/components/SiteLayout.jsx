@@ -7,6 +7,7 @@ import useIsMobile from "../hooks/useIsMobile";
 
 const navItems = [
   { path: "/", label: "홈", emoji: "🏠" },
+  { path: "/briefing", label: "시장 브리핑", emoji: "☀️" },
   { path: "/exchange", label: "환율, 채권", emoji: "💱" },
   { path: "/indexes", label: "지수", emoji: "📈" },
   { path: "/commodity", label: "원자재", emoji: "⛏️" },

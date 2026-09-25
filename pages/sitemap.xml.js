@@ -1,19 +1,27 @@
 // 동적 사이트맵 — 정적 라우트 + 아카이브 전 날짜 (구 public/sitemap.xml 대체)
 import { listAllDays } from "../src/lib/archiveDb";
+import { listBriefingDays } from "../src/lib/briefingDb";
 
 const SITE = "https://hyeongeonnoil.com";
-const STATIC_PATHS = ["", "/exchange", "/indexes", "/commodity", "/coin", "/cfd", "/archive", "/reports", "/updates", "/others", "/privacy"];
+const STATIC_PATHS = ["", "/briefing", "/exchange", "/indexes", "/commodity", "/coin", "/cfd", "/archive", "/reports", "/updates", "/others", "/privacy"];
 
 export async function getServerSideProps({ res }) {
   let days = [];
+  let briefingDays = [];
   try {
     days = await listAllDays();
   } catch {
     // DB 오류 시에도 정적 경로는 내보냄
   }
+  try {
+    briefingDays = await listBriefingDays();
+  } catch {
+    // Redis 오류 시 브리핑 항목만 생략
+  }
 
   const urls = [
     ...STATIC_PATHS.map((p) => `  <url><loc>${SITE}${p}</loc></url>`),
+    ...briefingDays.map((d) => `  <url><loc>${SITE}/briefing/${d}</loc><lastmod>${d}</lastmod></url>`),
     ...days.map((d) => `  <url><loc>${SITE}/archive/${d}</loc><lastmod>${d}</lastmod></url>`),
   ];
 

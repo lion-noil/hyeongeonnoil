@@ -1,5 +1,6 @@
 // RSS 피드 — 네이버 서치어드바이저 제출용 + 일반 구독
 import { getRecentDays } from "../src/lib/archiveDb";
+import { listBriefings } from "../src/lib/briefingDb";
 
 const SITE = "https://hyeongeonnoil.com";
 
@@ -18,11 +19,32 @@ const esc = (s) =>
 
 export async function getServerSideProps({ res }) {
   let days = [];
+  let briefings = [];
   try {
     days = await getRecentDays(20);
   } catch {
     // DB 오류 시 빈 피드로 응답 (500 대신)
   }
+  try {
+    briefings = await listBriefings(20);
+  } catch {
+    // Redis 오류 시 브리핑 항목만 생략
+  }
+
+  // 시장 브리핑(아침 7시 발행)을 먼저, 그 뒤 날짜별 뉴스 요약
+  const briefingItems = briefings
+    .map(({ day, title, lead }) => {
+      const link = `${SITE}/briefing/${day}`;
+      const pubDate = new Date(`${day}T07:00:00+09:00`).toUTCString();
+      return `  <item>
+    <title>${esc(title)}</title>
+    <link>${link}</link>
+    <guid isPermaLink="true">${link}</guid>
+    <pubDate>${pubDate}</pubDate>
+    <description>${esc(lead)}</description>
+  </item>`;
+    })
+    .join("\n");
 
   const items = days
     .map(({ day, countries, excerpt }) => {
@@ -44,11 +66,12 @@ export async function getServerSideProps({ res }) {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 <channel>
-  <title>NewsInsight — 날짜별 세계 뉴스 요약</title>
-  <link>${SITE}/archive</link>
+  <title>NewsInsight — 시장 브리핑·세계 뉴스 요약</title>
+  <link>${SITE}/briefing</link>
   <atom:link href="${SITE}/rss.xml" rel="self" type="application/rss+xml" />
-  <description>미국·중국·일본·한국 등 주요국 뉴스 방송을 매일 요약합니다.</description>
+  <description>매일 아침 환율·금리·증시·원자재 시세와 세계 뉴스를 한 편으로 정리하고, 주요국 뉴스 방송을 날짜별로 요약합니다.</description>
   <language>ko</language>
+${briefingItems}
 ${items}
 </channel>
 </rss>`;
