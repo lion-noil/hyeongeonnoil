@@ -2,7 +2,8 @@
 // ISR 10분: 보고서는 매월 1일 07:30(월간) 등 드물게 갱신됨. 원천 = Upstash trading:reports
 import Head from "next/head";
 import Link from "next/link";
-import { listReports, KIND_KO } from "../../src/lib/reportsDb";
+import { listReports, getReport, KIND_KO } from "../../src/lib/reportsDb";
+import PerfView from "../../src/components/PerfView";
 
 const box = { maxWidth: 780, margin: "0 auto", padding: "8px 16px 40px", color: "#eee" };
 const card = { background: "#242424", borderRadius: 10, padding: "14px 18px", marginBottom: 12, display: "block", textDecoration: "none", color: "#eee" };
@@ -18,7 +19,7 @@ function fmtTs(iso) {
   return `${s.slice(0, 10)} ${s.slice(11, 16)}`;
 }
 
-export default function ReportsPage({ reports }) {
+export default function ReportsPage({ reports, perf }) {
   return (
     <div style={box}>
       <Head>
@@ -37,6 +38,9 @@ export default function ReportsPage({ reports }) {
         판정 원칙: 1개월 표본은 노이즈 — 🔴 2개월 연속 또는 백테스트 최악연도 초과 시에만 파라미터 재검토.
       </p>
 
+      {perf?.data && <PerfView data={perf.data} compact />}
+
+      <h2 style={{ color: "#00ffcc", fontSize: 17, margin: "18px 0 8px" }}>보고서</h2>
       {!reports.length && (
         <div style={{ ...card, color: "#999" }}>아직 발행된 보고서가 없습니다.</div>
       )}
@@ -58,8 +62,9 @@ export default function ReportsPage({ reports }) {
 
 export async function getStaticProps() {
   try {
-    return { props: { reports: await listReports() }, revalidate: 600 };
+    const [all, perf] = await Promise.all([listReports(), getReport("perf:latest").catch(() => null)]);
+    return { props: { reports: all.filter((r) => r.kind !== "perf"), perf: perf || null }, revalidate: 600 };
   } catch {
-    return { props: { reports: [] }, revalidate: 120 };
+    return { props: { reports: [], perf: null }, revalidate: 120 };
   }
 }

@@ -5,8 +5,8 @@
 import { Redis } from "@upstash/redis";
 
 export const REPORTS_KEY = "trading:reports";
-export const KINDS = ["monthly", "deep", "weekly"];
-export const KIND_KO = { monthly: "월간", deep: "월간 심층", weekly: "주간" };
+export const KINDS = ["perf", "monthly", "deep", "weekly"];
+export const KIND_KO = { perf: "성적표", monthly: "월간", deep: "월간 심층", weekly: "주간" };
 
 function client() {
   const url = process.env.UPSTASH_REDIS_REST_URL;
@@ -27,15 +27,16 @@ function parse(v) {
 
 // URL 슬러그 ↔ id.  슬러그 = "{kind}-{label}" (예: monthly-2026-08), id = "{kind}:{label}"
 export function slugToId(slug) {
-  const m = /^(monthly|deep|weekly)-([0-9A-Za-z-]{4,20})$/.exec(String(slug || ""));
+  const m = /^(perf|monthly|deep|weekly)-([0-9A-Za-z-]{4,20})$/.exec(String(slug || ""));
   return m ? `${m[1]}:${m[2]}` : null;
 }
 export function idToSlug(id) {
-  const m = /^(monthly|deep|weekly):([0-9A-Za-z-]{4,20})$/.exec(String(id || ""));
+  const m = /^(perf|monthly|deep|weekly):([0-9A-Za-z-]{4,20})$/.exec(String(id || ""));
   return m ? `${m[1]}-${m[2]}` : null;
 }
 
 function sortMeta(a, b) {
+  if ((a.kind === "perf") !== (b.kind === "perf")) return a.kind === "perf" ? -1 : 1; // 성적표는 항상 맨 위
   if (a.label !== b.label) return a.label < b.label ? 1 : -1; // 최신 라벨 먼저
   return KINDS.indexOf(a.kind) - KINDS.indexOf(b.kind);       // 같은 라벨: monthly→deep→weekly
 }
