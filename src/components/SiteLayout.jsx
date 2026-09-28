@@ -108,6 +108,9 @@ export default function SiteLayout({ children }) {
   useRevealObserver(pathname);
   useTiltCards();
 
+  // 앱 전용 임베드 페이지(/embed/*): 레이아웃 전부 없이 페이지만 (지구본 등 — 배경 투명)
+  if (pathname.startsWith("/embed/")) return <>{children}</>;
+
   // 앱 WebView 임베드(?embed=1): 내비·헤더·푸터·3D 없이 본문만 (보고서 상세 등)
   if (String(query?.embed || "") === "1") {
     return (
