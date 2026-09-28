@@ -2,9 +2,9 @@
 // 스키마: News_scrap/app/perf_report.py build()  { accounts:[{name,currency,months[],weeks[],recent8w,...}], target_month_pct }
 import Link from "next/link";
 
-const card = { background: "#242424", borderRadius: 10, padding: "14px 16px", marginBottom: 12 };
-const th = { textAlign: "left", padding: "4px 8px", color: "#9bd", fontSize: 12, borderBottom: "1px solid #444", whiteSpace: "nowrap" };
-const td = { padding: "4px 8px", fontSize: 13, borderBottom: "1px solid #2e2e2e", whiteSpace: "nowrap" };
+const card = { background: "var(--panel-2)", borderRadius: 10, padding: "14px 16px", marginBottom: 12 };
+const th = { textAlign: "left", padding: "4px 8px", color: "#9bd", fontSize: 12, borderBottom: "1px solid var(--line)", whiteSpace: "nowrap" };
+const td = { padding: "4px 8px", fontSize: 13, borderBottom: "1px solid var(--line)", whiteSpace: "nowrap" };
 
 const f = (v, d = 1) => (v == null ? "" : `${v > 0 ? "+" : ""}${Number(v).toFixed(d)}`);
 const money = (v, ccy) => (v == null ? "" : `${v > 0 ? "+" : ""}${Number(v).toFixed(v >= 100 || v <= -100 ? 0 : 2)} ${ccy}`);
@@ -15,7 +15,7 @@ function Bar({ pct, hit, scale }) {
   const color = pct >= 0 ? (hit ? "#00ffcc" : "#7fbfb5") : "#ff6b6b";
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 150 }}>
-      <div style={{ width: 90, height: 8, background: "#1a1a1a", borderRadius: 4, overflow: "hidden", position: "relative" }}>
+      <div style={{ width: 90, height: 8, background: "var(--panel)", borderRadius: 4, overflow: "hidden", position: "relative" }}>
         <div style={{ position: "absolute", left: pct >= 0 ? "50%" : `${50 - w / 2}%`, width: `${w / 2}%`, height: "100%", background: color }} />
         <div style={{ position: "absolute", left: "50%", width: 1, height: "100%", background: "#555" }} />
       </div>

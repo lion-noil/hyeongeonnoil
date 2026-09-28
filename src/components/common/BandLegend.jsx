@@ -23,7 +23,7 @@ export default function BandLegend({ mode = "1m" }) {
             style={{
                 display: "flex", flexWrap: "wrap", gap: 14, alignItems: "center",
                 padding: "8px 12px", marginBottom: 12,
-                background: "#141414", border: "1px solid #262626", borderRadius: 10,
+                background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 10,
             }}
         >
             <span style={{ fontSize: 11.5, fontWeight: 900, color: "#888" }}>

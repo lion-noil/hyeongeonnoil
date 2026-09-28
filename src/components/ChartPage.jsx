@@ -38,12 +38,12 @@ const ChartPage = ({ chartType, title, envelop }) => {
     };
   }, [updateGridColumns]);
 
-  if (loading) return <p>📊 로딩 중...</p>;
+  if (loading) return <p style={{ textAlign: "center", color: "var(--muted)", padding: 60 }}>시세 불러오는 중…</p>;
   if (error) return <p>❌ {error}</p>;
 
   return (
 
-    <div style={{ padding: isMobile ? "12px 8px" : "40px", color: "#fff", backgroundColor: "#111", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "12px 8px" : "40px", color: "#fff", background: "transparent", minHeight: "60vh" }}>
       <h1 style={{ color: "#00ffcc", fontSize: isMobile ? 22 : undefined }}>{title}</h1>
 
       <div
@@ -62,6 +62,7 @@ const ChartPage = ({ chartType, title, envelop }) => {
   return (
     <div
       key={index.label}
+      className="reveal tilt"
       style={{
         backgroundColor: "transparent",
         padding: isMobile ? "4px 0" : "20px",

@@ -11,7 +11,7 @@ const COUNTRY_KO = {
 };
 
 const box = { maxWidth: 780, margin: "0 auto", padding: "8px 16px 40px", color: "#eee" };
-const card = { background: "#242424", borderRadius: 10, padding: "16px 18px", marginBottom: 16 };
+const card = { background: "var(--panel-2)", borderRadius: 10, padding: "16px 18px", marginBottom: 16 };
 
 export default function ArchiveDayPage({ day, countries, prevDay, nextDay }) {
   const [y, m, d] = day.split("-");

@@ -50,7 +50,7 @@ export default function AssetPanel({asset, statsBySymbol, config, walletCcy = "U
                 zIndex: 10,
                 padding: 14,
                 borderRadius: 14,
-                background: "#1a1a1a",
+                background: "var(--panel)",
                 marginBottom: 14,
             }}
         >

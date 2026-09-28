@@ -115,7 +115,7 @@ const navStyle = {
   justifyContent: "center",
   gap: "10px",
   padding: "20px",
-  backgroundColor: "#222",
+  backgroundColor: "var(--panel-2)",
 };
 
 const linkStyle = {
@@ -124,7 +124,7 @@ const linkStyle = {
   borderRadius: "8px",
   textDecoration: "none",
   color: "#00ffcc",
-  border: "1px solid #444",
+  border: "1px solid var(--line)",
   transition: "all 0.2s ease-in-out",
 };
 

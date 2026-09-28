@@ -73,7 +73,7 @@ function OverlayLabel({ label: l }) {
                             padding: "8px 10px",
                             borderRadius: 10,
                             background: "rgba(10,10,10,0.97)",
-                            border: "1px solid #333",
+                            border: "1px solid var(--line)",
                             color: "#fff",
                             fontSize: 12,
                             fontWeight: 800,
@@ -633,9 +633,9 @@ export default function ChartView({
             width: initialW,
             height: initialH,
             autoSize: false,
-            layout: { background: { color: "#111" }, textColor: "#ddd" },
+            layout: { background: { color: "#0a0f22" }, textColor: "#c7cdea", fontFamily: "Pretendard Variable, Pretendard, sans-serif" },
             grid: {
-                vertLines: { color: "rgba(255,255,255,0.06)" }, horzLines: { color: "rgba(255,255,255,0.06)" },
+                vertLines: { color: "rgba(148,163,255,0.07)" }, horzLines: { color: "rgba(148,163,255,0.07)" },
             },
             timeScale: {
                 timeVisible: true,
@@ -932,7 +932,7 @@ export default function ChartView({
                 height,
                 borderRadius: 12,
                 overflow: "hidden",
-                background: "#111",
+                background: "var(--chart-bg)",
             }}
         >
             <div
@@ -945,7 +945,7 @@ export default function ChartView({
                     height,
                     borderRadius: 12,
                     overflow: "hidden",
-                    background: "#111",
+                    background: "var(--chart-bg)",
                     zIndex: 1,
                 }}
             />

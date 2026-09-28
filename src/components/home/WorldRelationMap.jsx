@@ -301,7 +301,7 @@ function DetailPanel({ name, weekHols, states, rels, sources }) {
 
         {/* 점수 근거 */}
         {scoreBasis.text && (
-          <div style={{ marginTop:8, padding:"7px 9px", background:"#0b1522", borderRadius:7, border:"1px solid #14202e" }}>
+          <div style={{ marginTop:8, padding:"7px 9px", background: "var(--panel)", borderRadius:7, border:"1px solid #14202e" }}>
             <div style={{ fontSize:9, color:"#445566", marginBottom:4 }}>📊 점수 근거</div>
             <div style={{ fontSize:10, color:"#90a4bc", lineHeight:1.5 }}>{scoreBasis.text}</div>
             {scoreBasis.dates.length > 0 && (
@@ -311,7 +311,7 @@ function DetailPanel({ name, weekHols, states, rels, sources }) {
         )}
 
         {/* 이번 주 공휴일 (실데이터만) */}
-        <div style={{ marginTop:8, padding:"8px 10px", background:"#0b1522", borderRadius:7, border:"1px solid #18263a" }}>
+        <div style={{ marginTop:8, padding:"8px 10px", background: "var(--panel)", borderRadius:7, border:"1px solid #18263a" }}>
           <div style={{ fontSize:10, color:"#445566", marginBottom:6, letterSpacing:".5px" }}>🗓 이번 주 공휴일</div>
           {hols.length === 0 ? (
             <div style={{ fontSize:10, color:"#2e3e4e" }}>— 공휴일 없음</div>
@@ -355,7 +355,7 @@ function DetailPanel({ name, weekHols, states, rels, sources }) {
             <div key={i} style={{
               fontSize:11, color:"#b0c4dc",
               padding:"7px 10px", marginBottom:6,
-              background:"#0b1522", borderRadius:7,
+              background: "var(--panel)", borderRadius:7,
               borderLeft:`3px solid ${mc}`,
             }}>
               <span style={{ fontSize:9, color:"#2a3a48", marginRight:6 }}>0{i + 1}</span>{it.text}
@@ -374,7 +374,7 @@ function DetailPanel({ name, weekHols, states, rels, sources }) {
           return (
             <div key={i} style={{
               padding:"6px 10px", marginBottom:5,
-              background:"#0b1522", borderRadius:7,
+              background: "var(--panel)", borderRadius:7,
             }}>
               <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                 <span style={{ fontSize:18 }}>{FLAGS[other]}</span>

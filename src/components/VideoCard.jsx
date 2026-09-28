@@ -17,10 +17,10 @@ const VideoCard = ({ country, video }) => {
   return (
     <div
       style={{
-        border: "1px solid #333",
+        border: "1px solid var(--line)",
         padding: "15px",
         borderRadius: "10px",
-        backgroundColor: "#2a2a2a",
+        backgroundColor: "var(--panel-2)",
         boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.3)",
         width: "320px",
         textAlign: "left",

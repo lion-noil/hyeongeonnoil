@@ -6,7 +6,7 @@ import { listReports, getReport, KIND_KO } from "../../src/lib/reportsDb";
 import PerfView from "../../src/components/PerfView";
 
 const box = { maxWidth: 780, margin: "0 auto", padding: "8px 16px 40px", color: "#eee" };
-const card = { background: "#242424", borderRadius: 10, padding: "14px 18px", marginBottom: 12, display: "block", textDecoration: "none", color: "#eee" };
+const card = { background: "var(--panel-2)", borderRadius: 10, padding: "14px 18px", marginBottom: 12, display: "block", textDecoration: "none", color: "#eee" };
 const badge = (kind) => ({
   display: "inline-block", fontSize: 12, padding: "2px 8px", borderRadius: 6, marginRight: 8,
   color: kind === "weekly" ? "#ffd479" : kind === "deep" ? "#c7a2ff" : "#00ffcc",

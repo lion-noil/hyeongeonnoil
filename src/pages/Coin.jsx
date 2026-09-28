@@ -39,8 +39,8 @@ function CopyTradingInfoBanner({ startDate, startUsdt, equityUsdt }) {
         gap: 8,
         padding: "6px 10px",
         borderRadius: 999,
-        background: "#1a1a1a",
-        border: "1px solid #2a2a2a",
+        background: "var(--panel)",
+        border: "1px solid var(--line)",
         fontSize: 12,
         opacity: 0.95,
         whiteSpace: "nowrap",
@@ -50,7 +50,7 @@ function CopyTradingInfoBanner({ startDate, startUsdt, equityUsdt }) {
         padding: 18,
         borderRadius: 16,
         background: "linear-gradient(135deg, rgba(0,255,204,0.15), rgba(0,0,0,0))",
-        border: "1px solid #2a2a2a",
+        border: "1px solid var(--line)",
         boxShadow: "0 8px 24px rgba(0,0,0,0.35)",
         width: "100%",
         boxSizing: "border-box",
@@ -155,8 +155,8 @@ function TradingLogicTabs() {
     const wrapStyle = {
         padding: 16,
         borderRadius: 16,
-        background: "#151515",
-        border: "1px solid #2a2a2a",
+        background: "var(--panel)",
+        border: "1px solid var(--line)",
         boxShadow: "0 8px 24px rgba(0,0,0,0.35)",
         width: "100%",
         boxSizing: "border-box",
@@ -263,8 +263,8 @@ function TradingLogicFloatingButton() {
                             maxHeight: "88vh",
                             overflowY: "auto",
                             borderRadius: 18,
-                            background: "#111",
-                            border: "1px solid #2a2a2a",
+                            background: "var(--panel)",
+                            border: "1px solid var(--line)",
                             boxShadow: "0 20px 60px rgba(0,0,0,0.65)",
                         }}
                     >
@@ -279,7 +279,7 @@ function TradingLogicFloatingButton() {
                                 gap: 12,
                                 padding: "12px 14px",
                                 background: "rgba(17,17,17,0.94)",
-                                borderBottom: "1px solid #2a2a2a",
+                                borderBottom: "1px solid var(--line)",
                                 backdropFilter: "blur(8px)",
                             }}
                         >
@@ -291,8 +291,8 @@ function TradingLogicFloatingButton() {
                                 type="button"
                                 onClick={() => setOpen(false)}
                                 style={{
-                                    border: "1px solid #333",
-                                    background: "#1a1a1a",
+                                    border: "1px solid var(--line)",
+                                    background: "var(--panel)",
                                     color: "#fff",
                                     borderRadius: 10,
                                     padding: "7px 10px",
@@ -325,8 +325,8 @@ function MiniLogicChart({ title, lines = [], points = [], note }) {
                 marginTop: 12,
                 padding: 12,
                 borderRadius: 14,
-                background: "#0f0f0f",
-                border: "1px solid #282828",
+                background: "var(--panel)",
+                border: "1px solid var(--line)",
                 overflow: "hidden",
             }}
         >
@@ -392,8 +392,8 @@ const LBOX = {
     marginTop: 8,
     padding: 10,
     borderRadius: 12,
-    background: "#101010",
-    border: "1px solid #2a2a2a",
+    background: "var(--panel)",
+    border: "1px solid var(--line)",
     fontSize: 12,
     lineHeight: 1.7,
 };
@@ -418,8 +418,8 @@ const LADD = {
 };
 
 function LogicOverviewTab() {
-    const cell = { padding: "8px 10px", borderBottom: "1px solid #222", fontSize: 12, verticalAlign: "top" };
-    const head = { ...cell, fontWeight: 900, color: "#00ffcc", borderBottom: "1px solid #2a2a2a" };
+    const cell = { padding: "8px 10px", borderBottom: "1px solid var(--line)", fontSize: 12, verticalAlign: "top" };
+    const head = { ...cell, fontWeight: 900, color: "#00ffcc", borderBottom: "1px solid var(--line)" };
     return (
         <div style={{ fontSize: 13, lineHeight: 1.7 }}>
             <div style={{ fontWeight: 900, marginBottom: 6 }}>전략 체계 — S11 「1분봉책」 · S22 「4시간봉책」 · S33 「일봉책」</div>
@@ -589,7 +589,7 @@ const LIVE_GROUPS = [
 ];
 
 function LogicLiveTab() {
-    const cell = { padding: "5px 7px", borderBottom: "1px solid #222", fontSize: 11, verticalAlign: "top" };
+    const cell = { padding: "5px 7px", borderBottom: "1px solid var(--line)", fontSize: 11, verticalAlign: "top" };
     const head = { ...cell, fontWeight: 900, color: "#00ffcc", whiteSpace: "nowrap" };
 
     const ZCell = ({ s }) => {
@@ -630,7 +630,7 @@ function LogicLiveTab() {
                         {LIVE_GROUPS.map((g) => (
                             <React.Fragment key={g.group}>
                                 <tr>
-                                    <td colSpan={6} style={{ ...cell, fontWeight: 900, color: "#00ffcc", background: "#0f0f0f", fontSize: 11.5 }}>
+                                    <td colSpan={6} style={{ ...cell, fontWeight: 900, color: "#00ffcc", background: "var(--panel)", fontSize: 11.5 }}>
                                         {g.group}
                                     </td>
                                 </tr>
@@ -959,16 +959,16 @@ export default function Coin() {
 
     /* ------------------------- UI ------------------------- */
     if (!configLoaded) {
-        return (<div style={{ padding: 24, color: "#fff", background: "#111", minHeight: "100vh" }}>
+        return (<div style={{ padding: 24, color: "#fff", background: "transparent", minHeight: "60vh" }}>
             <div style={{ opacity: 0.85 }}>config 로딩중...</div>
         </div>);
     }
 
     if (!symbolsReady) {
-        return (<div style={{ padding: 24, color: "#fff", background: "#111", minHeight: "100vh" }}>
+        return (<div style={{ padding: 24, color: "#fff", background: "transparent", minHeight: "60vh" }}>
             <div
                 style={{
-                    padding: 14, borderRadius: 12, background: "#1a1a1a", border: "1px solid #2a2a2a", lineHeight: 1.6,
+                    padding: 14, borderRadius: 12, background: "var(--panel)", border: "1px solid var(--line)", lineHeight: 1.6,
                 }}
             >
                 심볼 목록을 불러오지 못했어요.
@@ -986,13 +986,13 @@ export default function Coin() {
     // 초대 링크 제거됨 (2026-09-01) — 상단 CopyTradingInfoBanner 주석 참조. 원복은 해당 커밋 revert.
     const startDate = "2026-02-01";
 
-    return (<div style={{ padding: isMobile ? 8 : 24, color: "#fff", background: "#111", minHeight: "100vh" }}>
+    return (<div style={{ padding: isMobile ? 8 : 24, color: "#fff", background: "transparent", minHeight: "60vh" }}>
         <div
             style={{
                 maxWidth: PAGE_MAX_W,
                 margin: "0 auto",
                 overflowX: isMobile ? "visible" : "auto",
-                background: "#111",
+                background: "var(--panel)",
             }}
         >
             <div style={{ minWidth: isMobile ? 0 : MIN_MAIN }}>
@@ -1057,7 +1057,7 @@ export default function Coin() {
                                 style={{
                                     padding: "14px 16px",
                                     borderRadius: 14,
-                                    background: "#1a1a1a",
+                                    background: "var(--panel)",
                                     marginBottom: 14,
                                     boxShadow: "0 8px 24px rgba(0,0,0,0.35)",
                                 }}

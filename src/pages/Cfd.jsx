@@ -232,16 +232,16 @@ export default function Cfd() {
 
     /* ------------------------- UI ------------------------- */
     if (!configLoaded) {
-        return (<div style={{padding: 24, color: "#fff", background: "#111", minHeight: "100vh"}}>
+        return (<div style={{padding: 24, color: "#fff", background: "transparent", minHeight: "60vh"}}>
             <div style={{opacity: 0.85}}>config 로딩중...</div>
         </div>);
     }
 
     if (!symbolsReady) {
-        return (<div style={{padding: 24, color: "#fff", background: "#111", minHeight: "100vh"}}>
+        return (<div style={{padding: 24, color: "#fff", background: "transparent", minHeight: "60vh"}}>
             <div
                 style={{
-                    padding: 14, borderRadius: 12, background: "#1a1a1a", border: "1px solid #2a2a2a", lineHeight: 1.6,
+                    padding: 14, borderRadius: 12, background: "var(--panel)", border: "1px solid var(--line)", lineHeight: 1.6,
                 }}
             >
                 loading...
@@ -254,14 +254,14 @@ export default function Cfd() {
     const GAP = 24;
     const MIN_MAIN = MIN_LEFT + MIN_RIGHT + GAP; // ✅ main 최소폭
     return (
-        <div style={{padding: isMobile ? 8 : 24, color: "#fff", background: "#111", minHeight: "100vh"}}>
+        <div style={{padding: isMobile ? 8 : 24, color: "#fff", background: "transparent", minHeight: "60vh"}}>
             {/* ✅ Coin처럼: maxWidth + overflowX + 내부 minWidth */}
             <div
                 style={{
                     maxWidth: PAGE_MAX_W,
                     margin: "0 auto",
                     overflowX: isMobile ? "visible" : "auto",
-                    background: "#111",
+                    background: "var(--panel)",
                 }}
             >
                 <div style={{minWidth: isMobile ? 0 : MIN_MAIN}}>
@@ -318,7 +318,7 @@ export default function Cfd() {
                                     style={{
                                         padding: "14px 16px",
                                         borderRadius: 14,
-                                        background: "#1a1a1a",
+                                        background: "var(--panel)",
                                         marginBottom: 14,
                                         boxShadow: "0 8px 24px rgba(0,0,0,0.35)",
                                     }}

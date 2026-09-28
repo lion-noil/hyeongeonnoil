@@ -8,7 +8,7 @@ function Layout() {
   const isMobile = useIsMobile();
 
   return (
-    <div style={{ backgroundColor: "#1a1a1a", minHeight: "100vh", color: "#fff", fontFamily: "Arial, sans-serif" }}>
+    <div style={{ background: "transparent", minHeight: "60vh", color: "#fff", fontFamily: "Arial, sans-serif" }}>
       {/* 공통 헤더 */}
       <header style={{ textAlign: "center", padding: isMobile ? "10px 8px" : "20px" }}>
         <h1 style={{ marginBottom: isMobile ? 4 : "10px", color: "#00bfff", fontSize: isMobile ? 22 : undefined }}>
@@ -30,7 +30,7 @@ function Layout() {
         style={{
           textAlign: "center",
           padding: isMobile ? "20px 12px 28px" : "28px 20px 36px",
-          borderTop: "1px solid #2a2a2a",
+          borderTop: "1px solid var(--line)",
           color: "#888",
           fontSize: isMobile ? 12 : 13,
           lineHeight: 1.7,

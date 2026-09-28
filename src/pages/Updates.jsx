@@ -30,7 +30,7 @@ export default function Updates() {
   const notes = [...UPDATE_NOTES].sort((a, b) => String(b.date).localeCompare(String(a.date)));
 
   return (
-    <div style={{ padding: isMobile ? "12px 8px" : "40px", color: "#fff", backgroundColor: "#111", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "12px 8px" : "40px", color: "#fff", background: "transparent", minHeight: "60vh" }}>
       <h1 style={{ color: "#00ffcc", fontSize: isMobile ? 22 : undefined }}>🛠 전략 업데이트 기록</h1>
       <p style={{ fontSize: 13, opacity: 0.65, marginTop: 4 }}>
         트레이딩봇 전략 변경 이력 — 최신순. 현재 라이브: <b>S11 1분봉책</b> · <b>S22 4시간봉책</b> · <b>S33 일봉책</b>.
@@ -42,7 +42,7 @@ export default function Updates() {
             key={n.date + n.title}
             style={{
               padding: "14px 16px", borderRadius: 14,
-              background: "#171717", border: "1px solid #262626",
+              background: "#171717", border: "1px solid var(--line)",
               boxShadow: "0 6px 18px rgba(0,0,0,0.3)",
             }}
           >
@@ -122,7 +122,7 @@ export default function Updates() {
                             style={{
                               padding: "5px 8px", textAlign: "left", fontSize: 11.5,
                               color: "#00ffcc", fontWeight: 900,
-                              borderBottom: "1px solid #2a2a2a", whiteSpace: "nowrap",
+                              borderBottom: "1px solid var(--line)", whiteSpace: "nowrap",
                             }}
                           >
                             {h}
@@ -138,7 +138,7 @@ export default function Updates() {
                               key={ci}
                               style={{
                                 padding: "5px 8px", fontSize: 12, color: "#cfd6df",
-                                borderBottom: "1px solid #1f1f1f", verticalAlign: "top",
+                                borderBottom: "1px solid var(--line)", verticalAlign: "top",
                                 fontWeight: ci === 0 ? 800 : 400,
                                 whiteSpace: ci === 0 ? "nowrap" : "normal",
                               }}

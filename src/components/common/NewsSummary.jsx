@@ -97,10 +97,10 @@ function SummaryItem({ item, index }) {
   return (
     <div
       style={{
-        border: "1px solid #3a3a3a",
+        border: "1px solid var(--line)",
         borderRadius: "8px",
         marginBottom: "6px",
-        backgroundColor: "#222",
+        backgroundColor: "var(--panel-2)",
         overflow: "hidden",
       }}
     >

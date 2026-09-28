@@ -85,7 +85,7 @@ export default function GlobalBriefingCard({ briefing }) {
         margin: "0 auto 24px",
         padding: "16px 18px",
         borderRadius: 14,
-        background: "#111823",
+        background: "var(--panel)",
         border: "1px solid #1f2c3f",
         boxShadow: "0 8px 24px rgba(0,0,0,0.35)",
       }}
@@ -110,7 +110,7 @@ export default function GlobalBriefingCard({ briefing }) {
                 style={{
                   flex: "0 0 auto",
                   width: 22, height: 22, borderRadius: 999,
-                  background: "#1c2a3f", color: "#7fb3e8",
+                  background: "var(--panel-2)", color: "#7fb3e8",
                   fontSize: 12, fontWeight: 900,
                   display: "flex", alignItems: "center", justifyContent: "center",
                   marginTop: 1,

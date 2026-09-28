@@ -29,7 +29,7 @@ export default function BriefingIndex({ items }) {
       </p>
       {!items.length && <p style={{ color: "#888" }}>첫 브리핑은 다음 거래일 아침에 올라옵니다.</p>}
       {items.map((it) => (
-        <article key={it.day} style={{ background: "#242424", borderRadius: 10, padding: "14px 18px", marginBottom: 12 }}>
+        <article key={it.day} style={{ background: "var(--panel-2)", borderRadius: 10, padding: "14px 18px", marginBottom: 12 }}>
           <p style={{ color: "#999", fontSize: 12, margin: "0 0 4px" }}>{kdate(it.day)} · 시세 기준 {it.data_date} 종가</p>
           <h2 style={{ fontSize: 18, margin: "0 0 6px", lineHeight: 1.4 }}>
             <Link href={`/briefing/${it.day}`} style={{ color: "#00ffcc", textDecoration: "none" }}>

@@ -293,8 +293,8 @@ export default function ArchiveChartView({
             style={{
                 height,
                 borderRadius: 12,
-                border: "1px solid #333",
-                background: "#111",
+                border: "1px solid var(--line)",
+                background: "var(--chart-bg)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -307,7 +307,7 @@ export default function ArchiveChartView({
 
     return (<div
         style={{
-            borderRadius: 12, border: "1px solid #333", background: "#111", overflow: "hidden",
+            borderRadius: 12, border: "1px solid var(--line)", background: "var(--chart-bg)", overflow: "hidden",
         }}
     >
         <div
@@ -315,7 +315,7 @@ export default function ArchiveChartView({
                 padding: "8px 10px",
                 fontSize: 12,
                 color: "#aaa",
-                borderBottom: "1px solid #222",
+                borderBottom: "1px solid var(--line)",
                 display: "flex",
                 justifyContent: "space-between",
                 gap: 12,

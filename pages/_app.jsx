@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import SiteLayout from "../src/components/SiteLayout";
+import "../src/styles/globals.css";
 import { initGA, trackPageview, trackEvent } from "../src/lib/ga";
 
 export default function MyApp({ Component, pageProps }) {

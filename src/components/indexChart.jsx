@@ -150,8 +150,8 @@ function IndexChart({ processedData, dataName, envelope }) {
       padding: "6px 10px",
       color,
       backgroundColor: background || undefined,
-      borderRight: border ? "2px solid #444" : undefined,
-      borderBottom: "2px solid #444",
+      borderRight: border ? "2px solid var(--line)" : undefined,
+      borderBottom: "2px solid var(--line)",
       textAlign: align,
       display: "flex",
       alignItems: "center",
@@ -180,7 +180,7 @@ function IndexChart({ processedData, dataName, envelope }) {
 
   return (
     <div style={{
-      background: "#222",
+      background: "var(--panel-2)",
       padding: "20px",
       borderRadius: "12px",
       color: "#fff",
@@ -305,7 +305,7 @@ function IndexChart({ processedData, dataName, envelope }) {
       {customTooltip?.payload?.length > 0 && (
         <div style={{
           marginTop: "10px",
-          backgroundColor: "#333",
+          backgroundColor: "rgba(148,163,255,0.10)",
           padding: "10px",
           borderRadius: "8px",
           color: "#fff",
@@ -315,7 +315,7 @@ function IndexChart({ processedData, dataName, envelope }) {
             <div style={{
               marginBottom: "8px",
               paddingBottom: "8px",
-              borderBottom: "2px solid #555",
+              borderBottom: "2px solid var(--line)",
               fontWeight: "bold",
               textAlign: "center",
               fontSize: "16px"
@@ -327,7 +327,7 @@ function IndexChart({ processedData, dataName, envelope }) {
           <div style={{
             display: "grid",
             gridTemplateColumns: "auto 1fr auto 1fr",
-            border: "2px solid #444",
+            border: "2px solid var(--line)",
           }}>
             <Cell label="종가" color={customTooltip?.payload[0]?.color} border />
             <Cell value={safeFixed(customTooltip.payload[0]?.value)} align="right" border />
@@ -341,7 +341,7 @@ function IndexChart({ processedData, dataName, envelope }) {
                   ? customTooltip?.payload[2]?.color
                   : customTooltip?.payload[3]?.color
               }
-              background="#2a2a2a"
+              background="rgba(148,163,255,0.07)"
               border
             />
             <Cell
@@ -351,7 +351,7 @@ function IndexChart({ processedData, dataName, envelope }) {
                 return `${d > 0 ? "+" : ""}${d.toFixed(2)}`;
               })()}
               align="right"
-              background="#2a2a2a"
+              background="rgba(148,163,255,0.07)"
               color={
                 (customTooltip?.payload[0]?.value ?? 0) - (customTooltip?.payload[1]?.value ?? 0) > 0
                   ? customTooltip?.payload[2]?.color
@@ -369,7 +369,7 @@ function IndexChart({ processedData, dataName, envelope }) {
                   ? customTooltip?.payload[2]?.color
                   : customTooltip?.payload[3]?.color
               }
-              background="#2a2a2a"
+              background="rgba(148,163,255,0.07)"
               border
             />
             <Cell
@@ -381,7 +381,7 @@ function IndexChart({ processedData, dataName, envelope }) {
                 return `${pct > 0 ? "+" : ""}${pct.toFixed(2)}`;
               })()}
               align="right"
-              background="#2a2a2a"
+              background="rgba(148,163,255,0.07)"
               color={
                 (customTooltip?.payload[0]?.value ?? 0) - (customTooltip?.payload[1]?.value ?? 0) > 0
                   ? customTooltip?.payload[2]?.color

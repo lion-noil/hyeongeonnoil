@@ -26,7 +26,7 @@ export default function EntryStrategyChips({ entries, sigMap, fontSize = 10.5, o
             gap: 4,
             padding: "1px 7px",
             borderRadius: 999,
-            background: "#141414",
+            background: "var(--panel)",
             border: `1px solid ${g.color}55`,
             color: "#cfcfcf",
             fontSize,

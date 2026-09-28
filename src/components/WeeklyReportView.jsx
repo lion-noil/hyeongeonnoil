@@ -7,7 +7,7 @@ const ICON = { 점검: "🔧", 주의: "🟠", 관찰: "👀", 정상: "✅" };
 const GRADE_COLOR = { 점검: "#ffb347", 주의: "#ff7f50", 관찰: "#ffd479", 정상: "#00ffcc" };
 const ACCOUNT_KO = { BYBIT: "코인", MT5: "CFD" };
 
-const card = { background: "#242424", borderRadius: 10, padding: "14px 16px", marginBottom: 12 };
+const card = { background: "var(--panel-2)", borderRadius: 10, padding: "14px 16px", marginBottom: 12 };
 const chip = (on, color = "#00ffcc") => ({
   display: "inline-block", padding: "4px 10px", marginRight: 6, marginBottom: 6, borderRadius: 14, fontSize: 13,
   cursor: "pointer", userSelect: "none",

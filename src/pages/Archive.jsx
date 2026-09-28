@@ -31,8 +31,8 @@ function TradingArchivePanel({
             style={{
                 marginBottom: 18,
                 borderRadius: 12,
-                background: "#181818",
-                border: "1px solid #333",
+                background: "var(--panel)",
+                border: "1px solid var(--line)",
                 overflow: "hidden",
             }}
         >
@@ -117,7 +117,7 @@ function TradingSnapshotBody({
                 <div style={{ marginBottom: 12, overflowX: "auto" }}>
                     <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
                         <thead>
-                            <tr style={{ color: "#aaa", borderBottom: "1px solid #333" }}>
+                            <tr style={{ color: "#aaa", borderBottom: "1px solid var(--line)" }}>
                                 <th align="left">Symbol</th>
                                 <th align="left">Side</th>
                                 <th align="right">Qty</th>
@@ -128,7 +128,7 @@ function TradingSnapshotBody({
                         </thead>
                         <tbody>
                             {asset.positions.map((p) => (
-                                <tr key={`${p.symbol}-${p.side}`} style={{ borderBottom: "1px solid #222" }}>
+                                <tr key={`${p.symbol}-${p.side}`} style={{ borderBottom: "1px solid var(--line)" }}>
                                     <td>{p.symbol}</td>
                                     <td>{p.side}</td>
                                     <td align="right">{fmtNum(p.qty, 4)}</td>
@@ -273,7 +273,7 @@ function ArchiveTradeDetail({ day, symbol, trades = [], asset = null }) {
                 <div style={{ overflowX: "auto", marginTop: 14 }}>
                     <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
                         <thead>
-                            <tr style={{ color: "#aaa", borderBottom: "1px solid #333" }}>
+                            <tr style={{ color: "#aaa", borderBottom: "1px solid var(--line)" }}>
                                 <th align="left">Time</th>
                                 <th align="left">Kind</th>
                                 <th align="left">Side</th>
@@ -301,7 +301,7 @@ function ArchiveTradeDetail({ day, symbol, trades = [], asset = null }) {
                                 const pnl = t.kind === "EXIT" ? getRealizedPnlUsdtFromTrade(t) : null;
 
                                 return (
-                                    <tr key={t.id} style={{ borderBottom: "1px solid #222" }}>
+                                    <tr key={t.id} style={{ borderBottom: "1px solid var(--line)" }}>
                                         <td>{timeText}</td>
                                         <td>{t.kind}</td>
                                         <td>{t.side}</td>
@@ -443,8 +443,8 @@ function ArchiveMetric({ label, value }) {
             style={{
                 padding: 10,
                 borderRadius: 10,
-                background: "#111",
-                border: "1px solid #2a2a2a",
+                background: "var(--panel)",
+                border: "1px solid var(--line)",
             }}
         >
             <div style={{ fontSize: 12, color: "#aaa" }}>{label}</div>
@@ -790,8 +790,8 @@ function Archive() {
         height: 38,
         padding: "0 14px",
         borderRadius: 999,
-        border: "1px solid #2a2a2a",
-        background: "#2a2a2a",
+        border: "1px solid var(--line)",
+        background: "var(--panel-2)",
         color: "#fff",
         cursor: "pointer",
         display: "inline-flex",
@@ -810,7 +810,7 @@ function Archive() {
     };
 
     return (
-        <div style={{ padding: isMobile ? "12px 8px" : "40px", color: "#fff", backgroundColor: "#111", minHeight: "100vh" }}>
+        <div style={{ padding: isMobile ? "12px 8px" : "40px", color: "#fff", background: "transparent", minHeight: "60vh" }}>
             <h1 style={{ color: "#00ffcc", fontSize: isMobile ? 22 : undefined }}>📅 아카이브</h1>
 
             {error && <p style={{ color: "red" }}>❌ 오류 발생: {error.message}</p>}
@@ -865,7 +865,7 @@ function Archive() {
                         key={day}
                         style={{
                             marginBottom: "20px",
-                            borderBottom: "1px solid #333",
+                            borderBottom: "1px solid var(--line)",
                             paddingBottom: "10px",
                         }}
                     >
@@ -972,7 +972,7 @@ function Archive() {
                                                         <button
                                                             onClick={() => toggleSummary(resultKey)}
                                                             style={{
-                                                                backgroundColor: "#222",
+                                                                backgroundColor: "var(--panel-2)",
                                                                 color: "#00ffcc",
                                                                 border: "1px solid #00ffcc",
                                                                 borderRadius: "6px",
@@ -989,7 +989,7 @@ function Archive() {
                                                             <div
                                                                 style={{
                                                                     marginTop: "6px",
-                                                                    backgroundColor: "#1a1a1a",
+                                                                    backgroundColor: "var(--panel)",
                                                                     padding: "10px 12px",
                                                                     borderRadius: "8px",
                                                                 }}
@@ -1024,7 +1024,7 @@ function Archive() {
                                                     <button
                                                         onClick={() => toggleContent(summaryKey, day, country)}
                                                         style={{
-                                                            backgroundColor: "#222",
+                                                            backgroundColor: "var(--panel-2)",
                                                             color: "#00ffcc",
                                                             border: "1px solid #00ffcc",
                                                             borderRadius: "6px",
@@ -1044,7 +1044,7 @@ function Archive() {
                                                         <div
                                                             style={{
                                                                 marginTop: "6px",
-                                                                backgroundColor: "#222",
+                                                                backgroundColor: "var(--panel-2)",
                                                                 padding: "10px 12px",
                                                                 borderRadius: "8px",
                                                                 position: "relative",

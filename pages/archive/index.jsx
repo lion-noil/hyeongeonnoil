@@ -9,14 +9,14 @@ const Archive = dynamic(() => import("../../src/pages/Archive"), { ssr: false })
 function DayIndex({ days }) {
   if (!days.length) return null;
   return (
-    <nav style={{ maxWidth: 780, margin: "0 auto", padding: "24px 16px 40px", borderTop: "1px solid #2a2a2a" }}>
+    <nav style={{ maxWidth: 780, margin: "0 auto", padding: "24px 16px 40px", borderTop: "1px solid var(--line)" }}>
       <h2 style={{ color: "#00ffcc", fontSize: 16 }}>날짜별 뉴스 요약</h2>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
         {days.map((d) => (
           <Link
             key={d}
             href={`/archive/${d}`}
-            style={{ color: "#9bd", fontSize: 13, textDecoration: "none", border: "1px solid #333", borderRadius: 6, padding: "4px 8px" }}
+            style={{ color: "#9bd", fontSize: 13, textDecoration: "none", border: "1px solid var(--line)", borderRadius: 6, padding: "4px 8px" }}
           >
             {d}
           </Link>

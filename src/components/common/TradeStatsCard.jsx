@@ -51,7 +51,7 @@ function SummaryChip({ label, value, color }) {
       style={{
         display: "inline-flex", alignItems: "baseline", gap: 6,
         padding: "6px 10px", borderRadius: 999,
-        background: "#1a1a1a", border: "1px solid #2a2a2a",
+        background: "var(--panel)", border: "1px solid var(--line)",
         fontSize: 12, whiteSpace: "nowrap",
       }}
     >
@@ -69,7 +69,7 @@ function MonthNavButton({ dir, disabled, onClick }) {
       onClick={onClick}
       style={{
         padding: "2px 8px", borderRadius: 8,
-        border: "1px solid #333", background: "#1a1a1a",
+        border: "1px solid var(--line)", background: "var(--panel)",
         color: disabled ? "#444" : "#fff",
         fontWeight: 900, fontSize: 12,
         cursor: disabled ? "default" : "pointer",
@@ -186,7 +186,7 @@ function EquitySection({ rows, month, currency, currentEquity, onSelectMonth, is
   const fmt = (n) => n.toLocaleString(undefined, { maximumFractionDigits: 2 });
 
   return (
-    <div style={{ marginTop: 12, padding: "10px 12px", borderRadius: 12, background: "#101010", border: "1px solid #242424" }}>
+    <div style={{ marginTop: 12, padding: "10px 12px", borderRadius: 12, background: "var(--panel)", border: "1px solid #242424" }}>
       <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
         <span style={{ fontSize: 11, fontWeight: 900, color: "#00ffcc" }}>평가 {currency}</span>
         <b style={{ fontSize: 16 }}>{cur != null ? fmt(cur) : "—"}</b>
@@ -235,7 +235,7 @@ export default function TradeStatsCard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, month]);
 
-  const cell = { padding: "5px 8px", borderBottom: "1px solid #222", fontSize: 12, whiteSpace: "nowrap" };
+  const cell = { padding: "5px 8px", borderBottom: "1px solid var(--line)", fontSize: 12, whiteSpace: "nowrap" };
   const head = { ...cell, fontWeight: 900, color: "#00ffcc", fontSize: 11 };
   const num = { ...cell, textAlign: "right", fontVariantNumeric: "tabular-nums" };
 
@@ -243,7 +243,7 @@ export default function TradeStatsCard({
     <div
       style={{
         padding: 16, borderRadius: 16,
-        background: "#151515", border: "1px solid #2a2a2a",
+        background: "var(--panel)", border: "1px solid var(--line)",
         boxShadow: "0 8px 24px rgba(0,0,0,0.35)",
         width: "100%", boxSizing: "border-box",
       }}

@@ -9,12 +9,12 @@ import WeeklyReportView from "../../src/components/WeeklyReportView";
 import PerfView from "../../src/components/PerfView";
 
 const box = { maxWidth: 900, margin: "0 auto", padding: "8px 16px 40px", color: "#eee" };
-const card = { background: "#242424", borderRadius: 10, padding: "16px 18px", marginBottom: 16, overflowX: "auto" };
+const card = { background: "var(--panel-2)", borderRadius: 10, padding: "16px 18px", marginBottom: 16, overflowX: "auto" };
 
 // 마크다운 → 다크 테마 인라인 스타일 (사이트는 Tailwind 미사용)
 const md = {
   h1: ({ children }) => <h1 style={{ color: "#00bfff", fontSize: 22, margin: "8px 0 12px" }}>{children}</h1>,
-  h2: ({ children }) => <h2 style={{ color: "#00ffcc", fontSize: 18, margin: "22px 0 10px", borderBottom: "1px solid #333", paddingBottom: 6 }}>{children}</h2>,
+  h2: ({ children }) => <h2 style={{ color: "#00ffcc", fontSize: 18, margin: "22px 0 10px", borderBottom: "1px solid var(--line)", paddingBottom: 6 }}>{children}</h2>,
   h3: ({ children }) => <h3 style={{ color: "#9bd", fontSize: 16, margin: "18px 0 8px" }}>{children}</h3>,
   p: ({ children }) => <p style={{ lineHeight: 1.8, fontSize: 15, margin: "8px 0" }}>{children}</p>,
   ul: ({ children }) => <ul style={{ lineHeight: 1.8, fontSize: 15, paddingLeft: 22 }}>{children}</ul>,
@@ -26,18 +26,18 @@ const md = {
     </blockquote>
   ),
   code: ({ inline, children }) => (
-    <code style={{ background: "#1a1a1a", padding: inline ? "1px 5px" : 10, borderRadius: 4, fontSize: 13, display: inline ? "inline" : "block", whiteSpace: "pre-wrap" }}>
+    <code style={{ background: "var(--panel)", padding: inline ? "1px 5px" : 10, borderRadius: 4, fontSize: 13, display: inline ? "inline" : "block", whiteSpace: "pre-wrap" }}>
       {children}
     </code>
   ),
-  hr: () => <hr style={{ border: 0, borderTop: "1px solid #333", margin: "20px 0" }} />,
+  hr: () => <hr style={{ border: 0, borderTop: "1px solid var(--line)", margin: "20px 0" }} />,
   table: ({ children }) => (
     <div style={{ overflowX: "auto", margin: "10px 0" }}>
       <table style={{ borderCollapse: "collapse", fontSize: 13, minWidth: 480, whiteSpace: "nowrap" }}>{children}</table>
     </div>
   ),
-  th: ({ children }) => <th style={{ textAlign: "left", padding: "6px 10px", borderBottom: "1px solid #444", color: "#00ffcc", background: "#1f1f1f", position: "sticky", top: 0 }}>{children}</th>,
-  td: ({ children }) => <td style={{ padding: "5px 10px", borderBottom: "1px solid #2e2e2e" }}>{children}</td>,
+  th: ({ children }) => <th style={{ textAlign: "left", padding: "6px 10px", borderBottom: "1px solid var(--line)", color: "#00ffcc", background: "var(--panel-2)", position: "sticky", top: 0 }}>{children}</th>,
+  td: ({ children }) => <td style={{ padding: "5px 10px", borderBottom: "1px solid var(--line)" }}>{children}</td>,
   a: ({ href, children }) => <a href={href} target="_blank" rel="noreferrer" style={{ color: "#00bfff" }}>{children}</a>,
 };
 

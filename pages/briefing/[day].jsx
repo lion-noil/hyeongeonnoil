@@ -8,7 +8,7 @@ import { getBriefing, listBriefingDays } from "../../src/lib/briefingDb";
 
 const SITE = "https://hyeongeonnoil.com";
 const box = { maxWidth: 780, margin: "0 auto", padding: "8px 16px 40px", color: "#eee" };
-const card = { background: "#242424", borderRadius: 10, padding: "16px 18px", marginBottom: 16 };
+const card = { background: "var(--panel-2)", borderRadius: 10, padding: "16px 18px", marginBottom: 16 };
 const UP = "#ff6b6b";
 const DOWN = "#4dabf7";
 
@@ -96,7 +96,7 @@ export default function BriefingDayPage({ b, prevDay, nextDay }) {
               {(b.snapshot || []).map((s) => {
                 const isRate = s.unit === "%";
                 return (
-                  <tr key={s.key} style={{ borderTop: "1px solid #333", textAlign: "right" }}>
+                  <tr key={s.key} style={{ borderTop: "1px solid var(--line)", textAlign: "right" }}>
                     <td style={{ textAlign: "left", padding: "7px 4px", color: "#ddd" }}>
                       {s.label}
                       <span style={{ color: "#777", fontSize: 11, marginLeft: 6 }}>{s.date?.slice(5)}</span>
@@ -146,7 +146,7 @@ export default function BriefingDayPage({ b, prevDay, nextDay }) {
       {b.keywords?.length > 0 && (
         <p style={{ display: "flex", flexWrap: "wrap", gap: 6, margin: "4px 0 16px" }}>
           {b.keywords.map((k) => (
-            <span key={k} style={{ fontSize: 12, color: "#9bd", border: "1px solid #333", borderRadius: 6, padding: "3px 8px" }}>
+            <span key={k} style={{ fontSize: 12, color: "#9bd", border: "1px solid var(--line)", borderRadius: 6, padding: "3px 8px" }}>
               {k}
             </span>
           ))}

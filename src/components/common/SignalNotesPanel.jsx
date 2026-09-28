@@ -66,8 +66,8 @@ export default function SignalNotesPanel({
         <div
             style={{
                 marginTop: 10,
-                background: "#161616",
-                border: "1px solid #262626",
+                background: "var(--panel)",
+                border: "1px solid var(--line)",
                 borderRadius: 12,
                 padding: "10px 12px",
                 width: "100%",
@@ -86,8 +86,8 @@ export default function SignalNotesPanel({
                     style={{
                         padding: "6px 10px",
                         borderRadius: 8,
-                        border: "1px solid #2a2a2a",
-                        background: "#1f1f1f",
+                        border: "1px solid var(--line)",
+                        background: "var(--panel-2)",
                         color: "#ddd",
                         fontSize: 12,
                         cursor: "pointer",
@@ -123,8 +123,8 @@ export default function SignalNotesPanel({
                                 style={{
                                     padding: "8px 10px",
                                     borderRadius: 10,
-                                    background: "#1b1b1b",
-                                    border: "1px solid #2a2a2a",
+                                    background: "var(--panel-2)",
+                                    border: "1px solid var(--line)",
                                 }}
                             >
                                 {/* 2줄 레이아웃: 모바일에서 7컬럼 고정폭이 넘쳐 태그·설명이 잘리던 문제 해소 */}

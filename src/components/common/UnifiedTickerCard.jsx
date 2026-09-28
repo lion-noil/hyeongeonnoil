@@ -21,7 +21,7 @@ export default function UnifiedTickerCard({
             style={{
                 padding: "16px 18px",
                 borderRadius: 14,
-                background: "#1a1a1a",
+                background: "var(--panel)",
                 boxShadow: "0 8px 24px rgba(0,0,0,0.35)",
             }}
         >
