@@ -134,7 +134,7 @@ export default function GlobalBriefingCard({ briefing }) {
                     </span>
                   )}
                 </div>
-                <div style={{ fontSize: 12.5, color: "#aebdd0", lineHeight: 1.55, marginTop: 3 }}>
+                <div style={{ fontSize: 12.5, color: "#aebdd0", lineHeight: 1.55, marginTop: 3, whiteSpace: "pre-line" }}>
                   {it.summary}
                 </div>
                 {countries.length > 0 && (
