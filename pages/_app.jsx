@@ -10,6 +10,8 @@ export default function MyApp({ Component, pageProps }) {
   const router = useRouter();
 
   useEffect(() => {
+    // 앱 웹뷰 전용 페이지(/embed/*)는 GA 제외 — 앱을 열 때마다 사이트 방문으로 잡혀 집계가 부풀던 것(2026-09-29)
+    if (window.location.pathname.startsWith("/embed/")) return undefined;
     initGA();
     trackPageview(window.location.pathname + window.location.search);
 
