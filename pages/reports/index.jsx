@@ -4,6 +4,30 @@ import Head from "next/head";
 import Link from "next/link";
 import { listReports, getReport, KIND_KO } from "../../src/lib/reportsDb";
 import PerfView from "../../src/components/PerfView";
+import { ldJson, ORG } from "../../src/lib/jsonLd";
+
+// WebPage + BreadcrumbList JSON-LD (2026-09-30)
+const PAGE_LD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      name: "트레이딩봇 보고서 — 월간 셀별 성과·심층 분석",
+      url: "https://hyeongeonnoil.com/reports",
+      description: "코인(Bybit)·CFD(MT5) 자동매매 봇의 주간·월간 심볼×전략 성과 보고서와 심층 분석 기록입니다.",
+      inLanguage: "ko",
+      isPartOf: { "@type": "WebSite", name: "현건노일 NewsInsight", url: "https://hyeongeonnoil.com" },
+      publisher: ORG,
+    },
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "홈", item: "https://hyeongeonnoil.com/" },
+        { "@type": "ListItem", position: 2, name: "트레이딩봇 보고서", item: "https://hyeongeonnoil.com/reports" },
+      ],
+    },
+  ],
+};
 
 const box = { maxWidth: 780, margin: "0 auto", padding: "8px 16px 40px", color: "#eee" };
 const card = { background: "var(--panel-2)", borderRadius: 10, padding: "14px 18px", marginBottom: 12, display: "block", textDecoration: "none", color: "#eee" };
@@ -30,6 +54,7 @@ export default function ReportsPage({ reports, perf }) {
           key="desc"
         />
         <link rel="canonical" href="https://hyeongeonnoil.com/reports" key="canonical" />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(PAGE_LD) }} />
       </Head>
 
       <h1 style={{ color: "#00bfff", fontSize: 24 }}>📑 트레이딩봇 보고서</h1>

@@ -18,7 +18,8 @@ export default function ArchiveDayPage({ day, countries, prevDay, nextDay }) {
   const names = Object.keys(countries);
   const firstSummary = names.length ? (countries[names[0]].summary || "").split("\n")[0] : "";
   const title = `${y}년 ${Number(m)}월 ${Number(d)}일 세계 뉴스 요약 — NewsInsight`;
-  const desc = `${names.map((c) => COUNTRY_KO[c] || c).join("·")} 주요 뉴스 정리. ${firstSummary}`.slice(0, 150);
+  // 설명에도 날짜를 넣어 검색어("… 2026년 9월 16일")와 페이지 날짜가 일치함을 분명히 함 — 다른 날짜 페이지가 대신 노출되던 문제(2026-09-30)
+  const desc = `${y}년 ${Number(m)}월 ${Number(d)}일 ${names.map((c) => COUNTRY_KO[c] || c).join("·")} 주요 뉴스 정리. ${firstSummary}`.slice(0, 150);
 
   const jsonLd = {
     "@context": "https://schema.org",

@@ -44,7 +44,8 @@ const ChartPage = ({ chartType, title, envelop }) => {
   return (
 
     <div style={{ padding: isMobile ? "12px 8px" : "40px", color: "#fff", background: "transparent", minHeight: "60vh" }}>
-      <h1 style={{ color: "#00ffcc", fontSize: isMobile ? 22 : undefined }}>{title}</h1>
+      {/* h1 은 pages/*.jsx 의 서버렌더 요약(SeoSummary)이 맡음 → 여기는 h2(크기는 h1 기본값 유지) */}
+      <h2 style={{ color: "#00ffcc", fontSize: isMobile ? 22 : "2em", margin: "0.67em 0" }}>{title}</h2>
 
       <div
         style={{

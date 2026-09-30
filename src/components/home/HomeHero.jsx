@@ -41,11 +41,12 @@ export default function HomeHero() {
         <div className="eyebrow">
           <span className="live-dot" /> LIVE · GLOBAL MARKETS &amp; NEWS
         </div>
-        <h1 className="hero-title">
+        {/* h1 은 pages/index.jsx 의 서버렌더 요약(SeoSummary)이 맡음 → 히어로 제목은 h2(.hero-title 스타일 동일) */}
+        <h2 className="hero-title">
           세계의 흐름을
           <br />
           <span className="grad-text">한 화면에서</span>
-        </h1>
+        </h2>
         <p className="hero-sub">
           8개국 뉴스를 매일 요약하고, 나라 사이의 긴장과 협력을 지구본 위에 그립니다. 환율·지수·원자재·코인 시세와 자동매매 성적까지 함께 봅니다.
         </p>

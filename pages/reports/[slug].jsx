@@ -7,6 +7,7 @@ import remarkGfm from "remark-gfm";
 import { getReport, listReports, slugToId, KIND_KO } from "../../src/lib/reportsDb";
 import WeeklyReportView from "../../src/components/WeeklyReportView";
 import PerfView from "../../src/components/PerfView";
+import { ldJson, ORG } from "../../src/lib/jsonLd";
 
 const box = { maxWidth: 900, margin: "0 auto", padding: "8px 16px 40px", color: "#eee" };
 const card = { background: "var(--panel-2)", borderRadius: 10, padding: "16px 18px", marginBottom: 16, overflowX: "auto" };
@@ -50,6 +51,20 @@ export default function ReportDetailPage({ report, prev, next }) {
   const url = `https://hyeongeonnoil.com/reports/${report.slug}`;
   const kindKo = KIND_KO[report.kind] || report.kind;
   const desc = `${kindKo} 보고서 ${report.label} — 코인(Bybit)·CFD(MT5) 봇의 셀별 성과 기록`;
+  // Article JSON-LD — 발행일은 생성 시각(generated_at, 없으면 label 의 날짜) (2026-09-30)
+  const published = String(report.generated_at || "").slice(0, 10) || String(report.label || "").slice(0, 10) || undefined;
+  const articleLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: report.title,
+    description: desc,
+    ...(published ? { datePublished: published, dateModified: String(report.generated_at || "").slice(0, 10) || published } : {}),
+    inLanguage: "ko",
+    author: ORG,
+    publisher: ORG,
+    mainEntityOfPage: url,
+    url,
+  };
   return (
     <div style={box}>
       <Head>
@@ -59,6 +74,7 @@ export default function ReportDetailPage({ report, prev, next }) {
         <meta property="og:description" content={desc} key="og-desc" />
         <meta property="og:url" content={url} key="og-url" />
         <link rel="canonical" href={url} key="canonical" />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(articleLd) }} />
       </Head>
 
       <p style={{ color: "#888", fontSize: 13, margin: "4px 0 10px" }}>
