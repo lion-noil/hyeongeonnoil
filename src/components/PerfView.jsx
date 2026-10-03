@@ -9,15 +9,15 @@ const td = { padding: "4px 8px", fontSize: 13, borderBottom: "1px solid var(--li
 const f = (v, d = 1) => (v == null ? "" : `${v > 0 ? "+" : ""}${Number(v).toFixed(d)}`);
 const money = (v, ccy) => (v == null ? "" : `${v > 0 ? "+" : ""}${Number(v).toFixed(v >= 100 || v <= -100 ? 0 : 2)} ${ccy}`);
 
-function Bar({ pct, hit, scale }) {
+// 게이지 = 목표 달성률: 목표(월 2%·주 0.46%)에 닿으면 가득 참. 손실은 같은 눈금의 빨간 막대.
+function Bar({ pct, hit, target }) {
   if (pct == null) return <span style={{ color: "#666" }}>—</span>;
-  const w = Math.min(100, (Math.abs(pct) / scale) * 100);
+  const w = Math.min(100, (Math.abs(pct) / target) * 100);
   const color = pct >= 0 ? (hit ? "#00ffcc" : "#7fbfb5") : "#ff6b6b";
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 150 }}>
-      <div style={{ width: 90, height: 8, background: "var(--panel)", borderRadius: 4, overflow: "hidden", position: "relative" }}>
-        <div style={{ position: "absolute", left: pct >= 0 ? "50%" : `${50 - w / 2}%`, width: `${w / 2}%`, height: "100%", background: color }} />
-        <div style={{ position: "absolute", left: "50%", width: 1, height: "100%", background: "#555" }} />
+      <div style={{ width: 90, height: 8, background: "var(--panel)", borderRadius: 4, overflow: "hidden" }}>
+        <div style={{ width: `${w}%`, height: "100%", background: color }} />
       </div>
       <span style={{ color, fontSize: 13, fontVariantNumeric: "tabular-nums" }}>{f(pct, 2)}%</span>
     </div>
@@ -27,8 +27,6 @@ function Bar({ pct, hit, scale }) {
 function AccountBlock({ a, targetM, targetW, compact }) {
   const months = a.months || [];
   const weeks = (a.weeks || []).slice(compact ? -8 : -16);
-  const scaleM = Math.max(5, ...months.map((m) => Math.abs(m.pct || 0)));
-  const scaleW = Math.max(2, ...weeks.map((w) => Math.abs(w.pct || 0)));
   const r8 = a.recent8w || {};
   return (
     <div style={card}>
@@ -56,7 +54,7 @@ function AccountBlock({ a, targetM, targetW, compact }) {
                 <td style={td}>{m.ym}{m.partial ? <span style={{ color: "#ff9f5a", fontSize: 11 }}> 진행중</span> : ""}</td>
                 <td style={{ ...td, color: "#888" }}>{m.n}</td>
                 <td style={{ ...td, color: m.realized >= 0 ? "#dfe" : "#fbb" }}>{money(m.realized, a.currency)}</td>
-                <td style={td}><Bar pct={m.pct} hit={m.hit} scale={scaleM} /></td>
+                <td style={td}><Bar pct={m.pct} hit={m.hit} target={targetM} /></td>
               </tr>
             ))}
           </tbody>
@@ -72,7 +70,7 @@ function AccountBlock({ a, targetM, targetW, compact }) {
                 <td style={td}>{w.label}<span style={{ color: "#777", fontSize: 11 }}> {w.monday.slice(5)}</span>{w.partial ? <span style={{ color: "#ff9f5a", fontSize: 11 }}> 진행중</span> : ""}</td>
                 <td style={{ ...td, color: "#888" }}>{w.n}</td>
                 <td style={{ ...td, color: w.realized >= 0 ? "#dfe" : "#fbb" }}>{money(w.realized, a.currency)}</td>
-                <td style={td}><Bar pct={w.pct} hit={w.hit} scale={scaleW} /></td>
+                <td style={td}><Bar pct={w.pct} hit={w.hit} target={targetW} /></td>
                 {!compact && <td style={{ ...td, color: "#999" }}>{w.eqd == null ? "" : `${f(w.eqd, 2)}%`}</td>}
               </tr>
             ))}
