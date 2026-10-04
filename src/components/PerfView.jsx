@@ -26,6 +26,43 @@ function Bar({ pct, hit, target }) {
   );
 }
 
+// 지표 타일: 07-16(현행 셀 확정) 이후 실측 vs 시뮬 기준(perf_benchmark.json). 낙폭 판정색 = 평소 범위/시뮬 최악 이내/초과.
+const DD_COLOR = { "평소 범위": "#00ffcc", "시뮬 최악 이내": "#ffd479", "시뮬 최악 초과": "#ff6b6b" };
+function Tile({ label, value, sub, color = "#eee" }) {
+  return (
+    <div style={{ background: "var(--panel)", borderRadius: 8, padding: "8px 10px", minWidth: 0 }}>
+      <div style={{ color: "#9bd", fontSize: 11 }}>{label}</div>
+      <div style={{ color, fontSize: 15, fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>{value}</div>
+      {sub && <div style={{ color: "#888", fontSize: 11, lineHeight: 1.5 }}>{sub}</div>}
+    </div>
+  );
+}
+
+function Stats({ st }) {
+  if (!st) return null;
+  const sim = st.sim;
+  return (
+    <div style={{ marginTop: 10 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(118px, 1fr))", gap: 6 }}>
+        <Tile label="진입 빈도" value={`월 ${st.entries_per_month}건`} sub={<>{sim && <>시뮬 {sim.trades_per_month}건 · </>}누적 {st.entries}건</>} />
+        {st.trade_avg_eq_pct != null && (
+          <Tile label="건당 평균(계좌 대비)" value={`${f(st.trade_avg_eq_pct, 3)}%`} color={st.trade_avg_eq_pct >= 0 ? "#00ffcc" : "#ff6b6b"}
+            sub={sim && `시뮬 ${f(sim.trade_avg_eq_pct, 3)}%`} />
+        )}
+        {st.win_rate != null && <Tile label="승률" value={`${Math.round(st.win_rate)}%`} sub={sim && `시뮬 ${Math.round(sim.win_rate)}%`} />}
+        <Tile label="최대 낙폭(실현)" value={`${st.mdd.toFixed(2)}%p`} color={DD_COLOR[st.dd_verdict] || "#eee"}
+          sub={<>{st.mdd_to && <>{st.mdd_from.slice(5)}~{st.mdd_to.slice(5)} · </>}지금 {st.dd_now.toFixed(2)}%p</>} />
+        {sim && (
+          <Tile label="시뮬 낙폭 기준" value={st.dd_verdict} color={DD_COLOR[st.dd_verdict]}
+            sub={`평소 ${sim.dd_p95}%p · 5년 최악 ${sim.mdd}%p`} />
+        )}
+        {st.eq_mdd != null && <Tile label="에쿼티 낙폭(미실현 포함)" value={`${st.eq_mdd.toFixed(1)}%`} sub={`지금 ${st.eq_dd_now.toFixed(1)}% · 입출금 섞임`} />}
+      </div>
+      <div style={{ color: "#777", fontSize: 11, marginTop: 4 }}>{st.from.slice(5)} 이후(현행 셀 구성) 집계</div>
+    </div>
+  );
+}
+
 function AccountBlock({ a, targetM, targetW, compact }) {
   const months = a.months || [];
   const weeks = (a.weeks || []).slice(compact ? -8 : -16);
@@ -46,14 +83,16 @@ function AccountBlock({ a, targetM, targetW, compact }) {
         {r8.pct != null && <> ({f(r8.pct)}%)</>} · 주 목표 {targetW}% 달성 {r8.hit_weeks}/{r8.weeks}주
         {a.months_avg_pct != null && <> · 완결 월 평균 <b style={{ color: a.months_avg_pct >= targetM ? "#00ffcc" : "#ffd479" }}>{f(a.months_avg_pct, 2)}%</b> (달성 {a.months_hit})</>}
       </div>
+      <Stats st={a.stats} />
 
       <div style={{ overflowX: "auto", marginTop: 10 }}>
         <table className="perf-table" style={{ borderCollapse: "collapse", width: "100%" }}>
-          <thead><tr><th style={th}>월</th><th style={th}>n</th><th style={th}>실현</th><th style={th}>수익률 (목표 {targetM}%)</th></tr></thead>
+          <thead><tr><th style={th}>월</th><th style={th}>진입</th><th style={th}>청산</th><th style={th}>실현</th><th style={th}>수익률 (목표 {targetM}%)</th></tr></thead>
           <tbody>
             {months.map((m) => (
               <tr key={m.ym}>
                 <td style={td}>{m.ym}{m.partial ? <span style={{ color: "#ff9f5a", fontSize: 11 }}> 진행중</span> : ""}</td>
+                <td style={{ ...td, color: "#888" }}>{m.entries ?? ""}</td>
                 <td style={{ ...td, color: "#888" }}>{m.n}</td>
                 <td style={{ ...td, color: m.realized >= 0 ? "#dfe" : "#fbb" }}><Money v={m.realized} ccy={a.currency} /></td>
                 <td style={td}><Bar pct={m.pct} hit={m.hit} target={targetM} /></td>
@@ -65,7 +104,7 @@ function AccountBlock({ a, targetM, targetW, compact }) {
 
       <div style={{ overflowX: "auto", marginTop: 12 }}>
         <table className="perf-table" style={{ borderCollapse: "collapse", width: "100%" }}>
-          <thead><tr><th style={th}>주</th><th style={th}>n</th><th style={th}>실현</th><th style={th}>수익률 (주 목표 {targetW}%)</th>{!compact && <th style={th}>에쿼티Δ</th>}</tr></thead>
+          <thead><tr><th style={th}>주</th><th style={th}>청산</th><th style={th}>실현</th><th style={th}>수익률 (주 목표 {targetW}%)</th>{!compact && <th style={th}>에쿼티Δ</th>}</tr></thead>
           <tbody>
             {weeks.map((w) => (
               <tr key={w.label}>
