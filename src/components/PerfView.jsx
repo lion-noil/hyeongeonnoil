@@ -3,11 +3,13 @@
 import Link from "next/link";
 
 const card = { background: "var(--panel-2)", borderRadius: 10, padding: "14px 16px", marginBottom: 12 };
-const th = { textAlign: "left", padding: "4px 8px", color: "#9bd", fontSize: 12, borderBottom: "1px solid var(--line)", whiteSpace: "nowrap" };
-const td = { padding: "4px 8px", fontSize: 13, borderBottom: "1px solid var(--line)", whiteSpace: "nowrap" };
+const th = { textAlign: "left", color: "#9bd", fontSize: 12, borderBottom: "1px solid var(--line)", whiteSpace: "nowrap" };
+const td = { borderBottom: "1px solid var(--line)", whiteSpace: "nowrap" };
 
 const f = (v, d = 1) => (v == null ? "" : `${v > 0 ? "+" : ""}${Number(v).toFixed(d)}`);
 const money = (v, ccy) => (v == null ? "" : `${v > 0 ? "+" : ""}${Number(v).toFixed(v >= 100 || v <= -100 ? 0 : 2)} ${ccy}`);
+// 표 안 금액: 통화 표기는 좁은 화면에서 숨김(.perf-ccy) — 표가 화면 안에 들어오게. 칸 여백·막대 폭도 globals.css .perf-* 에서 반응형.
+const Money = ({ v, ccy }) => (v == null ? null : <>{money(v, "").trim()}<span className="perf-ccy"> {ccy}</span></>);
 
 // 게이지 = 목표 달성률: 목표(월 2%·주 0.46%)에 닿으면 가득 참. 손실은 같은 눈금의 빨간 막대.
 function Bar({ pct, hit, target }) {
@@ -15,8 +17,8 @@ function Bar({ pct, hit, target }) {
   const w = Math.min(100, (Math.abs(pct) / target) * 100);
   const color = pct >= 0 ? (hit ? "#00ffcc" : "#7fbfb5") : "#ff6b6b";
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 150 }}>
-      <div style={{ width: 90, height: 8, background: "var(--panel)", borderRadius: 4, overflow: "hidden" }}>
+    <div className="perf-bar" style={{ display: "flex", alignItems: "center", gap: 6 }}>
+      <div className="perf-track" style={{ height: 8, flex: "0 0 auto", background: "var(--panel)", borderRadius: 4, overflow: "hidden" }}>
         <div style={{ width: `${w}%`, height: "100%", background: color }} />
       </div>
       <span style={{ color, fontSize: 13, fontVariantNumeric: "tabular-nums" }}>{f(pct, 2)}%</span>
@@ -29,7 +31,7 @@ function AccountBlock({ a, targetM, targetW, compact }) {
   const weeks = (a.weeks || []).slice(compact ? -8 : -16);
   const r8 = a.recent8w || {};
   return (
-    <div style={card}>
+    <div className="perf-card" style={card}>
       <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 6, alignItems: "baseline" }}>
         <span style={{ color: "#00ffcc", fontWeight: 600, fontSize: 16 }}>{a.name}</span>
         {a.equity_last && (
@@ -46,14 +48,14 @@ function AccountBlock({ a, targetM, targetW, compact }) {
       </div>
 
       <div style={{ overflowX: "auto", marginTop: 10 }}>
-        <table style={{ borderCollapse: "collapse", width: "100%" }}>
+        <table className="perf-table" style={{ borderCollapse: "collapse", width: "100%" }}>
           <thead><tr><th style={th}>월</th><th style={th}>n</th><th style={th}>실현</th><th style={th}>수익률 (목표 {targetM}%)</th></tr></thead>
           <tbody>
             {months.map((m) => (
               <tr key={m.ym}>
                 <td style={td}>{m.ym}{m.partial ? <span style={{ color: "#ff9f5a", fontSize: 11 }}> 진행중</span> : ""}</td>
                 <td style={{ ...td, color: "#888" }}>{m.n}</td>
-                <td style={{ ...td, color: m.realized >= 0 ? "#dfe" : "#fbb" }}>{money(m.realized, a.currency)}</td>
+                <td style={{ ...td, color: m.realized >= 0 ? "#dfe" : "#fbb" }}><Money v={m.realized} ccy={a.currency} /></td>
                 <td style={td}><Bar pct={m.pct} hit={m.hit} target={targetM} /></td>
               </tr>
             ))}
@@ -62,14 +64,14 @@ function AccountBlock({ a, targetM, targetW, compact }) {
       </div>
 
       <div style={{ overflowX: "auto", marginTop: 12 }}>
-        <table style={{ borderCollapse: "collapse", width: "100%" }}>
+        <table className="perf-table" style={{ borderCollapse: "collapse", width: "100%" }}>
           <thead><tr><th style={th}>주</th><th style={th}>n</th><th style={th}>실현</th><th style={th}>수익률 (주 목표 {targetW}%)</th>{!compact && <th style={th}>에쿼티Δ</th>}</tr></thead>
           <tbody>
             {weeks.map((w) => (
               <tr key={w.label}>
-                <td style={td}>{w.label}<span style={{ color: "#777", fontSize: 11 }}> {w.monday.slice(5)}</span>{w.partial ? <span style={{ color: "#ff9f5a", fontSize: 11 }}> 진행중</span> : ""}</td>
+                <td style={td}><span className="perf-yr">{w.label.slice(0, 5)}</span>{w.label.slice(5)}<span style={{ color: "#777", fontSize: 11 }}> {w.monday.slice(5)}</span>{w.partial ? <span style={{ color: "#ff9f5a", fontSize: 11 }}> 진행중</span> : ""}</td>
                 <td style={{ ...td, color: "#888" }}>{w.n}</td>
-                <td style={{ ...td, color: w.realized >= 0 ? "#dfe" : "#fbb" }}>{money(w.realized, a.currency)}</td>
+                <td style={{ ...td, color: w.realized >= 0 ? "#dfe" : "#fbb" }}><Money v={w.realized} ccy={a.currency} /></td>
                 <td style={td}><Bar pct={w.pct} hit={w.hit} target={targetW} /></td>
                 {!compact && <td style={{ ...td, color: "#999" }}>{w.eqd == null ? "" : `${f(w.eqd, 2)}%`}</td>}
               </tr>
@@ -91,7 +93,7 @@ export default function PerfView({ data, compact = false }) {
         <h2 style={{ color: "#00bfff", fontSize: 19, margin: 0 }}>📈 성적표 <span style={{ color: "#888", fontSize: 13 }}>목표 월 {targetM}% · 갱신 {String(data.generated_at || "").slice(0, 16).replace("T", " ")}</span></h2>
         {compact && <Link href="/reports/perf-latest" style={{ color: "#00ffcc", fontSize: 13 }}>전체 보기 →</Link>}
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: 12 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 440px), 1fr))", gap: 12 }}>
         {data.accounts.map((a) => <AccountBlock key={a.account} a={a} targetM={targetM} targetW={targetW} compact={compact} />)}
       </div>
       {!compact && data.note && <p style={{ color: "#777", fontSize: 12, lineHeight: 1.6 }}>{data.note}</p>}

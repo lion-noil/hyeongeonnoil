@@ -736,6 +736,8 @@ function extractSymbolsFromConfig(cfgRaw) {
 
 export default function Coin() {
     const isMobile = useIsMobile();
+    // 태블릿 폭(769~980px): 계정 안내+포지션 카드 2열(최소 904px)이 안 들어가 오른쪽 카드가 잘렸음 → 1열로 쌓기
+    const stackTop = useIsMobile(980);
     const [dayOffset, setDayOffset] = useState(0);
 
     /* ------------------------- config ------------------------- */
@@ -1002,7 +1004,7 @@ export default function Coin() {
                 <div
                     style={{
                         display: "grid",
-                        gridTemplateColumns: isMobile ? "1fr" : "minmax(360px, 0.85fr) minmax(520px, 1.15fr)",
+                        gridTemplateColumns: stackTop ? "minmax(0, 1fr)" : "minmax(360px, 0.85fr) minmax(520px, 1.15fr)",
                         gap: isMobile ? 12 : 24,
                         alignItems: "start",
                         justifyContent: "center",

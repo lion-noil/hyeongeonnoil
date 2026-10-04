@@ -110,7 +110,7 @@ export default function ChartPanelCore({
             return lbl ? `(1분봉 · 밴드 MA·σ ${lbl})` : "(1분봉 · 밴드 없음)";
           })()}
         </span>
-        <span style={{ marginLeft: 10, fontSize: 12, opacity: 0.45 }}>
+        <span style={{ marginLeft: 10, fontSize: 12, opacity: 0.45, display: "inline-block", whiteSpace: "nowrap" }}>
           (dayOffset: {dayOffset} · digits: {autoDigits})
         </span>
         {(() => {
@@ -126,6 +126,7 @@ export default function ChartPanelCore({
                 background: isLoading ? "rgba(156,163,175,0.12)" : "rgba(255,184,108,0.12)",
                 border: `1px solid ${isLoading ? "rgba(156,163,175,0.35)" : "rgba(255,184,108,0.35)"}`,
                 borderRadius: 8, padding: "2px 7px",
+                display: "inline-block", whiteSpace: "nowrap", verticalAlign: "middle",   // 배지가 글자 중간에서 두 줄로 쪼개지지 않게
               }}
               title={isLoading
                 ? "밴드용 MA창 히스토리를 받는 중입니다."

@@ -8,6 +8,8 @@ import { STRAT_PARAMS, STRAT_META, H4_META, fmtParam, fmtFade, fmtH4, maxHoldFor
 
 const BLUE = "#3a9bdc";   // 롱 진입 (BandLegend·ChartView 밴드와 동일)
 const AMBER = "#e8913a";  // 숏 진입
+// 한 전략 줄이 화면보다 길면(모바일) 롱/숏/보유 덩어리 사이에서만 줄바꿈 — 줄 전체 nowrap 은 화면 밖으로 잘렸음.
+const NOWRAP = { whiteSpace: "nowrap", display: "inline-block" };
 
 // 밴드 선 견본: 방향색 + 전략 선스타일
 function Swatch({ color, dashed }) {
@@ -63,22 +65,22 @@ export default function SymbolStrategyTag({ symbol, timeframe }) {
         const dashed = dashedOf(key);
         const hold = maxHoldFor(symbol, key);
         return (
-          <span key={key} style={{ whiteSpace: "nowrap", opacity: active ? 1 : 0.38 }}>
-            <b style={{ color: "#cfcfcf" }}>{STRAT_META[key].label}</b>{" "}
+          <span key={key} style={{ opacity: active ? 1 : 0.38 }}>
+            <b style={{ color: "#cfcfcf", ...NOWRAP }}>{STRAT_META[key].label}</b>{" "}
             {s.L && (
-              <span style={{ color: BLUE }}>
+              <span style={{ color: BLUE, ...NOWRAP }}>
                 {isFade ? <span style={{ marginRight: 2 }}>↘</span> : <Swatch color={BLUE} dashed={dashed} />}
                 롱 {isFade ? fmtFade(s.L) : fmtParam(s.L)}
               </span>
             )}
             {s.L && s.S && <span style={{ color: "#555" }}> · </span>}
             {s.S && (
-              <span style={{ color: AMBER }}>
+              <span style={{ color: AMBER, ...NOWRAP }}>
                 {isFade ? <span style={{ marginRight: 2 }}>↗</span> : <Swatch color={AMBER} dashed={dashed} />}
                 숏 {isFade ? fmtFade(s.S) : fmtParam(s.S)}
               </span>
             )}
-            {hold && <span style={{ color: "#8a8a8a" }}> 보유≤{hold}</span>}
+            {hold && <span style={{ color: "#8a8a8a", ...NOWRAP }}> 보유≤{hold}</span>}
           </span>
         );
       })}
@@ -86,17 +88,17 @@ export default function SymbolStrategyTag({ symbol, timeframe }) {
         const dashed = key === "s12";                       // 역추세=점선 (관행 유지)
         const noSwatch = key === "s13" || key === "s15";    // 페이드·스윕은 밴드 개념 없음
         return (
-          <span key={`h4-${key}`} style={{ whiteSpace: "nowrap", opacity: h4Active ? 1 : 0.38 }}>
-            <b style={{ color: "#cfcfcf" }}>{H4_META[key].label}</b>{" "}
+          <span key={`h4-${key}`} style={{ opacity: h4Active ? 1 : 0.38 }}>
+            <b style={{ color: "#cfcfcf", ...NOWRAP }}>{H4_META[key].label}</b>{" "}
             {s.L && (
-              <span style={{ color: BLUE }}>
+              <span style={{ color: BLUE, ...NOWRAP }}>
                 {noSwatch ? <span style={{ marginRight: 2 }}>{key === "s13" ? "↘" : "≈"}</span> : <Swatch color={BLUE} dashed={dashed} />}
                 롱 {fmtH4(key, s.L)}
               </span>
             )}
             {s.L && s.S && <span style={{ color: "#555" }}> · </span>}
             {s.S && (
-              <span style={{ color: AMBER }}>
+              <span style={{ color: AMBER, ...NOWRAP }}>
                 {noSwatch ? <span style={{ marginRight: 2 }}>{key === "s13" ? "↗" : "≈"}</span> : <Swatch color={AMBER} dashed={dashed} />}
                 숏 {fmtH4(key, s.S)}
               </span>

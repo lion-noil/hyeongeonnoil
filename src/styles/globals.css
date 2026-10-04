@@ -183,14 +183,34 @@ a { color: var(--cyan); }
 .site-footer .foot-links { display: flex; gap: 16px; flex-wrap: wrap; }
 .site-footer .foot-links a { color: var(--text-2); }
 
+/* ── 성적표(PerfView) 표 ─────────────────────────── */
+.perf-table th, .perf-table td { padding: 4px 8px; }
+.perf-table td { font-size: 13px; }
+.perf-bar { min-width: 150px; }
+.perf-track { width: 90px; }
+/* 카드 폭 기준(화면 폭 아님): 성적표 카드는 넓은 화면에서도 여러 열로 나뉘어 좁다 → 좁은 카드에선 촘촘하게 */
+.perf-card { container-type: inline-size; }
+@container (max-width: 520px) {
+  .perf-table th, .perf-table td { padding: 4px 3px; }
+  .perf-table td { font-size: 12px; }
+  .perf-table th { font-size: 11px !important; }
+  .perf-bar { min-width: 0; }
+  .perf-track { width: 32px; }
+  .perf-ccy, .perf-yr { display: none; }
+}
+@container (max-width: 330px) {
+  .perf-table th, .perf-table td { padding: 4px 2px; }
+  .perf-table td { font-size: 11.5px; }
+  .perf-track { width: 18px; }
+}
+
 /* ── 반응형 ─────────────────────────────────────── */
 @media (max-width: 900px) {
   .topbar-inner { padding: 8px 12px; gap: 10px; }
-  .brand small, .topbar-clock span { display: none; }
+  .brand small, .topbar-clock { display: none; }   /* 시계를 숨겨 메뉴 폭 확보 */
   .brand b { font-size: 15px; }
   .brand-mark { width: 26px; height: 26px; }
   .nav a { padding: 7px 10px; font-size: 13px; }
-  .topbar-clock b { font-size: 13px; }
   .site-main { padding: 4px 0 16px; }
   .hero { grid-template-columns: minmax(0, 1fr); min-height: 0; padding: 10px 14px 0; gap: 0; }
   .hero-visual { order: -1; margin: 0 -14px 18px; }
@@ -200,6 +220,10 @@ a { color: var(--cyan); }
   .hero-stats { gap: 22px; margin-top: 24px; }
   .hero-stats b { font-size: 22px; }
   .section-head { margin: 40px 14px 14px; padding: 0; }
+}
+/* 폰 폭: 메뉴가 다 안 들어가므로 오른쪽 흐림으로 '옆으로 더 있음' 표시 */
+@media (max-width: 600px) {
+  .nav { padding-right: 18px; -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 22px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 22px), transparent); }
 }
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }

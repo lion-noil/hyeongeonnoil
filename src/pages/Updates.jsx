@@ -36,7 +36,8 @@ export default function Updates() {
         트레이딩봇 전략 변경 이력 — 최신순. 현재 라이브: <b>S11 1분봉책</b> · <b>S22 4시간봉책</b> · <b>S33 일봉책</b>.
       </p>
 
-      <div style={{ maxWidth: 860, marginTop: 20, display: "grid", gap: 14 }}>
+      {/* minmax(0,1fr): 표(minWidth 420)가 카드를 화면 밖으로 밀어내지 않게 — 표는 자기 영역 안에서만 스크롤 */}
+      <div style={{ maxWidth: 860, marginTop: 20, display: "grid", gridTemplateColumns: "minmax(0, 1fr)", gap: 14 }}>
         {notes.map((n) => (
           <div
             key={n.date + n.title}
@@ -92,7 +93,7 @@ export default function Updates() {
                       minWidth: 0,
                     }}
                   >
-                    <div style={{ fontSize: 15, fontWeight: 900, color: "#00ffcc", whiteSpace: "nowrap" }}>{s.v}</div>
+                    <div style={{ fontSize: 15, fontWeight: 900, color: "#00ffcc", overflowWrap: "anywhere" }}>{s.v}</div>
                     <div style={{ fontSize: 10.5, opacity: 0.65, marginTop: 1 }}>{s.k}</div>
                   </div>
                 ))}

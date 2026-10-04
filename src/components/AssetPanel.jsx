@@ -2,6 +2,7 @@
 import React, {useMemo, useState} from "react";
 import {fmtComma, buildPositionRows, calcEquityUSDT} from "../lib/tradeUtils";
 import EntryStrategyChips from "./common/EntryStrategyChips";
+import useIsMobile from "../hooks/useIsMobile";
 
 // 퍼센트 출력 유틸
 const pctStr = (v, digits = 2) =>
@@ -17,6 +18,8 @@ export default function AssetPanel({asset, statsBySymbol, config, walletCcy = "U
     // ✅ 포지션 크기(진입금액) 큰 순으로 정렬
     const rows = [...rawRows].sort((a, b) => rowValue(b) - rowValue(a));
     const equity = calcEquityUSDT(asset, statsBySymbol, walletCcy);
+    // 좁은 화면: 수량 열을 빼고(진입 열을 누르면 수량으로 전환됨) 표가 화면 안에 들어오게 — 종전엔 오른쪽 열이 잘려 보였음
+    const narrow = useIsMobile(600);
 
     // ✅ 진입 표시 모드 토글: "usdt" | "qty"
     const [entryMode, setEntryMode] = useState("usdt");
@@ -135,18 +138,21 @@ export default function AssetPanel({asset, statsBySymbol, config, walletCcy = "U
                         style={{
                             display: "grid",
                             // ✅ 현재가 제거 + P&L(%) 합치기 + 진입(토글) 합치기
-                            gridTemplateColumns: "10ch 7ch 9ch 11ch 16ch 18ch",
-                            columnGap: 10,
+                            // 열 폭은 내용에 맞춤(auto) — 고정 ch 폭은 값이 길면 오른쪽 열이 잘렸음
+                            gridTemplateColumns: `repeat(${narrow ? 5 : 6}, auto)`,
+                            justifyContent: "space-between",
+                            columnGap: narrow ? 4 : 10,
                             rowGap: 6,
-                            fontSize: 12,
+                            fontSize: narrow ? 11 : 12,
                             alignItems: "center",
-                            minWidth: "max-content",
+                            minWidth: "100%",
+                            whiteSpace: "nowrap",
                         }}
                     >
                         {/* 헤더 */}
                         <div style={{opacity: 0.65}}>심볼</div>
                         <div style={{opacity: 0.65}}>방향</div>
-                        <div style={{opacity: 0.65, textAlign: "right"}}>수량</div>
+                        {!narrow && <div style={{opacity: 0.65, textAlign: "right"}}>수량</div>}
                         <div style={{opacity: 0.65, textAlign: "right"}}>평균가</div>
                         <div style={{opacity: 0.65, textAlign: "right"}}>P&amp;L(%)</div>
                         <div style={{opacity: 0.65, textAlign: "right", cursor: "pointer"}}
@@ -189,7 +195,7 @@ export default function AssetPanel({asset, statsBySymbol, config, walletCcy = "U
                                         {r.side}
                                     </div>
 
-                                    <div style={{textAlign: "right"}}>{fmtComma(r.qty, 3)}</div>
+                                    {!narrow && <div style={{textAlign: "right"}}>{fmtComma(r.qty, 3)}</div>}
                                     <div style={{textAlign: "right"}}>{fmtComma(r.avg, 1)}</div>
 
                                     <div
