@@ -63,6 +63,10 @@ function Stats({ st }) {
   );
 }
 
+// 월별 시뮬 적합 판정색: 낙폭 정상/주의/이탈, 진입 적합/많음/적음 (perf_report.py months[].dd_fit·entries_fit)
+const FIT_COLOR = { 정상: "#00ffcc", 적합: "#00ffcc", 주의: "#ffd479", 많음: "#ffd479", 적음: "#ffd479", 이탈: "#ff6b6b" };
+const Fit = ({ v }) => (v ? <span style={{ color: FIT_COLOR[v] || "#888", fontSize: 11 }}> {v}</span> : null);
+
 function AccountBlock({ a, targetM, targetW, compact }) {
   const months = a.months || [];
   const weeks = (a.weeks || []).slice(compact ? -8 : -16);
@@ -87,20 +91,27 @@ function AccountBlock({ a, targetM, targetW, compact }) {
 
       <div style={{ overflowX: "auto", marginTop: 10 }}>
         <table className="perf-table" style={{ borderCollapse: "collapse", width: "100%" }}>
-          <thead><tr><th style={th}>월</th><th style={th}>진입</th><th style={th}>청산</th><th style={th}>실현</th><th style={th}>수익률 (목표 {targetM}%)</th></tr></thead>
+          <thead><tr><th style={th}>월</th><th style={th}>진입</th><th style={th}>청산</th><th style={th}>실현</th><th style={th}>수익률 (목표 {targetM}%)</th><th style={th}>낙폭</th></tr></thead>
           <tbody>
             {months.map((m) => (
               <tr key={m.ym}>
                 <td style={td}>{m.ym}{m.partial ? <span style={{ color: "#ff9f5a", fontSize: 11 }}> 진행중</span> : ""}</td>
-                <td style={{ ...td, color: "#888" }}>{m.entries ?? ""}</td>
+                <td style={{ ...td, color: "#888" }}>{m.entries ?? ""}<Fit v={m.entries_fit} /></td>
                 <td style={{ ...td, color: "#888" }}>{m.n}</td>
                 <td style={{ ...td, color: m.realized >= 0 ? "#dfe" : "#fbb" }}><Money v={m.realized} ccy={a.currency} /></td>
                 <td style={td}><Bar pct={m.pct} hit={m.hit} target={targetM} /></td>
+                <td style={{ ...td, color: "#bbb" }}>{m.dd == null ? "" : `${m.dd.toFixed(2)}`}<Fit v={m.dd_fit} /></td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      {a.stats?.sim?.month_dd && (
+        <div style={{ color: "#888", fontSize: 11, marginTop: 4, lineHeight: 1.6 }}>
+          시뮬 한 달 기준 — 진입 {a.stats.sim.month_entries.p5}~{a.stats.sim.month_entries.p95}건(중앙 {a.stats.sim.month_entries.p50})
+          · 낙폭 평소 {a.stats.sim.month_dd.p50}%p, 95% {a.stats.sim.month_dd.p95}%p, 최악 {a.stats.sim.month_dd.max}%p
+        </div>
+      )}
 
       <div style={{ overflowX: "auto", marginTop: 12 }}>
         <table className="perf-table" style={{ borderCollapse: "collapse", width: "100%" }}>
