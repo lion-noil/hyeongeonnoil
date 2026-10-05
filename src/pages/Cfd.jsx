@@ -135,6 +135,18 @@ export default function Cfd() {
         return () => { alive = false; clearInterval(t); document.removeEventListener("visibilitychange", onVis); };
     }, []);
 
+    // 계좌별 자산: /api/asset 이 환율 계좌 포지션을 합쳐 주고(asset.fx.symbols 로 구분) 지갑·평가액은 asset.fx 에 따로 준다.
+    const {mainAsset, fxAsset} = useMemo(() => {
+        const fx = asset?.fx;
+        if (!fx) return {mainAsset: asset, fxAsset: null};
+        const fxSet = new Set(fx.symbols || []);
+        const split = (keep) => Object.fromEntries(Object.entries(asset?.positions || {}).filter(([s]) => fxSet.has(String(s).toUpperCase()) === keep));
+        return {
+            mainAsset: {...asset, positions: split(false), fx: undefined},
+            fxAsset: {wallet: fx.wallet, equity: fx.equity, unrealised: fx.unrealised, updatedMs: fx.updatedMs, positions: split(true)},
+        };
+    }, [asset]);
+
     // ✅ 자산 포지션 심볼(FX 등)의 현재가 — CFD 차트(지수/금속)엔 없으니 직접 받아와 미실현 PnL 채움.
     const posKey = useMemo(
         () => Object.keys(asset?.positions || {}).map((s) => String(s).toUpperCase()).sort().join(","),
@@ -277,9 +289,23 @@ export default function Cfd() {
                             background: "rgba(255,184,108,0.14)", border: "1px solid rgba(255,184,108,0.4)",
                             color: "#ffb86c", fontWeight: 800, fontSize: 11,
                         }}>
-                            ⚠ 데모(모의) 계좌 · MT5
+                            ⚠ 데모(모의) 계좌 · MT5{fxAsset ? " 비환율" : ""}
                         </div>
-                        <AssetPanel asset={asset} statsBySymbol={assetStats} config={configState} walletCcy="USD" strategyBySignalId={sigStratMap} />
+                        <AssetPanel asset={mainAsset} statsBySymbol={assetStats} config={configState} walletCcy="USD" strategyBySignalId={sigStratMap} />
+                        {/* 환율 전용 계좌(2026-10-05~): 지갑·평가액이 별도라 패널도 따로 */}
+                        {fxAsset && (
+                            <div style={{marginTop: 12}}>
+                                <div style={{
+                                    display: "inline-flex", alignItems: "center", gap: 6,
+                                    marginBottom: 8, padding: "3px 9px", borderRadius: 999,
+                                    background: "rgba(255,184,108,0.14)", border: "1px solid rgba(255,184,108,0.4)",
+                                    color: "#ffb86c", fontWeight: 800, fontSize: 11,
+                                }}>
+                                    ⚠ 데모(모의) 계좌 · MT5 환율 전용
+                                </div>
+                                <AssetPanel asset={fxAsset} statsBySymbol={assetStats} config={configState} walletCcy="USD" strategyBySignalId={sigStratMap} />
+                            </div>
+                        )}
                         {/* ✅ 매매 전적 + 월 평가(에쿼티) 통합 카드 — 같은 ◀▶ 달로 이동 */}
                         <div style={{ marginTop: 12 }}>
                             <TradeStatsCard
@@ -287,7 +313,7 @@ export default function Cfd() {
                                 nsList={CFD_STATS_SIGNALS}
                                 equitySource="mt5"
                                 equityCurrency="USD"
-                                currentEquity={calcEquityUSDT(asset, assetStats, "USD")}
+                                currentEquity={calcEquityUSDT(mainAsset, assetStats, "USD")}
                             />
                         </div>
                     </div>

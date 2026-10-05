@@ -15,6 +15,8 @@ function json(payload: unknown, status = 200): Response {
 
 const DAY_MS = 86_400_000;
 const DEFAULT_NS = "agent:CopyZannavi:u7c9f14d2a1:BYBIT";
+const MT5_MAIN_NS = "agent:CopyZannaviMT5:u8f3a9c1e7b:MT5";
+const MT5_FX_NS = "agent:CopyZannaviFX:u5d2b7e4c9a:MT5";
 
 function streamIdFromMs(ms: number): string {
   return `${ms}-0`;
@@ -291,7 +293,15 @@ export async function GET(req: Request): Promise<Response> {
     const fromId = streamIdFromMs(fromMs);
     const toId = streamIdToMs(toMs);
 
-    const raw = await redis.xrange(keyStream, fromId, toId, limit);
+    let raw: any = await redis.xrange(keyStream, fromId, toId, limit);
+
+    // 환율 전용 MT5 계좌(2026-10-05~, executor-a3): MT5 ns 조회에 그 계좌 체결을 함께 싣는다(심볼이 겹치지 않음).
+    // 사이트·앱은 MT5 를 한 ns 로 읽으므로 여기서 합쳐야 환율 체결 금액·마커가 빠지지 않는다. 아래에서 시간순 정렬.
+    if (ns === MT5_MAIN_NS) {
+      const rawFx: any = await redis.xrange(`trading:${MT5_FX_NS}:trade_records`, fromId, toId, limit).catch(() => null);
+      if (Array.isArray(raw) && Array.isArray(rawFx)) raw = [...raw, ...rawFx];
+      else if (rawFx && typeof rawFx === "object" && !Array.isArray(rawFx)) raw = { ...(raw && !Array.isArray(raw) ? raw : {}), ...rawFx };
+    }
 
     // source_signal 복구용 시그널 스트림: ns의 거래소에 맞는 채널들을 조회.
     // (구 하드코딩 trading:bybit:signals — MT5 ns에선 항상 미스, bybit 채널은 s11로 이관됨)

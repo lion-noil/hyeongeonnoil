@@ -3,6 +3,9 @@ export const config = {runtime: "edge"};
 
 import {Redis} from "@upstash/redis";
 
+const MT5_MAIN_NS = "agent:CopyZannaviMT5:u8f3a9c1e7b:MT5";
+const MT5_FX_NS = "agent:CopyZannaviFX:u5d2b7e4c9a:MT5";
+
 /* ------------------------- utils ------------------------- */
 function json(payload: unknown, status = 200): Response {
     return new Response(JSON.stringify(payload), {
@@ -230,6 +233,36 @@ export default async function handler(req: Request): Promise<Response> {
         }
 
         const payload: any = {retCode: 0, asset: {wallet, positions, equity, unrealised, updatedMs}};
+
+        // 환율 전용 MT5 계좌(2026-10-05~, executor-a3): MT5 ns 응답에 그 계좌 포지션을 합치고(심볼이 겹치지 않음),
+        // 지갑·평가액은 섞지 않고 asset.fx 로 따로 준다. 화면은 fx.symbols 로 포지션을 계좌별로 가른다.
+        if (ns === MT5_MAIN_NS && wantSymbols.length === 0) {
+            try {
+                const fxKey = `trading:${MT5_FX_NS}:asset`;
+                const h = ((await (redis as any).hgetall(fxKey)) || {}) as Record<string, unknown>;
+                const fxSymbols: string[] = [];
+                for (const [field, val] of Object.entries(h)) {
+                    if (!field.startsWith("positions.")) continue;
+                    const sym = field.slice("positions.".length).trim().toUpperCase();
+                    if (!sym) continue;
+                    fxSymbols.push(sym);
+                    const parsed = parsePositionVal(val);
+                    if (parsed) positions[sym] = {LONG: parsed.LONG ?? null, SHORT: parsed.SHORT ?? null};
+                }
+                const w = numOrNull(h[`wallet.${walletCoin}`]);
+                if (w !== null) {
+                    payload.asset.fx = {
+                        wallet: {[walletCoin]: w},
+                        equity: numOrNull(h[`equity.${walletCoin}`]),
+                        unrealised: numOrNull(h[`unrealised.${walletCoin}`]),
+                        updatedMs: numOrNull(h["updated_ms"]),
+                        symbols: fxSymbols.sort(),
+                    };
+                }
+            } catch {
+                /* 환율 계좌를 못 읽어도 기본 계좌 응답은 그대로 */
+            }
+        }
 
         // 15초 엣지 캐시: 익명 폴링이 매번 홈 Redis(터널)까지 가지 않게. executor 발행 주기(5분)·프론트 폴링(30초)보다 짧아 신선도 손실 없음.
         return new Response(JSON.stringify(payload), {
