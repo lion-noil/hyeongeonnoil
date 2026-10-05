@@ -42,7 +42,10 @@ const num = { ...td, textAlign: "right", fontVariantNumeric: "tabular-nums" };
 const thR = { ...th, textAlign: "right" };
 const avg = (xs) => (xs.length ? xs.reduce((x, y) => x + y, 0) / xs.length : null);
 
-function AccountBlock({ a, targetM, targetW, compact, prop }) {
+function AccountBlock({ a, targetM: gM, targetW: gW, compact, prop }) {
+  // 유니버스별 목표(환율은 월 1%) — 없으면 전체 목표
+  const targetM = a.target_month_pct ?? gM;
+  const targetW = a.target_week_pct ?? gW;
   // 평가손 포함 낙폭·하루 최대 낙폭: 실행기 평가액 기록이 있는 달(2026-10~)만 값이 있다 → 값이 있을 때만 열을 낸다
   const hasMtm = (a.months || []).some((m) => m.mtm_dd != null);
   // 평가손 기준 = 같은 전략 5년 시뮬(보유 포지션을 그 시간 최악가로 평가): 평가낙폭은 달 95%가 이내였던 값, 일최대는 날 99%가 이내였던 값
@@ -149,10 +152,11 @@ export default function PerfView({ data, compact = false }) {
   if (!data?.accounts) return null;
   const targetM = data.target_month_pct ?? 2;
   const targetW = data.target_week_pct ?? 0.46;
+  const fxT = data.accounts.find((a) => a.target_month_pct != null && a.target_month_pct !== targetM)?.target_month_pct;
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: 6, margin: "4px 0 6px" }}>
-        <h2 style={{ color: "#00bfff", fontSize: 19, margin: 0 }}>📈 성적표 <span style={{ color: "#888", fontSize: 13 }}>유니버스별 월 성적 · 목표 월 {targetM}% · 갱신 {String(data.generated_at || "").slice(0, 16).replace("T", " ")}</span></h2>
+        <h2 style={{ color: "#00bfff", fontSize: 19, margin: 0 }}>📈 성적표 <span style={{ color: "#888", fontSize: 13 }}>유니버스별 월 성적 · 목표 월 {targetM}%{fxT ? ` (환율 ${fxT}%)` : ""} · 갱신 {String(data.generated_at || "").slice(0, 16).replace("T", " ")}</span></h2>
         {compact && <Link href="/reports/perf-latest" style={{ color: "#00ffcc", fontSize: 13 }}>전체 보기 →</Link>}
       </div>
       <p style={{ color: "#999", fontSize: 12, lineHeight: 1.7, margin: "0 0 10px" }}>
