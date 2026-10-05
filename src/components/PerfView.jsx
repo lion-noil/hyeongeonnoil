@@ -71,7 +71,7 @@ function AccountBlock({ a, targetM: gM, targetW: gW, compact, prop }) {
 
       {/* 기준 3칸: 이 유니버스가 맞춰야 할 숫자 — 목표 수익률, 5년 시뮬의 최대 낙폭·월 평균 진입 횟수 */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 6, marginTop: 10 }}>
-        <Goal label="목표 수익률" value={`월 ${targetM}%`} sub="이상이면 달성" />
+        <Goal label={sim ? "목표 수익률 (시뮬 평균)" : "목표 수익률"} value={`월 ${targetM}%`} sub="이상이면 달성" />
         <Goal label="시뮬 최대 낙폭" value={sim ? `${sim.mdd}%` : "—"} sub="이내면 달성" />
         <Goal label="시뮬 평균 진입" value={sim ? `월 ${Math.round(sim.trades_per_month)}건` : "—"}
           sub={sim?.month_entries ? `${sim.month_entries.p5}~${sim.month_entries.p95}건이면 정상` : ""} />
@@ -156,7 +156,7 @@ export default function PerfView({ data, compact = false }) {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: 6, margin: "4px 0 6px" }}>
-        <h2 style={{ color: "#00bfff", fontSize: 19, margin: 0 }}>📈 성적표 <span style={{ color: "#888", fontSize: 13 }}>유니버스별 월 성적 · 목표 월 {targetM}%{fxT ? ` (환율 ${fxT}%)` : ""} · 갱신 {String(data.generated_at || "").slice(0, 16).replace("T", " ")}</span></h2>
+        <h2 style={{ color: "#00bfff", fontSize: 19, margin: 0 }}>📈 성적표 <span style={{ color: "#888", fontSize: 13 }}>유니버스별 월 성적 · {data.target_basis === "sim" ? "목표 = 5년 시뮬 월평균" : `목표 월 ${targetM}%${fxT ? ` (환율 ${fxT}%)` : ""}`} · 갱신 {String(data.generated_at || "").slice(0, 16).replace("T", " ")}</span></h2>
         {compact && <Link href="/reports/perf-latest" style={{ color: "#00ffcc", fontSize: 13 }}>전체 보기 →</Link>}
       </div>
       <p style={{ color: "#999", fontSize: 12, lineHeight: 1.7, margin: "0 0 10px" }}>
