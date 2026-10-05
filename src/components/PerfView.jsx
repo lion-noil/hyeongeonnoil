@@ -26,9 +26,18 @@ function Bar({ pct, hit, target }) {
   );
 }
 
-// 유니버스 카드 = 월별 표 하나: 수익률(목표 2%) · 낙폭 · 진입 수. 아래 줄들은 비교 기준(실제 평균, 5년 시뮬 평균·범위).
-// 숫자 색 = 시뮬 한 달 분포 대비: 초록 범위 안 · 노랑 범위 밖 · 빨강 시뮬 최악 초과 (perf_report.py months[].dd_fit·entries_fit)
-const FIT_COLOR = { 정상: "#00ffcc", 적합: "#00ffcc", 주의: "#ffd479", 많음: "#ffd479", 적음: "#ffd479", 이탈: "#ff6b6b" };
+// 유니버스 카드 = 기준 3칸(목표 수익률 · 시뮬 최대 낙폭 · 시뮬 평균 진입) + 월별 표(수익률·낙폭·진입, 기준 대비 ✓/✗).
+// 달성 판정: 수익률 ≥ 목표, 낙폭 ≤ 5년 시뮬 최대 낙폭, 진입은 시뮬 달 90% 범위 안이면 정상(perf_report.py entries_fit).
+function Goal({ label, value, sub }) {
+  return (
+    <div style={{ background: "var(--panel)", borderRadius: 8, padding: "7px 9px", minWidth: 0 }}>
+      <div style={{ color: "#9bd", fontSize: 11 }}>{label}</div>
+      <div style={{ color: "#eee", fontSize: 15, fontWeight: 600, fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>{value}</div>
+      {sub && <div style={{ color: "#888", fontSize: 10.5 }}>{sub}</div>}
+    </div>
+  );
+}
+const Mark = ({ ok }) => <span style={{ color: ok ? "#00ffcc" : "#ff6b6b", fontSize: 12 }}> {ok ? "✓" : "✗"}</span>;
 const num = { ...td, textAlign: "right", fontVariantNumeric: "tabular-nums" };
 const thR = { ...th, textAlign: "right" };
 const avg = (xs) => (xs.length ? xs.reduce((x, y) => x + y, 0) / xs.length : null);
@@ -51,42 +60,42 @@ function AccountBlock({ a, targetM, targetW, compact }) {
         )}
       </div>
 
+      {/* 기준 3칸: 이 유니버스가 맞춰야 할 숫자 — 목표 수익률, 5년 시뮬의 최대 낙폭·월 평균 진입 횟수 */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 6, marginTop: 10 }}>
+        <Goal label="목표 수익률" value={`월 ${targetM}%`} sub="이상이면 달성" />
+        <Goal label="시뮬 최대 낙폭" value={sim ? `${sim.mdd}%` : "—"} sub="이내면 달성" />
+        <Goal label="시뮬 평균 진입" value={sim ? `월 ${Math.round(sim.trades_per_month)}건` : "—"}
+          sub={sim?.month_entries ? `${sim.month_entries.p5}~${sim.month_entries.p95}건이면 정상` : ""} />
+      </div>
+
       <div style={{ overflowX: "auto", marginTop: 10 }}>
         <table className="perf-table" style={{ borderCollapse: "collapse", width: "100%" }}>
-          <thead><tr><th style={th}>월</th><th style={th}>수익률 (목표 {targetM}%)</th><th style={thR}>낙폭</th><th style={thR}>진입</th></tr></thead>
+          <thead><tr><th style={th}>월</th><th style={th}>수익률</th><th style={thR}>낙폭</th><th style={thR}>진입</th></tr></thead>
           <tbody>
-            {months.map((m) => (
-              <tr key={m.ym}>
-                <td style={td}>{m.ym}{m.partial ? <span style={{ color: "#ff9f5a", fontSize: 11 }}> 진행중</span> : ""}</td>
-                <td style={td}><Bar pct={m.pct} hit={m.hit} target={targetM} /></td>
-                <td style={{ ...num, color: FIT_COLOR[m.dd_fit] || "#999" }}>{m.dd == null ? "" : `${m.dd.toFixed(2)}%`}</td>
-                <td style={{ ...num, color: FIT_COLOR[m.entries_fit] || "#999" }}>{m.entries == null ? "" : `${m.entries}건`}</td>
-              </tr>
-            ))}
-            {judged.length > 0 && (
-              <tr>
-                <td style={{ ...td, color: "#9bd" }}>실제 평균 <span style={{ color: "#777", fontSize: 11 }}>{judged[0].ym.slice(5)}~{judged[judged.length - 1].ym.slice(5)}월</span></td>
-                <td style={{ ...td, color: "#eee", fontVariantNumeric: "tabular-nums" }}>{f(avg(judged.map((m) => m.pct)), 2)}%</td>
-                <td style={{ ...num, color: "#eee" }}>{avg(judged.map((m) => m.dd)).toFixed(2)}%</td>
-                <td style={{ ...num, color: "#eee" }}>{avg(judged.map((m) => m.entries)).toFixed(0)}건</td>
-              </tr>
-            )}
-            {sim?.month_dd && (
-              <>
-                <tr>
-                  <td style={{ ...td, color: "#9bd" }}>시뮬 평균 <span style={{ color: "#777", fontSize: 11 }}>5년</span></td>
-                  <td style={{ ...td, color: "#bbb", fontVariantNumeric: "tabular-nums" }}>{f(sim.month_mean, 2)}%</td>
-                  <td style={{ ...num, color: "#bbb" }}>{(sim.month_dd.mean ?? sim.month_dd.p50).toFixed(2)}%</td>
-                  <td style={{ ...num, color: "#bbb" }}>{Math.round(sim.trades_per_month)}건</td>
+            {months.map((m) => {
+              const judge = !!m.dd_fit;   // 현행 전략으로만 돈 달(08월~)만 기준과 비교
+              const ddOk = judge && sim && m.dd != null ? m.dd <= sim.mdd : null;
+              const enOk = m.entries_fit ? m.entries_fit === "적합" : null;
+              return (
+                <tr key={m.ym}>
+                  <td style={td}>{m.ym}{m.partial ? <span style={{ color: "#ff9f5a", fontSize: 11 }}> 진행중</span> : ""}</td>
+                  <td style={td}><div style={{ display: "flex", alignItems: "center" }}><Bar pct={m.pct} hit={m.hit} target={targetM} />{judge && !m.partial && <Mark ok={!!m.hit} />}</div></td>
+                  <td style={{ ...num, color: ddOk == null ? "#999" : ddOk ? "#00ffcc" : "#ff6b6b" }}>{m.dd == null ? "" : `${m.dd.toFixed(2)}%`}{ddOk != null && <Mark ok={ddOk} />}</td>
+                  <td style={{ ...num, color: enOk == null ? "#999" : enOk ? "#00ffcc" : "#ffd479" }}>{m.entries == null ? "" : `${m.entries}건`}{enOk != null && (enOk ? <Mark ok /> : <span style={{ fontSize: 11 }}> {m.entries_fit}</span>)}</td>
                 </tr>
+              );
+            })}
+            {judged.length > 0 && (() => {
+              const p = avg(judged.map((m) => m.pct)), d = Math.max(...judged.map((m) => m.dd)), e = avg(judged.map((m) => m.entries));
+              return (
                 <tr>
-                  <td style={{ ...td, color: "#9bd" }}>시뮬 범위 <span style={{ color: "#777", fontSize: 11 }}>달 90%</span></td>
-                  <td style={{ ...td, color: "#888", fontVariantNumeric: "tabular-nums" }}>{f(sim.month_pct.p5, 1)} ~ {f(sim.month_pct.p95, 1)}%</td>
-                  <td style={{ ...num, color: "#888" }}>~{sim.month_dd.p95}%</td>
-                  <td style={{ ...num, color: "#888" }}>{sim.month_entries.p5}~{sim.month_entries.p95}건</td>
+                  <td style={{ ...td, color: "#9bd" }}>{judged[0].ym.slice(5)}~{judged[judged.length - 1].ym.slice(5)}월 <span style={{ color: "#777", fontSize: 11 }}>평균·최대</span></td>
+                  <td style={{ ...td, color: p >= targetM ? "#00ffcc" : "#ffd479", fontVariantNumeric: "tabular-nums" }}>평균 {f(p, 2)}%<Mark ok={p >= targetM} /></td>
+                  <td style={{ ...num, color: sim && d > sim.mdd ? "#ff6b6b" : "#00ffcc" }}>최대 {d.toFixed(2)}%{sim && <Mark ok={d <= sim.mdd} />}</td>
+                  <td style={{ ...num, color: "#eee" }}>평균 {e.toFixed(0)}건</td>
                 </tr>
-              </>
-            )}
+              );
+            })()}
           </tbody>
         </table>
       </div>
@@ -124,7 +133,7 @@ export default function PerfView({ data, compact = false }) {
       </div>
       <p style={{ color: "#999", fontSize: 12, lineHeight: 1.7, margin: "0 0 10px" }}>
         <b style={{ color: "#bbb" }}>수익률</b> 그 달 청산 손익 ÷ 월초 계좌 평가액 · <b style={{ color: "#bbb" }}>낙폭</b> 그 달 누적 손익이 고점에서 가장 많이 내려간 폭 · <b style={{ color: "#bbb" }}>진입</b> 그 달 새로 연 포지션 수.
-        {" "}낙폭·진입 숫자 색: <span style={{ color: "#00ffcc" }}>초록</span> 시뮬 범위 안 · <span style={{ color: "#ffd479" }}>노랑</span> 범위 밖 · <span style={{ color: "#ff6b6b" }}>빨강</span> 5년 시뮬 최악 초과 · 회색 비교 안 함.
+        {" "}각 카드 위 3칸이 기준(시뮬 = 같은 전략을 5년 돌린 결과), 표의 <span style={{ color: "#00ffcc" }}>✓</span> 달성 · <span style={{ color: "#ff6b6b" }}>✗</span> 미달 · 회색은 옛 전략 달이라 비교 안 함.
       </p>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 400px), 1fr))", gap: 12 }}>
         {data.accounts.map((a) => <AccountBlock key={a.account} a={a} targetM={targetM} targetW={targetW} compact={compact} />)}
