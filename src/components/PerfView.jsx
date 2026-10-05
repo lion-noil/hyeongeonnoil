@@ -42,7 +42,9 @@ const num = { ...td, textAlign: "right", fontVariantNumeric: "tabular-nums" };
 const thR = { ...th, textAlign: "right" };
 const avg = (xs) => (xs.length ? xs.reduce((x, y) => x + y, 0) / xs.length : null);
 
-function AccountBlock({ a, targetM, targetW, compact }) {
+function AccountBlock({ a, targetM, targetW, compact, prop }) {
+  // 평가손 포함 낙폭·하루 최대 낙폭: 실행기 평가액 기록이 있는 달(2026-10~)만 값이 있다 → 값이 있을 때만 열을 낸다
+  const hasMtm = !!prop && (a.months || []).some((m) => m.mtm_dd != null);
   const sim = a.stats?.sim;
   const from = (a.stats?.from || "").slice(0, 7);
   // 요약 화면은 현행 전략 달만(그 전 달은 다른 전략이라 비교 대상이 아님), 전체 보기는 모든 달
@@ -67,10 +69,15 @@ function AccountBlock({ a, targetM, targetW, compact }) {
         <Goal label="시뮬 평균 진입" value={sim ? `월 ${Math.round(sim.trades_per_month)}건` : "—"}
           sub={sim?.month_entries ? `${sim.month_entries.p5}~${sim.month_entries.p95}건이면 정상` : ""} />
       </div>
+      {hasMtm && (
+        <div style={{ color: "#888", fontSize: 11, marginTop: 6, lineHeight: 1.6 }}>
+          프랍 선(평가손 포함): 평가낙폭 {prop.total_dd}% · 일최대 {prop.daily_dd}% 이내면 ✓ — {prop.since.slice(5)}부터 기록
+        </div>
+      )}
 
       <div style={{ overflowX: "auto", marginTop: 10 }}>
         <table className="perf-table" style={{ borderCollapse: "collapse", width: "100%" }}>
-          <thead><tr><th style={th}>월</th><th style={th}>수익률</th><th style={thR}>낙폭</th><th style={thR}>진입</th></tr></thead>
+          <thead><tr><th style={th}>월</th><th style={th}>수익률</th><th style={thR}>낙폭</th><th style={thR}>진입</th>{hasMtm && <><th style={thR}>평가낙폭</th><th style={thR}>일최대</th></>}</tr></thead>
           <tbody>
             {months.map((m) => {
               const judge = !!m.dd_fit;   // 현행 전략으로만 돈 달(08월~)만 기준과 비교
@@ -82,6 +89,12 @@ function AccountBlock({ a, targetM, targetW, compact }) {
                   <td style={td}><div style={{ display: "flex", alignItems: "center" }}><Bar pct={m.pct} hit={m.hit} target={targetM} />{judge && !m.partial && <Mark ok={!!m.hit} />}</div></td>
                   <td style={{ ...num, color: ddOk == null ? "#999" : ddOk ? "#00ffcc" : "#ff6b6b" }}>{m.dd == null ? "" : `${m.dd.toFixed(2)}%`}{ddOk != null && <Mark ok={ddOk} />}</td>
                   <td style={{ ...num, color: enOk == null ? "#999" : enOk ? "#00ffcc" : "#ffd479" }}>{m.entries == null ? "" : `${m.entries}건`}{enOk != null && (enOk ? <Mark ok /> : <span style={{ fontSize: 11 }}> {m.entries_fit}</span>)}</td>
+                  {hasMtm && (
+                    <>
+                      <td style={{ ...num, color: m.mtm_dd == null ? "#999" : m.mtm_dd <= prop.total_dd ? "#00ffcc" : "#ff6b6b" }}>{m.mtm_dd == null ? "—" : <>{m.mtm_dd.toFixed(2)}%<Mark ok={m.mtm_dd <= prop.total_dd} /></>}</td>
+                      <td style={{ ...num, color: m.day_dd_max == null ? "#999" : m.day_dd_max <= prop.daily_dd ? "#00ffcc" : "#ff6b6b" }}>{m.day_dd_max == null ? "—" : <>{m.day_dd_max.toFixed(2)}%<Mark ok={m.day_dd_max <= prop.daily_dd} /></>}</td>
+                    </>
+                  )}
                 </tr>
               );
             })}
@@ -93,6 +106,7 @@ function AccountBlock({ a, targetM, targetW, compact }) {
                   <td style={{ ...td, color: p >= targetM ? "#00ffcc" : "#ffd479", fontVariantNumeric: "tabular-nums" }}>평균 {f(p, 2)}%<Mark ok={p >= targetM} /></td>
                   <td style={{ ...num, color: sim && d > sim.mdd ? "#ff6b6b" : "#00ffcc" }}>최대 {d.toFixed(2)}%{sim && <Mark ok={d <= sim.mdd} />}</td>
                   <td style={{ ...num, color: "#eee" }}>평균 {e.toFixed(0)}건</td>
+                  {hasMtm && <><td style={td} /><td style={td} /></>}
                 </tr>
               );
             })()}
@@ -132,11 +146,11 @@ export default function PerfView({ data, compact = false }) {
         {compact && <Link href="/reports/perf-latest" style={{ color: "#00ffcc", fontSize: 13 }}>전체 보기 →</Link>}
       </div>
       <p style={{ color: "#999", fontSize: 12, lineHeight: 1.7, margin: "0 0 10px" }}>
-        <b style={{ color: "#bbb" }}>수익률</b> 그 달 청산 손익 ÷ 월초 계좌 평가액 · <b style={{ color: "#bbb" }}>낙폭</b> 그 달 누적 손익이 고점에서 가장 많이 내려간 폭 · <b style={{ color: "#bbb" }}>진입</b> 그 달 새로 연 포지션 수.
+        <b style={{ color: "#bbb" }}>수익률</b> 그 달 청산 손익 ÷ 월초 계좌 평가액 · <b style={{ color: "#bbb" }}>낙폭</b> 그 달 누적 손익이 고점에서 가장 많이 내려간 폭 · <b style={{ color: "#bbb" }}>진입</b> 그 달 새로 연 포지션 수 · <b style={{ color: "#bbb" }}>평가낙폭</b> 들고 있는 포지션의 평가손까지 넣은 계좌 평가액이 월중 고점에서 내려간 폭 · <b style={{ color: "#bbb" }}>일최대</b> 하루 중 시작 평가액 대비 가장 많이 내려간 폭.
         {" "}각 카드 위 3칸이 기준(시뮬 = 같은 전략을 5년 돌린 결과), 표의 <span style={{ color: "#00ffcc" }}>✓</span> 달성 · <span style={{ color: "#ff6b6b" }}>✗</span> 미달 · 회색은 옛 전략 달이라 비교 안 함.
       </p>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 400px), 1fr))", gap: 12 }}>
-        {data.accounts.map((a) => <AccountBlock key={a.account} a={a} targetM={targetM} targetW={targetW} compact={compact} />)}
+        {data.accounts.map((a) => <AccountBlock key={a.account} a={a} targetM={targetM} targetW={targetW} compact={compact} prop={data.prop} />)}
       </div>
       {!compact && data.note && <p style={{ color: "#777", fontSize: 12, lineHeight: 1.6 }}>{data.note}</p>}
     </div>
