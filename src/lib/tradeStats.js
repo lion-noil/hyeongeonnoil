@@ -75,19 +75,22 @@ function universeOf(page, symbol) {
 // coin = Bybit executor: s1~s4 2% / s11~s14 5%
 // cfd  = MT5 executor:  s1/s2 2% / 책(s11~s15) 비FX 3.5%·FX 2.3%(WTI 4h페이드 1.75%)
 //        / 일봉(s3/s4) 비FX 7%·FX 11.5%
-function entryWeightPct(page, ns, strat, symbol) {
+// 환율은 2026-10-05 전용 계좌 분리와 함께 ×2.5 (책 5.75%·일봉 28.75%) — 그날 이후 청산분부터(분리 시점에 열린 환율 포지션 0건).
+const FX_X25_FROM = "2026-10-05";
+function entryWeightPct(page, ns, strat, symbol, dayKey = "") {
   const isFx = FX_SYMBOLS.has(String(symbol || "").toUpperCase());
+  const fxMult = String(dayKey || "") >= FX_X25_FROM ? 2.5 : 1;
   if (page === "coin") {
     if (strat === "S11" || strat === "S12" || strat === "S13" || strat === "S14") return 5;
     return 2; // S1/S2(구)·S3/S4(일봉)
   }
   // cfd
   if (strat === "S1" || strat === "S2") return 2;
-  if (strat === "S3" || strat === "S4") return isFx ? 11.5 : 7;
+  if (strat === "S3" || strat === "S4") return isFx ? 11.5 * fxMult : 7;
   // 책(S11~S15)
   if (strat === "S13" && String(symbol).toUpperCase() === "WTI" &&
       String(ns).toLowerCase() === "s22m") return 1.75; // WTI 4h페이드 절반 규칙
-  return isFx ? 2.3 : 3.5;
+  return isFx ? 2.3 * fxMult : 3.5;
 }
 
 function reasonsOf(sig) {
@@ -167,7 +170,7 @@ export async function loadTradeStats(page, nsList, monthKey) {
 
       const symbol = String(sig?.symbol || "").toUpperCase();
       const pnl = sig?.pnl_pct !== null && sig?.pnl_pct !== undefined ? Number(sig.pnl_pct) : null;
-      const w = entryWeightPct(page, ns, strat, symbol);
+      const w = entryWeightPct(page, ns, strat, symbol, sig?.day_key);
       const uni = universeOf(page, symbol);
       const book = bookOf(ns, strat);
       const rowKey = `${book.code}·${strat}`;
