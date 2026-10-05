@@ -44,7 +44,11 @@ const avg = (xs) => (xs.length ? xs.reduce((x, y) => x + y, 0) / xs.length : nul
 
 function AccountBlock({ a, targetM, targetW, compact, prop }) {
   // 평가손 포함 낙폭·하루 최대 낙폭: 실행기 평가액 기록이 있는 달(2026-10~)만 값이 있다 → 값이 있을 때만 열을 낸다
-  const hasMtm = !!prop && (a.months || []).some((m) => m.mtm_dd != null);
+  const hasMtm = (a.months || []).some((m) => m.mtm_dd != null);
+  // 평가손 기준 = 같은 전략 5년 시뮬(보유 포지션을 그 시간 최악가로 평가): 평가낙폭은 달 95%가 이내였던 값, 일최대는 날 99%가 이내였던 값
+  const mtmSim = a.stats?.sim?.mtm;
+  const mtmLim = mtmSim?.month_dd?.p95 ?? prop?.total_dd;
+  const dayLim = mtmSim?.day_dd?.p99 ?? prop?.daily_dd;
   const sim = a.stats?.sim;
   const from = (a.stats?.from || "").slice(0, 7);
   // 요약 화면은 현행 전략 달만(그 전 달은 다른 전략이라 비교 대상이 아님), 전체 보기는 모든 달
@@ -69,9 +73,15 @@ function AccountBlock({ a, targetM, targetW, compact, prop }) {
         <Goal label="시뮬 평균 진입" value={sim ? `월 ${Math.round(sim.trades_per_month)}건` : "—"}
           sub={sim?.month_entries ? `${sim.month_entries.p5}~${sim.month_entries.p95}건이면 정상` : ""} />
       </div>
-      {hasMtm && (
+      {mtmSim && (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 6, marginTop: 6 }}>
+          <Goal label="시뮬 평가낙폭 (평가손 포함)" value={`월 ${mtmSim.month_dd.p95}%`} sub={`이내면 달성 · 5년 최악 ${mtmSim.month_dd.max}%`} />
+          <Goal label="시뮬 일최대 낙폭" value={`하루 ${mtmSim.day_dd.p99}%`} sub={`이내면 달성 · 5년 최악 ${mtmSim.day_dd.max}%`} />
+        </div>
+      )}
+      {hasMtm && prop && (
         <div style={{ color: "#888", fontSize: 11, marginTop: 6, lineHeight: 1.6 }}>
-          프랍 선(평가손 포함): 평가낙폭 {prop.total_dd}% · 일최대 {prop.daily_dd}% 이내면 ✓ — {prop.since.slice(5)}부터 기록
+          평가낙폭·일최대는 {prop.since.slice(5)}부터 기록 · 참고로 프랍 통상 선은 총 {prop.total_dd}% · 하루 {prop.daily_dd}%
         </div>
       )}
 
@@ -91,8 +101,8 @@ function AccountBlock({ a, targetM, targetW, compact, prop }) {
                   <td style={{ ...num, color: enOk == null ? "#999" : enOk ? "#00ffcc" : "#ffd479" }}>{m.entries == null ? "" : `${m.entries}건`}{enOk != null && (enOk ? <Mark ok /> : <span style={{ fontSize: 11 }}> {m.entries_fit}</span>)}</td>
                   {hasMtm && (
                     <>
-                      <td style={{ ...num, color: m.mtm_dd == null ? "#999" : m.mtm_dd <= prop.total_dd ? "#00ffcc" : "#ff6b6b" }}>{m.mtm_dd == null ? "—" : <>{m.mtm_dd.toFixed(2)}%<Mark ok={m.mtm_dd <= prop.total_dd} /></>}</td>
-                      <td style={{ ...num, color: m.day_dd_max == null ? "#999" : m.day_dd_max <= prop.daily_dd ? "#00ffcc" : "#ff6b6b" }}>{m.day_dd_max == null ? "—" : <>{m.day_dd_max.toFixed(2)}%<Mark ok={m.day_dd_max <= prop.daily_dd} /></>}</td>
+                      <td style={{ ...num, color: m.mtm_dd == null ? "#999" : m.mtm_dd <= mtmLim ? "#00ffcc" : "#ff6b6b" }}>{m.mtm_dd == null ? "—" : <>{m.mtm_dd.toFixed(2)}%<Mark ok={m.mtm_dd <= mtmLim} /></>}</td>
+                      <td style={{ ...num, color: m.day_dd_max == null ? "#999" : m.day_dd_max <= dayLim ? "#00ffcc" : "#ff6b6b" }}>{m.day_dd_max == null ? "—" : <>{m.day_dd_max.toFixed(2)}%<Mark ok={m.day_dd_max <= dayLim} /></>}</td>
                     </>
                   )}
                 </tr>
@@ -147,7 +157,7 @@ export default function PerfView({ data, compact = false }) {
       </div>
       <p style={{ color: "#999", fontSize: 12, lineHeight: 1.7, margin: "0 0 10px" }}>
         <b style={{ color: "#bbb" }}>수익률</b> 그 달 청산 손익 ÷ 월초 계좌 평가액 · <b style={{ color: "#bbb" }}>낙폭</b> 그 달 누적 손익이 고점에서 가장 많이 내려간 폭 · <b style={{ color: "#bbb" }}>진입</b> 그 달 새로 연 포지션 수 · <b style={{ color: "#bbb" }}>평가낙폭</b> 들고 있는 포지션의 평가손까지 넣은 계좌 평가액이 월중 고점에서 내려간 폭 · <b style={{ color: "#bbb" }}>일최대</b> 하루 중 시작 평가액 대비 가장 많이 내려간 폭.
-        {" "}각 카드 위 3칸이 기준(시뮬 = 같은 전략을 5년 돌린 결과), 표의 <span style={{ color: "#00ffcc" }}>✓</span> 달성 · <span style={{ color: "#ff6b6b" }}>✗</span> 미달 · 회색은 옛 전략 달이라 비교 안 함.
+        {" "}각 카드 위 칸들이 기준(시뮬 = 같은 전략을 5년 돌린 결과), 표의 <span style={{ color: "#00ffcc" }}>✓</span> 달성 · <span style={{ color: "#ff6b6b" }}>✗</span> 미달 · 회색은 옛 전략 달이라 비교 안 함.
       </p>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 400px), 1fr))", gap: 12 }}>
         {data.accounts.map((a) => <AccountBlock key={a.account} a={a} targetM={targetM} targetW={targetW} compact={compact} prop={data.prop} />)}
