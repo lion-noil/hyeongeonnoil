@@ -46,19 +46,38 @@ function resolveBandMt5(sym) {
 
 
 /* ------------------------- symbols 추출 유틸 ------------------------- */
+// 환율 페이지 심볼(환율 전용 계좌가 주문하는 7종)
+const FX_PAGE_SYMBOLS = ["USDJPY", "EURUSD", "GBPUSD", "AUDUSD", "USDCAD", "USDCHF", "NZDUSD"];
+
 function extractSymbolsFromConfig(cfg) {
     const arr = cfg?.symbols;
     if (!Array.isArray(arr)) return [];
     return arr.map((s) => String(s).trim()).filter(Boolean).map((s) => s.toUpperCase());
 }
 
-export default function Cfd() {
+// variant: "cfd" = MT5 비환율 계좌(지수·금속·원유·코인CFD) / "fx" = MT5 환율 전용 계좌(2026-10-05~, 환율 7종)
+export default function Cfd({ variant = "cfd" }) {
+    const isFxPage = variant === "fx";
     const isMobile = useIsMobile();
     /* ------------------------- config ------------------------- */
     const [configState, setConfigState] = useState(null);
     const [configLoaded, setConfigLoaded] = useState(false);
     // MT5 자산 (데모/USD) — symbols보다 먼저 선언(차트 목록·정렬에서 참조)
     const [asset, setAsset] = useState({wallet: {USD: 0}, positions: {}});
+    // 계좌별 자산: /api/asset 이 환율 계좌 포지션을 합쳐 주고(asset.fx.symbols 로 구분) 지갑·평가액은 asset.fx 에 따로 준다.
+    const {mainAsset, fxAsset} = useMemo(() => {
+        const fx = asset?.fx;
+        if (!fx) return {mainAsset: asset, fxAsset: null};
+        const fxSet = new Set(fx.symbols || []);
+        const split = (keep) => Object.fromEntries(Object.entries(asset?.positions || {}).filter(([s]) => fxSet.has(String(s).toUpperCase()) === keep));
+        return {
+            mainAsset: {...asset, positions: split(false), fx: undefined},
+            fxAsset: {wallet: fx.wallet, equity: fx.equity, unrealised: fx.unrealised, updatedMs: fx.updatedMs, positions: split(true)},
+        };
+    }, [asset]);
+
+    // 이 페이지가 보는 계좌의 자산(포지션·지갑). 환율 계좌 정보가 아직 안 왔으면 빈 값.
+    const pageAsset = useMemo(() => (isFxPage ? fxAsset : mainAsset) || {wallet: {USD: 0}, positions: {}}, [isFxPage, fxAsset, mainAsset]);
 
     useEffect(() => {
         let alive = true;
@@ -79,10 +98,10 @@ export default function Cfd() {
 
     // ✅ 차트 심볼 = mt5 config(지수/금속) ∪ 자산 포지션 심볼(FX 등) — FX 포지션도 차트·현재가 받게
     const symbols = useMemo(() => {
-        const cfg = extractSymbolsFromConfig(configState);
-        const pos = Object.keys(asset?.positions || {}).map((s) => String(s).toUpperCase());
+        const cfg = isFxPage ? FX_PAGE_SYMBOLS : extractSymbolsFromConfig(configState).filter((s) => !FX_PAGE_SYMBOLS.includes(s));
+        const pos = Object.keys(pageAsset?.positions || {}).map((s) => String(s).toUpperCase());
         return [...new Set([...cfg, ...pos])];
-    }, [configState, asset]);
+    }, [configState, pageAsset, isFxPage]);
     const symbolsReady = symbols.length > 0;
 
     const [selectedSymbol, setSelectedSymbol] = useState(null);
@@ -96,8 +115,8 @@ export default function Cfd() {
     /* ------------------------- sorting + visibility ------------------------- */
     // ✅ 차트/티커 순서 = 포지션 크기(진입금액) 큰 순 (포지션 없으면 뒤로, 알파벳)
     const symbolsSortedByMa = useMemo(
-        () => sortSymbolsByPosition(symbols, asset),
-        [symbols, asset]
+        () => sortSymbolsByPosition(symbols, pageAsset),
+        [symbols, pageAsset]
     );
 
     // ✅ 옛 basic MA100 min-게이트는 제거(시그마 전환 후 무의미) → 정렬된 전 심볼 표시.
@@ -135,22 +154,10 @@ export default function Cfd() {
         return () => { alive = false; clearInterval(t); document.removeEventListener("visibilitychange", onVis); };
     }, []);
 
-    // 계좌별 자산: /api/asset 이 환율 계좌 포지션을 합쳐 주고(asset.fx.symbols 로 구분) 지갑·평가액은 asset.fx 에 따로 준다.
-    const {mainAsset, fxAsset} = useMemo(() => {
-        const fx = asset?.fx;
-        if (!fx) return {mainAsset: asset, fxAsset: null};
-        const fxSet = new Set(fx.symbols || []);
-        const split = (keep) => Object.fromEntries(Object.entries(asset?.positions || {}).filter(([s]) => fxSet.has(String(s).toUpperCase()) === keep));
-        return {
-            mainAsset: {...asset, positions: split(false), fx: undefined},
-            fxAsset: {wallet: fx.wallet, equity: fx.equity, unrealised: fx.unrealised, updatedMs: fx.updatedMs, positions: split(true)},
-        };
-    }, [asset]);
-
     // ✅ 자산 포지션 심볼(FX 등)의 현재가 — CFD 차트(지수/금속)엔 없으니 직접 받아와 미실현 PnL 채움.
     const posKey = useMemo(
-        () => Object.keys(asset?.positions || {}).map((s) => String(s).toUpperCase()).sort().join(","),
-        [asset]
+        () => Object.keys(pageAsset?.positions || {}).map((s) => String(s).toUpperCase()).sort().join(","),
+        [pageAsset]
     );
     const [fxPriceMap, setFxPriceMap] = useState({});
     useEffect(() => {
@@ -184,7 +191,7 @@ export default function Cfd() {
     const assetStats = useMemo(() => ({...fxPriceMap, ...symbolStatsMap}), [fxPriceMap, symbolStatsMap]);
 
     // 심볼별 보유 포지션 진입가 (차트 진입가 선 + 테두리용)
-    const entriesBySymbol = useMemo(() => positionEntriesBySymbol(asset), [asset]);
+    const entriesBySymbol = useMemo(() => positionEntriesBySymbol(pageAsset), [pageAsset]);
 
     // 세부 진입 전략 매핑 (entry_signal_id → 전략). lot 구성이 바뀔 때만 재로드(레포 30s 캐시).
     //   CFD_STATS_SIGNALS가 이 계좌에 lot을 남기는 전 채널(s11m/s22m/mt5/fxd/mt5d)을 이미 커버.
@@ -278,7 +285,7 @@ export default function Cfd() {
             >
                 <div style={{minWidth: isMobile ? 0 : MIN_MAIN}}>
                     <div style={{fontWeight: 800, fontSize: 18, marginBottom: 10, opacity: 0.95}}>
-                        CFD 차트 <span style={{opacity: 0.6, fontWeight: 700}}>({symbols.join(" / ")})</span>
+                        {isFxPage ? "환율 차트" : "CFD 차트"} <span style={{opacity: 0.6, fontWeight: 700}}>({symbols.join(" / ")})</span>
                     </div>
 
                     {/* ✅ 상단: 데모 라벨 + 자산/포지션 카드 (코인처럼 상단 배치) */}
@@ -289,31 +296,21 @@ export default function Cfd() {
                             background: "rgba(255,184,108,0.14)", border: "1px solid rgba(255,184,108,0.4)",
                             color: "#ffb86c", fontWeight: 800, fontSize: 11,
                         }}>
-                            ⚠ 데모(모의) 계좌 · MT5{fxAsset ? " 비환율" : ""}
+                            ⚠ 데모(모의) 계좌 · {isFxPage ? "MT5 환율 전용" : "MT5 비환율"}
                         </div>
-                        <AssetPanel asset={mainAsset} statsBySymbol={assetStats} config={configState} walletCcy="USD" strategyBySignalId={sigStratMap} />
-                        {/* 환율 전용 계좌(2026-10-05~): 지갑·평가액이 별도라 패널도 따로 */}
-                        {fxAsset && (
-                            <div style={{marginTop: 12}}>
-                                <div style={{
-                                    display: "inline-flex", alignItems: "center", gap: 6,
-                                    marginBottom: 8, padding: "3px 9px", borderRadius: 999,
-                                    background: "rgba(255,184,108,0.14)", border: "1px solid rgba(255,184,108,0.4)",
-                                    color: "#ffb86c", fontWeight: 800, fontSize: 11,
-                                }}>
-                                    ⚠ 데모(모의) 계좌 · MT5 환율 전용
-                                </div>
-                                <AssetPanel asset={fxAsset} statsBySymbol={assetStats} config={configState} walletCcy="USD" strategyBySignalId={sigStratMap} />
-                            </div>
-                        )}
+                        <a href={isFxPage ? "/cfd" : "/fx"} style={{marginLeft: 10, color: "#00ffcc", fontSize: 12}}>
+                            {isFxPage ? "비환율(CFD) 계좌 보기 →" : "환율 계좌 보기 →"}
+                        </a>
+                        <AssetPanel asset={pageAsset} statsBySymbol={assetStats} config={configState} walletCcy="USD" strategyBySignalId={sigStratMap} />
                         {/* ✅ 매매 전적 + 월 평가(에쿼티) 통합 카드 — 같은 ◀▶ 달로 이동 */}
                         <div style={{ marginTop: 12 }}>
                             <TradeStatsCard
                                 page="cfd"
                                 nsList={CFD_STATS_SIGNALS}
-                                equitySource="mt5"
+                                universe={isFxPage ? "환율" : "MT5"}
+                                equitySource={isFxPage ? "mt5fx" : "mt5"}
                                 equityCurrency="USD"
-                                currentEquity={calcEquityUSDT(mainAsset, assetStats, "USD")}
+                                currentEquity={calcEquityUSDT(pageAsset, assetStats, "USD")}
                             />
                         </div>
                     </div>

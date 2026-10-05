@@ -3,7 +3,7 @@ import { listAllDays } from "../src/lib/archiveDb";
 import { listBriefingDays } from "../src/lib/briefingDb";
 
 const SITE = "https://hyeongeonnoil.com";
-const STATIC_PATHS = ["", "/briefing", "/exchange", "/indexes", "/commodity", "/coin", "/cfd", "/archive", "/reports", "/updates", "/others", "/privacy"];
+const STATIC_PATHS = ["", "/briefing", "/exchange", "/indexes", "/commodity", "/coin", "/cfd", "/fx", "/archive", "/reports", "/updates", "/others", "/privacy"];
 
 export async function getServerSideProps({ res }) {
   let days = [];

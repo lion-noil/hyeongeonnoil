@@ -13,7 +13,10 @@ function json(payload: unknown, status = 200): Response {
     });
 }
 
+const KEY_FX = "trading:agent:CopyZannaviFX:u5d2b7e4c9a:MT5:daily_equity";   // 환율 전용 계좌(2026-10-05~)
+
 export default async function handler(_req: Request): Promise<Response> {
+    const key = new URL(_req.url).searchParams.get("acct") === "fx" ? KEY_FX : KEY;
     const url = process.env.UPSTASH_REDIS_REST_URL;
     const token = process.env.UPSTASH_REDIS_REST_TOKEN;
     if (!url || !token) {
@@ -22,7 +25,7 @@ export default async function handler(_req: Request): Promise<Response> {
 
     try {
         const redis = new Redis({ url, token });
-        const all = (await (redis as any).hgetall(KEY)) as Record<string, any> | null;
+        const all = (await (redis as any).hgetall(key)) as Record<string, any> | null;
 
         const rows = Object.entries(all || {})
             .map(([day, v]) => {

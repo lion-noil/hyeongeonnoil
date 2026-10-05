@@ -16,6 +16,7 @@ const navItems = [
   { path: "/commodity", label: "원자재" },
   { path: "/coin", label: "코인" },
   { path: "/cfd", label: "CFD" },
+  { path: "/fx", label: "FX" },
   { path: "/archive", label: "아카이브" },
   { path: "/reports", label: "보고서" },
   { path: "/updates", label: "업데이트" },

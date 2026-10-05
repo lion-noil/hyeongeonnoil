@@ -87,7 +87,7 @@ function useEquityRows(source) {
   useEffect(() => {
     if (!source) return;
     let alive = true;
-    const url = source === "mt5" ? "/api/mt5-equity" : "/api/equity-history?days=365";
+    const url = source === "mt5" ? "/api/mt5-equity" : source === "mt5fx" ? "/api/mt5-equity?acct=fx" : "/api/equity-history?days=365";
     fetch(url)
       .then((r) => r.json())
       .then((j) => {
@@ -213,7 +213,8 @@ function EquitySection({ rows, month, currency, currentEquity, onSelectMonth, is
 
 export default function TradeStatsCard({
   page, nsList, title = "매매 전적",
-  equitySource = null,      // "bybit" | "mt5" — 지정 시 월 평가 섹션 표시
+  equitySource = null,      // "bybit" | "mt5" | "mt5fx" — 지정 시 월 평가 섹션 표시
+  universe = null,          // 지정 시 그 유니버스("MT5"·"환율")만 표시 — MT5 는 계좌가 둘이라 페이지별로 가른다
   equityCurrency = "USDT",
   currentEquity = null,     // 이번 달 마지막 점으로 붙일 현재 평가(라이브)
 }) {
@@ -228,7 +229,12 @@ export default function TradeStatsCard({
     setData(null);
     setErr(null);
     loadTradeStats(page, nsList, month)
-      .then((d) => { if (alive) setData(d); })
+      .then((d) => {
+        if (!alive) return;
+        if (!universe) return setData(d);
+        const groups = d.groups.filter((g) => g.universe === universe);
+        setData({ ...d, groups, total: groups[0]?.total || { ...d.total, games: 0, winRatePct: null, avgPnlPct: null, contribPct: null } });
+      })
       .catch((e) => { if (alive) setErr(e?.message || "load failed"); });
     return () => { alive = false; };
     // nsList는 페이지 모듈 상수(안정 참조) 전제
