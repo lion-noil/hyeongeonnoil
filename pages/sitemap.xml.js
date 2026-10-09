@@ -4,7 +4,7 @@ import { listBriefingDays, listBriefingsEn } from "../src/lib/briefingDb";
 import { getMarketOverview, todayKST } from "../src/lib/marketDataDb";
 
 const SITE = "https://hyeongeonnoil.com";
-const STATIC_PATHS = ["", "/briefing", "/market", "/en/market", "/en/briefing", "/exchange", "/indexes", "/commodity", "/coin", "/cfd", "/fx", "/archive", "/reports", "/updates", "/others", "/privacy"];
+const STATIC_PATHS = ["", "/en", "/briefing", "/market", "/en/market", "/en/briefing", "/en/archive", "/exchange", "/indexes", "/commodity", "/coin", "/cfd", "/fx", "/archive", "/reports", "/updates", "/others", "/privacy"];
 
 export async function getServerSideProps({ res }) {
   let days = [];

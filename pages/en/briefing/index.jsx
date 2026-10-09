@@ -28,7 +28,8 @@ export default function BriefingIndexEn({ items }) {
         <link rel="alternate" hrefLang="en" href={`${SITE}/en/briefing`} key="alt-en" />
         <link rel="alternate" hrefLang="x-default" href={`${SITE}/briefing`} key="alt-x" />
       </Head>
-      <p style={{ color: "#999", fontSize: 13, margin: "8px 0 4px", textAlign: "right" }}>
+      <p style={{ color: "#999", fontSize: 13, margin: "8px 0 4px", display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+        <span><Link href="/en" style={{ color: "#9bd" }}>EN Home</Link> › Market Briefing</span>
         <Link href="/briefing" style={{ color: "#9bd" }}>한국어</Link>
       </p>
       <h1 style={{ color: "#00bfff", fontSize: 24 }}>Daily Market Briefing</h1>

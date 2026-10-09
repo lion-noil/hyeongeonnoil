@@ -82,7 +82,7 @@ export default function BriefingDayPageEn({ b, prevDay, nextDay }) {
 
       <p style={{ color: "#999", fontSize: 13, margin: "8px 0 4px", display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
         <span>
-          <Link href="/en/briefing" style={{ color: "#00ffcc" }}>Market Briefing</Link> · published {edate(b.day)} morning (KST) · prices as of {b.data_date} close
+          <Link href="/en" style={{ color: "#9bd" }}>EN Home</Link> › <Link href="/en/briefing" style={{ color: "#00ffcc" }}>Market Briefing</Link> · published {edate(b.day)} morning (KST) · prices as of {b.data_date} close
         </span>
         <Link href={`/briefing/${b.day}`} hrefLang="ko" style={{ color: "#9bd" }}>한국어</Link>
       </p>
@@ -134,6 +134,46 @@ export default function BriefingDayPageEn({ b, prevDay, nextDay }) {
           </section>
         ) : null,
       )}
+
+      {/* Yesterday's key world news — en.news ([{title, category, summary}], written by News_scrap from 2026-10-09; many days lack it)
+          falls back to the Korean news_items titles so the section never disappears. */}
+      {Array.isArray(en.news) && en.news.length > 0 ? (
+        <section style={card}>
+          <h2 style={{ color: "#00ffcc", fontSize: 17, marginTop: 0 }}>Yesterday's key world news</h2>
+          <ol style={{ margin: "0 0 8px", paddingLeft: 20, lineHeight: 1.7, fontSize: 14 }}>
+            {en.news.map((n, i) => (
+              <li key={i} style={{ marginBottom: 10 }}>
+                <strong style={{ color: "#eee" }}>{n.title}</strong>
+                {n.category ? <span style={{ color: "#999", fontSize: 12, marginLeft: 6 }}>· {n.category}</span> : null}
+                {n.summary ? <p style={{ margin: "3px 0 0", color: "#ccc", fontSize: 14, lineHeight: 1.7 }}>{n.summary}</p> : null}
+              </li>
+            ))}
+          </ol>
+          {b.news_day && (
+            <Link href={`/archive/${b.news_day}`} hrefLang="ko" style={{ color: "#00bfff", fontSize: 13 }}>
+              Full country-by-country summaries for {edate(b.news_day)} (Korean) →
+            </Link>
+          )}
+        </section>
+      ) : b.news_items?.length > 0 ? (
+        <section style={card}>
+          <h2 style={{ color: "#00ffcc", fontSize: 17, marginTop: 0 }}>Yesterday's key world news</h2>
+          <p style={{ color: "#999", fontSize: 12, margin: "0 0 8px" }}>Headlines are in Korean (English summaries were not generated for this day).</p>
+          <ol style={{ margin: "0 0 8px", paddingLeft: 20, lineHeight: 1.8, fontSize: 14 }} lang="ko">
+            {b.news_items.map((n, i) => (
+              <li key={i}>
+                {n.category ? <span style={{ color: "#999" }}>[{n.category}] </span> : null}
+                {n.title}
+              </li>
+            ))}
+          </ol>
+          {b.news_day && (
+            <Link href={`/archive/${b.news_day}`} hrefLang="ko" style={{ color: "#00bfff", fontSize: 13 }}>
+              Full country-by-country summaries for {edate(b.news_day)} (Korean) →
+            </Link>
+          )}
+        </section>
+      ) : null}
 
       {(en.keywords || []).length > 0 && (
         <p style={{ display: "flex", flexWrap: "wrap", gap: 6, margin: "4px 0 16px" }}>

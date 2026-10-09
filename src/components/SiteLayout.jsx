@@ -24,10 +24,15 @@ const navItems = [
   { path: "/others", label: "기타" },
 ];
 
-const isActivePath = (pathname, path) => (path === "/" ? pathname === "/" : pathname === path || pathname.startsWith(`${path}/`));
+// 영문 경로(/en, /en/*)에서만 내비 맨 앞에 붙는 영문 허브 링크 (2026-10-09)
+const EN_HOME = { path: "/en", label: "EN Home" };
+
+const isActivePath = (pathname, path) => (path === "/" || path === "/en" ? pathname === path : pathname === path || pathname.startsWith(`${path}/`));
 
 function TopBar() {
   const { pathname } = useRouter();
+  const isEn = pathname === "/en" || pathname.startsWith("/en/");
+  const items = isEn ? [EN_HOME, ...navItems] : navItems;
   const now = useCurrentTime();
   const navRef = useRef(null);
 
@@ -48,7 +53,7 @@ function TopBar() {
           </span>
         </Link>
         <nav className="nav" ref={navRef}>
-          {navItems.map(({ path, label }) => (
+          {items.map(({ path, label }) => (
             <Link key={path} href={path} className={isActivePath(pathname, path) ? "is-active" : undefined}>
               {label}
             </Link>
@@ -143,6 +148,7 @@ export default function SiteLayout({ children }) {
               <Link href="/archive">뉴스 아카이브</Link>
               <Link href="/reports">보고서</Link>
               <Link href="/privacy">개인정보처리방침</Link>
+              <Link href="/en" hrefLang="en">English</Link>
               <a href="/rss.xml">RSS</a>
             </div>
           </div>

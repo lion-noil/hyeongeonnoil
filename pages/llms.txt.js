@@ -13,6 +13,7 @@ const PAGES = [
   ["/briefing", "시장 브리핑", "매일 아침 1편 — 어제 종가 시세표(환율·금리·증시·원자재·코인)와 세계 뉴스를 연결한 한 장 정리"],
   ["/market", "시세 페이지", "달러·엔화 환율, 미국·한국 금리, 코스피200·나스닥100 등 지수, 금·WTI 의 매일 종가·전일/1주/1개월 변화·100일 평균 대비·추이 차트·FAQ (영문: /en/market)"],
   ["/en/briefing", "Market Briefing (English)", "영문판 시장 브리핑 — 영문 본문이 있는 날만"],
+  ["/en", "English hub", "영문 허브 — 오늘의 영문 브리핑·시세 13개 카드·최근 영문 브리핑·아카이브 안내(/en/archive)"],
   ["/archive", "뉴스 요약 아카이브", "날짜별 8개국(미국·중국·일본·인도·홍콩·한국·독일·영국) 주요 뉴스 방송 한국어 요약"],
   ["/exchange", "환율·채권", "달러 인덱스, 원·엔·위안·유로 등 주요 통화 환율과 미·일·한 국채 금리 일봉 차트(100일 이동평균·엔벨로프)"],
   ["/indexes", "세계 주가지수", "나스닥100·닛케이225·상하이A·항셍·BSE30·코스피200·유로스톡스50·DAX 일봉 차트"],
@@ -69,6 +70,9 @@ ${PAGES.map(([path, name, desc]) => `- [${name}](${SITE_URL}${path}): ${desc}`).
 
 ## 시세 페이지(종목별, 매일 종가 갱신 · 한/영)
 ${marketTopics.map((t) => `- [${t.ko.seo} — ${t.ko.name}](${SITE_URL}/market/${t.slug}) · [EN](${SITE_URL}/en/market/${t.slug})`).join("\n")}
+
+## English
+- [NewsInsight in English](${SITE_URL}/en): daily Korea market briefing in English (/en/briefing), 13 market pages with daily closes (/en/market), world news digest guide (/en/archive).
 
 ## 최근 브리핑
 ${briefingBlock}

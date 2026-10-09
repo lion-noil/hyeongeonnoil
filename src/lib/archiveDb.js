@@ -43,6 +43,27 @@ export async function getRecentDays(limit = 15) {
     });
 }
 
+// 최근 N일치 나라별 요약 전문 — /en/archive 안내 페이지의 헤드라인 추출용(extractHeadlines 입력 형태와 동일). (2026-10-09)
+//   [{ day, countries: { [country]: { summary } } }] 최신순
+export async function getRecentDaySummaries(limit = 14) {
+  const supabase = client();
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from("daily_collections")
+    .select("day, raw_json")
+    .order("day", { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return (data || [])
+    .filter((r) => /^\d{4}-\d{2}-\d{2}$/.test(r.day))
+    .map((r) => {
+      const yt = r.raw_json?.youtube_data || {};
+      const countries = {};
+      for (const [country, info] of Object.entries(yt)) countries[country] = { summary: info?.summary_result || "" };
+      return { day: r.day, countries };
+    });
+}
+
 // 단일 일자의 뉴스요약(youtube_data) — SEO 페이지 본문용.
 // summary_result(한국어 요약 전문)를 포함하고, 무거운 원문(summary_content)만 제외
 export async function getDaySummaries(day) {

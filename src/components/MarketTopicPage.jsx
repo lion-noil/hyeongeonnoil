@@ -368,6 +368,7 @@ export default function MarketTopicPage({ lang, topic: t, data, briefing: b, oth
 
       <p style={{ color: "#999", fontSize: 13, margin: "8px 0 4px", display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
         <span>
+          {lang === "en" && <><Link href="/en" style={{ color: "#9bd" }}>EN Home</Link> › </>}
           <Link href={d.base} style={{ color: "#00ffcc" }}>{d.crumbRoot}</Link> › {L.name}
         </span>
         <Link href={`${lang === "ko" ? "/en/market" : "/market"}/${t.slug}`} hrefLang={lang === "ko" ? "en" : "ko"} style={{ color: "#9bd" }}>
@@ -495,7 +496,8 @@ export function MarketIndexPage({ lang, overview }) {
         <AlternateLinks koPath="/market" enPath="/en/market" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(jsonLd) }} />
       </Head>
-      <p style={{ color: "#999", fontSize: 13, margin: "8px 0 4px", textAlign: "right" }}>
+      <p style={{ color: "#999", fontSize: 13, margin: "8px 0 4px", display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+        <span>{lang === "en" && <><Link href="/en" style={{ color: "#9bd" }}>EN Home</Link> › Markets</>}</span>
         <Link href={lang === "ko" ? "/en/market" : "/market"} style={{ color: "#9bd" }}>{d.enCta}</Link>
       </p>
       <h1 style={{ color: "#00bfff", fontSize: 24 }}>{lang === "ko" ? "시세 — 매일 종가와 추이" : "Markets — daily close and trend"}</h1>
