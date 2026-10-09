@@ -5,6 +5,7 @@
 import Head from "next/head";
 import Link from "next/link";
 import { getBriefing, listBriefingDays } from "../../src/lib/briefingDb";
+import { SLUG_BY_SNAP } from "../../src/lib/marketTopics";
 
 const SITE = "https://hyeongeonnoil.com";
 const box = { maxWidth: 780, margin: "0 auto", padding: "8px 16px 40px", color: "#eee" };
@@ -30,7 +31,7 @@ function kdate(day) {
   return `${y}년 ${Number(m)}월 ${Number(d)}일`;
 }
 
-export default function BriefingDayPage({ b, prevDay, nextDay }) {
+export default function BriefingDayPage({ b, prevDay, nextDay, hasEn = false }) {
   const url = `${SITE}/briefing/${b.day}`;
   const pageTitle = `${b.title} | NewsInsight`;
   const desc = String(b.lead || "").replace(/\s+/g, " ").slice(0, 155);
@@ -70,11 +71,21 @@ export default function BriefingDayPage({ b, prevDay, nextDay }) {
         <meta property="og:url" content={url} key="og-url" />
         <meta property="og:type" content="article" key="og-type" />
         <link rel="canonical" href={url} key="canonical" />
+        {/* 영문판(b.en)이 있는 날만 hreflang 상호 참조 (2026-10-09) */}
+        {hasEn && <link rel="alternate" hrefLang="ko" href={url} key="alt-ko" />}
+        {hasEn && <link rel="alternate" hrefLang="en" href={`${SITE}/en/briefing/${b.day}`} key="alt-en" />}
+        {hasEn && <link rel="alternate" hrefLang="x-default" href={url} key="alt-x" />}
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       </Head>
 
       <p style={{ color: "#999", fontSize: 13, margin: "8px 0 4px" }}>
         <Link href="/briefing" style={{ color: "#00ffcc" }}>시장 브리핑</Link> · {kdate(b.day)} 아침 발행 · 시세 기준 {b.data_date} 종가
+        {hasEn && (
+          <>
+            {" · "}
+            <Link href={`/en/briefing/${b.day}`} hrefLang="en" style={{ color: "#9bd" }}>English</Link>
+          </>
+        )}
       </p>
       <h1 style={{ color: "#00bfff", fontSize: 24, lineHeight: 1.35, marginTop: 4 }}>{b.title}</h1>
       <p style={{ fontSize: 16, lineHeight: 1.8, color: "#ddd" }}>{b.lead}</p>
@@ -98,7 +109,7 @@ export default function BriefingDayPage({ b, prevDay, nextDay }) {
                 return (
                   <tr key={s.key} style={{ borderTop: "1px solid var(--line)", textAlign: "right" }}>
                     <td style={{ textAlign: "left", padding: "7px 4px", color: "#ddd" }}>
-                      {s.label}
+                      {SLUG_BY_SNAP[s.key] ? <Link href={`/market/${SLUG_BY_SNAP[s.key]}`} style={{ color: "#ddd" }}>{s.label}</Link> : s.label}
                       <span style={{ color: "#777", fontSize: 11, marginLeft: 6 }}>{s.date?.slice(5)}</span>
                     </td>
                     <td style={{ padding: "7px 4px" }}>{isRate ? `${fmt(s.close, 3)}%` : `${fmt(s.close, s.dec)}${s.unit || ""}`}</td>
@@ -180,6 +191,7 @@ export async function getStaticProps({ params }) {
     return {
       props: {
         b,
+        hasEn: !!(b.en && typeof b.en === "object" && b.en.title),
         prevDay: idx >= 0 && idx + 1 < days.length ? days[idx + 1] : null,
         nextDay: idx > 0 ? days[idx - 1] : null,
       },

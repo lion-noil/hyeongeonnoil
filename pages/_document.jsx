@@ -1,8 +1,9 @@
-import { Html, Head, Main, NextScript } from "next/document";
+import NextDocument, { Html, Head, Main, NextScript } from "next/document";
 
-export default function Document() {
+// /en/* 라우트는 <html lang="en"> — 영문 시세·브리핑 페이지(2026-10-09). 그 외는 ko.
+export default function Document({ lang = "ko" }) {
   return (
-    <Html lang="ko">
+    <Html lang={lang}>
       <Head>
         <meta name="theme-color" content="#04060f" />
         <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
@@ -21,3 +22,9 @@ export default function Document() {
     </Html>
   );
 }
+
+Document.getInitialProps = async (ctx) => {
+  const initial = await NextDocument.getInitialProps(ctx);
+  const p = String(ctx.pathname || "");
+  return { ...initial, lang: p === "/en" || p.startsWith("/en/") ? "en" : "ko" };
+};

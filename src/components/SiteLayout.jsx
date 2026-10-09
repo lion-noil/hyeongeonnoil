@@ -11,6 +11,7 @@ const CosmicBackground = dynamic(() => import("./three/CosmicBackground"), { ssr
 const navItems = [
   { path: "/", label: "홈" },
   { path: "/briefing", label: "시장 브리핑" },
+  { path: "/market", label: "시세" },
   { path: "/exchange", label: "환율·채권" },
   { path: "/indexes", label: "지수" },
   { path: "/commodity", label: "원자재" },

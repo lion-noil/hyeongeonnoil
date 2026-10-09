@@ -3,12 +3,16 @@
 //   주의: 공식 표준이 아니라 관례이며 읽는 크롤러는 제한적 — 사람이 보는 페이지가 여전히 1차 자료다.
 import { listBriefings } from "../src/lib/briefingDb";
 import { getRecentDays } from "../src/lib/archiveDb";
+import { MARKET_TOPICS } from "../src/lib/marketTopics";
+import { getMarketOverview } from "../src/lib/marketDataDb";
 
 const SITE_URL = "https://hyeongeonnoil.com";
 
 const PAGES = [
   ["/", "홈", "어제 세계 핵심 뉴스 5선, 세계 정세 현황판(3D 지구본), 8개국 뉴스 방송 카드, 일정 캘린더"],
   ["/briefing", "시장 브리핑", "매일 아침 1편 — 어제 종가 시세표(환율·금리·증시·원자재·코인)와 세계 뉴스를 연결한 한 장 정리"],
+  ["/market", "시세 페이지", "달러·엔화 환율, 미국·한국 금리, 코스피200·나스닥100 등 지수, 금·WTI 의 매일 종가·전일/1주/1개월 변화·100일 평균 대비·추이 차트·FAQ (영문: /en/market)"],
+  ["/en/briefing", "Market Briefing (English)", "영문판 시장 브리핑 — 영문 본문이 있는 날만"],
   ["/archive", "뉴스 요약 아카이브", "날짜별 8개국(미국·중국·일본·인도·홍콩·한국·독일·영국) 주요 뉴스 방송 한국어 요약"],
   ["/exchange", "환율·채권", "달러 인덱스, 원·엔·위안·유로 등 주요 통화 환율과 미·일·한 국채 금리 일봉 차트(100일 이동평균·엔벨로프)"],
   ["/indexes", "세계 주가지수", "나스닥100·닛케이225·상하이A·항셍·BSE30·코스피200·유로스톡스50·DAX 일봉 차트"],
@@ -33,6 +37,14 @@ export async function getServerSideProps({ res }) {
   } catch {
     // Supabase 오류 시 목록만 생략
   }
+  // 시세 페이지 — 데이터 있는 심볼만(없는 심볼은 404). 조회 실패 시 전체 표기
+  let marketTopics = MARKET_TOPICS;
+  try {
+    const have = new Set((await getMarketOverview()).map((o) => o.slug));
+    if (have.size) marketTopics = MARKET_TOPICS.filter((t) => have.has(t.slug));
+  } catch {
+    // 생략
+  }
 
   const kdate = (d) => {
     const [y, m, dd] = String(d).split("-");
@@ -54,6 +66,9 @@ export async function getServerSideProps({ res }) {
 ${PAGES.map(([path, name, desc]) => `- [${name}](${SITE_URL}${path}): ${desc}`).join("\n")}
 - 사이트맵: ${SITE_URL}/sitemap.xml
 - RSS(뉴스 요약): ${SITE_URL}/rss.xml
+
+## 시세 페이지(종목별, 매일 종가 갱신 · 한/영)
+${marketTopics.map((t) => `- [${t.ko.seo} — ${t.ko.name}](${SITE_URL}/market/${t.slug}) · [EN](${SITE_URL}/en/market/${t.slug})`).join("\n")}
 
 ## 최근 브리핑
 ${briefingBlock}

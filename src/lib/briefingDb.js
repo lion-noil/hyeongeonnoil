@@ -41,7 +41,18 @@ export async function listBriefings(limit = 60) {
     .filter(([day]) => DAY_RE.test(day))
     .map(([day, v]) => {
       const b = parse(v);
-      return b ? { day, title: b.title || "", lead: b.lead || "", data_date: b.data_date || "", keywords: b.keywords || [] } : null;
+      if (!b) return null;
+      const en = b.en && typeof b.en === "object" && b.en.title ? b.en : null;
+      return {
+        day,
+        title: b.title || "",
+        lead: b.lead || "",
+        data_date: b.data_date || "",
+        keywords: b.keywords || [],
+        has_en: !!en, // 영문판 존재 여부 — /en/briefing 목록·사이트맵·hreflang 판정 (2026-10-09)
+        en_title: en ? en.title : "",
+        en_lead: en ? en.lead || "" : "",
+      };
     })
     .filter(Boolean)
     .sort((a, b) => (a.day < b.day ? 1 : -1))
@@ -53,4 +64,45 @@ export async function getBriefing(day) {
   const r = client();
   if (!r) return null;
   return parse(await r.hget(KEY, day));
+}
+
+// 최신 브리핑 day — market_briefings:latest 키, 없으면 해시 키 중 최대
+export async function getLatestBriefingDay() {
+  const r = client();
+  if (!r) return null;
+  const v = await r.get("market_briefings:latest");
+  if (typeof v === "string" && DAY_RE.test(v)) return v;
+  const days = await listBriefingDays();
+  return days[0] || null;
+}
+
+// 최신 브리핑 전문 (홈 서버렌더 블록·시세 페이지 '관련 뉴스')
+export async function getLatestBriefing() {
+  const day = await getLatestBriefingDay();
+  return day ? getBriefing(day) : null;
+}
+
+// 영문판(b.en)이 있는 브리핑만 — /en/briefing 목록·사이트맵. 최신순 [{day, title, lead, data_date}]
+export async function listBriefingsEn(limit = 60) {
+  const all = await listBriefings(1000);
+  return all
+    .filter((b) => b.has_en)
+    .slice(0, limit)
+    .map((b) => ({ day: b.day, title: b.en_title, lead: b.en_lead, data_date: b.data_date }));
+}
+
+// 시세 페이지 '관련 뉴스' 발췌 — 해당 section 본문(ko 또는 en) + 뉴스 제목. en 요청인데 영문이 없으면 본문 생략
+export function briefingExcerpt(b, sectionKey, lang = "ko") {
+  if (!b || !b.day) return null;
+  const hasEn = !!(b.en && typeof b.en === "object" && b.en.title);
+  const src = lang === "en" ? (hasEn ? b.en : null) : b;
+  const sec = src ? (src.sections || []).find((s) => s.key === sectionKey) : null;
+  return {
+    day: b.day,
+    title: lang === "en" && hasEn ? b.en.title : b.title || "",
+    sectionHeading: sec ? sec.heading || "" : "",
+    sectionBody: sec ? sec.body || "" : "",
+    news_items: (b.news_items || []).slice(0, 5).map((n) => ({ title: n.title || "", category: n.category || "" })),
+    hasEn,
+  };
 }

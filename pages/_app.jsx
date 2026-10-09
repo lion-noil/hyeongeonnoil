@@ -58,7 +58,7 @@ export default function MyApp({ Component, pageProps }) {
         <meta property="og:site_name" content="현건노일 NewsInsight" />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://hyeongeonnoil.com/logo512.png" />
-        <meta property="og:locale" content="ko_KR" />
+        <meta property="og:locale" content="ko_KR" key="og-locale" />
         <link rel="alternate" type="application/rss+xml" title="NewsInsight 뉴스 요약" href="https://hyeongeonnoil.com/rss.xml" />
       </Head>
       <SiteLayout>
