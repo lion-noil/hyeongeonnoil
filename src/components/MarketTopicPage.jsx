@@ -5,6 +5,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { ldJson } from "../lib/jsonLd";
 import { MARKET_TOPICS } from "../lib/marketTopics";
+import OgImageMeta from "./OgImageMeta";
 
 const SITE = "https://hyeongeonnoil.com";
 const box = { maxWidth: 780, margin: "0 auto", padding: "8px 16px 40px", color: "#eee" };
@@ -309,6 +310,8 @@ export default function MarketTopicPage({ lang, topic: t, data, briefing: b, oth
   const desc = d.desc(t, st).slice(0, 160);
   const faq = d.faq(t, st);
   const hasMa = data.chart.some((r) => Number.isFinite(r.ma100));
+  // 동적 OG 이미지(이름·종가·변화·90일 차트). v=마지막 종가일 → 종가가 바뀌면 CDN 캐시가 갈린다 (2026-10-09)
+  const ogImage = `${SITE}/api/og/market?slug=${t.slug}&lang=${lang}&v=${st.last.date}`;
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -316,6 +319,7 @@ export default function MarketTopicPage({ lang, topic: t, data, briefing: b, oth
         "@type": "Article",
         headline: d.h1(t, st),
         description: desc,
+        image: [ogImage],
         datePublished: `${st.last.date}T07:00:00+09:00`,
         dateModified: `${data.today}T06:00:00+09:00`,
         inLanguage: lang,
@@ -330,6 +334,7 @@ export default function MarketTopicPage({ lang, topic: t, data, briefing: b, oth
         name: `${L.name} daily close`,
         description: L.desc,
         url,
+        image: ogImage,
         temporalCoverage: `${st.periodStart}/${st.last.date}`,
         variableMeasured: lang === "ko" ? "종가" : "Daily close",
         creator: { "@type": "Organization", name: "NewsInsight", url: SITE },
@@ -365,6 +370,7 @@ export default function MarketTopicPage({ lang, topic: t, data, briefing: b, oth
         <AlternateLinks koPath={`/market/${t.slug}`} enPath={`/en/market/${t.slug}`} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(jsonLd) }} />
       </Head>
+      <OgImageMeta url={ogImage} alt={d.h1(t, st)} />
 
       <p style={{ color: "#999", fontSize: 13, margin: "8px 0 4px", display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
         <span>

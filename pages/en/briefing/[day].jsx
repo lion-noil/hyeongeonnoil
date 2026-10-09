@@ -6,6 +6,7 @@ import Link from "next/link";
 import { getBriefing, listBriefingsEn } from "../../../src/lib/briefingDb";
 import { SNAPSHOT_LABEL_EN, SLUG_BY_SNAP } from "../../../src/lib/marketTopics";
 import { ldJson } from "../../../src/lib/jsonLd";
+import OgImageMeta from "../../../src/components/OgImageMeta";
 
 const SITE = "https://hyeongeonnoil.com";
 const box = { maxWidth: 780, margin: "0 auto", padding: "8px 16px 40px", color: "#eee" };
@@ -37,6 +38,7 @@ export default function BriefingDayPageEn({ b, prevDay, nextDay }) {
   const url = `${SITE}/en/briefing/${b.day}`;
   const pageTitle = `${en.title} | NewsInsight`;
   const desc = String(en.lead || "").replace(/\s+/g, " ").slice(0, 155);
+  const ogImage = `${SITE}/api/og/briefing?day=${b.day}&lang=en`; // dynamic OG image (title + key prices) for Discover / link cards (2026-10-09)
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -44,6 +46,7 @@ export default function BriefingDayPageEn({ b, prevDay, nextDay }) {
         "@type": "NewsArticle",
         headline: en.title,
         description: desc,
+        image: [ogImage],
         datePublished: `${b.day}T07:00:00+09:00`,
         dateModified: b.generated_at || `${b.day}T07:00:00+09:00`,
         inLanguage: "en",
@@ -79,6 +82,7 @@ export default function BriefingDayPageEn({ b, prevDay, nextDay }) {
         <link rel="alternate" hrefLang="x-default" href={`${SITE}/briefing/${b.day}`} key="alt-x" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(jsonLd) }} />
       </Head>
+      <OgImageMeta url={ogImage} alt={en.title} />
 
       <p style={{ color: "#999", fontSize: 13, margin: "8px 0 4px", display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
         <span>

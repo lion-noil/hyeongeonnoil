@@ -4,6 +4,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { listAllDays, getDaySummaries } from "../../src/lib/archiveDb";
 import { extractHeadlines, buildArchiveTitle } from "../../src/lib/archiveHeadlines";
+import { OG_DEFAULT_IMAGE } from "../../src/components/OgImageMeta";
 
 const COUNTRY_KO = {
   USA: "미국", China: "중국", Japan: "일본", India: "인도",
@@ -33,6 +34,7 @@ export default function ArchiveDayPage({ day, countries, prevDay, nextDay, headl
         "@type": "Article",
         headline: title,
         description: desc,
+        image: [OG_DEFAULT_IMAGE],
         datePublished: day,
         inLanguage: "ko",
         author: { "@type": "Organization", name: "NewsInsight" },

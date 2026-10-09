@@ -6,6 +6,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { getBriefing, listBriefingDays } from "../../src/lib/briefingDb";
 import { SLUG_BY_SNAP } from "../../src/lib/marketTopics";
+import OgImageMeta from "../../src/components/OgImageMeta";
 
 const SITE = "https://hyeongeonnoil.com";
 const box = { maxWidth: 780, margin: "0 auto", padding: "8px 16px 40px", color: "#eee" };
@@ -35,6 +36,7 @@ export default function BriefingDayPage({ b, prevDay, nextDay, hasEn = false }) 
   const url = `${SITE}/briefing/${b.day}`;
   const pageTitle = `${b.title} | NewsInsight`;
   const desc = String(b.lead || "").replace(/\s+/g, " ").slice(0, 155);
+  const ogImage = `${SITE}/api/og/briefing?day=${b.day}&lang=ko`; // 동적 OG 이미지(제목+핵심 시세) — 디스커버·링크 카드 (2026-10-09)
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -42,6 +44,7 @@ export default function BriefingDayPage({ b, prevDay, nextDay, hasEn = false }) 
         "@type": "NewsArticle",
         headline: b.title,
         description: desc,
+        image: [ogImage],
         datePublished: `${b.day}T07:00:00+09:00`,
         dateModified: b.generated_at || `${b.day}T07:00:00+09:00`,
         inLanguage: "ko",
@@ -77,6 +80,7 @@ export default function BriefingDayPage({ b, prevDay, nextDay, hasEn = false }) 
         {hasEn && <link rel="alternate" hrefLang="x-default" href={url} key="alt-x" />}
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       </Head>
+      <OgImageMeta url={ogImage} alt={b.title} />
 
       <p style={{ color: "#999", fontSize: 13, margin: "8px 0 4px" }}>
         <Link href="/briefing" style={{ color: "#00ffcc" }}>시장 브리핑</Link> · {kdate(b.day)} 아침 발행 · 시세 기준 {b.data_date} 종가

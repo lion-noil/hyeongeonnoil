@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import SiteLayout from "../src/components/SiteLayout";
+import OgImageMeta from "../src/components/OgImageMeta";
 import "../src/styles/globals.css";
 import { initGA, trackPageview, trackEvent } from "../src/lib/ga";
 
@@ -57,10 +58,13 @@ export default function MyApp({ Component, pageProps }) {
         />
         <meta property="og:site_name" content="현건노일 NewsInsight" />
         <meta property="og:type" content="website" />
-        <meta property="og:image" content="https://hyeongeonnoil.com/logo512.png" />
+        {/* 구글 디스커버 요건 — 큰 이미지 미리보기 허용. /embed 는 name 중복제거로 noindex 가 덮어씀 */}
+        <meta name="robots" content="max-image-preview:large" />
         <meta property="og:locale" content="ko_KR" key="og-locale" />
         <link rel="alternate" type="application/rss+xml" title="NewsInsight 뉴스 요약" href="https://hyeongeonnoil.com/rss.xml" />
       </Head>
+      {/* 기본 OG 이미지(og-default.png). 브리핑·시세 페이지는 같은 key 로 동적 이미지(/api/og/*)를 덮어쓴다 (2026-10-09) */}
+      <OgImageMeta />
       <SiteLayout>
         <Component {...pageProps} />
       </SiteLayout>
