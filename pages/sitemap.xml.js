@@ -10,7 +10,7 @@ export async function getServerSideProps({ res }) {
   let days = [];
   let briefingDays = [];
   try {
-    days = await listAllDays();
+    days = await listAllDays({ withContent: true }); // 404 나는 빈 날짜 제외
   } catch {
     // DB 오류 시에도 정적 경로는 내보냄
   }

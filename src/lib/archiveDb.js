@@ -12,13 +12,13 @@ function client() {
 }
 
 // 전체 일자 목록 (최신순) — 사이트맵·이전/다음 링크 공용
-export async function listAllDays() {
+// withContent: youtube_data 가 없는 날(페이지가 404 되는 날, 예 2026-05-29·07-04)은 제외 — 사이트맵용 (2026-10-11)
+export async function listAllDays({ withContent = false } = {}) {
   const supabase = client();
   if (!supabase) return [];
-  const { data, error } = await supabase
-    .from("daily_collections")
-    .select("day")
-    .order("day", { ascending: false });
+  let q = supabase.from("daily_collections").select("day");
+  if (withContent) q = q.not("raw_json->youtube_data", "is", null);
+  const { data, error } = await q.order("day", { ascending: false });
   if (error) throw error;
   return (data || []).map((r) => r.day).filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d));
 }
