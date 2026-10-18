@@ -1,0 +1,46 @@
+{
+  "updated": "2026-10-19",
+  "account": {
+    "label": "환율 전용 MT5 데모 계좌 (HFM, 7개 메이저 통화쌍)",
+    "live_since": "2026-10-05",
+    "note": "데모 계좌입니다. 실제 자금이 아니며, 실행기·신호·사이징은 실계좌와 동일한 코드로 돌아갑니다."
+  },
+  "fxblue": {
+    "user": "objqwd",
+    "stats_url": "https://www.fxblue.com/users/objqwd/stats",
+    "page_url": "https://www.fxblue.com/users/objqwd",
+    "chart_embed": "https://www.fxblue.com/fxbluechart.aspx?c=ch_cumulativeprofit&id=objqwd",
+    "since": "2026-10-18",
+    "how": "터미널에 붙은 Publisher EA가 5분마다 거래 내역을 FX Blue 서버로 발행합니다. 계좌 측 기록이라 사후 수정이 불가능합니다."
+  },
+  "myfxbook": {
+    "url": "https://www.myfxbook.com/members/LionnoiL/fx-demo/12265278",
+    "badges": ["Track Record Verified", "Trading Privileges Verified"],
+    "since": "2026-10-18",
+    "how": "Myfxbook 서버가 읽기 전용(투자자) 비밀번호로 브로커 서버에 직접 접속해 거래 내역을 가져옵니다. 트랙레코드·거래권한 두 가지 검증 배지를 받았습니다."
+  },
+  "quantconnect": {
+    "url": "https://www.quantconnect.cloud/backtest/cc4a609759b8880e1dde3a2f6897fad0/?theme=darkly",
+    "engine": "LEAN 2.5 (QuantConnect 클라우드), Oanda 분봉 데이터",
+    "period": "2021-07-16 ~ 2026-07-21",
+    "run_at": "2026-10-18",
+    "stats": [
+      ["순이익", "+150.7% (10만 → 25만 달러)"],
+      ["연복리 수익률", "20.1%"],
+      ["샤프 / 소르티노", "0.87 / 1.01"],
+      ["확률적 샤프(PSR)", "27.5%"],
+      ["최대 낙폭", "12.3%"],
+      ["주문 수 / 승률", "1,699건 / 71%"],
+      ["평균 이익 / 손실", "+0.21% / −0.12% (손익비 1.72)"],
+      ["알파 / 베타", "0.095 / −0.27"]
+    ],
+    "cell_match": "17개 셀 전부 거래 건수가 자체 엔진과 ±10% 안에서 일치, 건당 수익도 같은 자리",
+    "caveats": [
+      "표본 안 결과입니다. 셀은 같은 5년 데이터로 선택됐고, 워크포워드(3년 학습·1년 검증 롤링)가 준 정직한 기대는 월 +0.5% 수준으로 전표본 수치의 절반입니다.",
+      "수익이 몇 달에 몰려 있습니다. 60개월 중 상위 5개월이 전체의 44%이고, 월 중앙값은 +0.6%인데 평균은 +1.8%입니다.",
+      "기여 상위 3셀이 전부 일봉 역추세 숏(NZDUSD·GBPUSD·AUDUSD)으로 달러 강세 국면의 수익입니다. 국면이 바뀌면 함께 꺾입니다.",
+      "월말 합산 낙폭은 작지만 분봉 기준 최대낙폭은 12.3%이고 마진 사용이 자본의 6배까지 오른 구간이 있습니다. 실제 경로는 거칩니다."
+    ],
+    "expectation": "현실적인 기대치: 월 +0.5~0.9%, 최악의 달 −2.6% 안팎, 낙폭 12% 이상 감수"
+  }
+}

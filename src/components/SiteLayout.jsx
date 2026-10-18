@@ -147,6 +147,7 @@ export default function SiteLayout({ children }) {
               <Link href="/briefing">시장 브리핑</Link>
               <Link href="/archive">뉴스 아카이브</Link>
               <Link href="/reports">보고서</Link>
+              <Link href="/verified">검증 기록</Link>
               <Link href="/privacy">개인정보처리방침</Link>
               <Link href="/en" hrefLang="en">English</Link>
               <a href="/rss.xml">RSS</a>

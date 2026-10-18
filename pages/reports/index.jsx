@@ -61,6 +61,7 @@ export default function ReportsPage({ reports, perf }) {
       <p style={{ color: "#999", fontSize: 13, lineHeight: 1.7 }}>
         매월 1일 자동 생성되는 셀(계좌×심볼×책×전략)별 성과 보고서와 심층 분석입니다.
         판정 원칙: 1개월 표본은 노이즈 — 🔴 2개월 연속 또는 백테스트 최악연도 초과 시에만 파라미터 재검토.
+        {" "}외부 서버가 집계·검증한 기록(FX Blue·Myfxbook·QuantConnect)은 <Link href="/verified" style={{ color: "#00ffcc" }}>검증 기록</Link>에 따로 모았습니다.
       </p>
 
       {perf?.data && <PerfView data={perf.data} compact />}

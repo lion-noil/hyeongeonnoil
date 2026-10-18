@@ -1,4 +1,5 @@
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import Seo from "../src/components/Seo";
 import { HubIntro, HubGuide } from "../src/components/HubSummary";
 import { HUBS } from "../src/lib/hubContent";
@@ -12,6 +13,10 @@ export default function FxPage({ hub }) {
       <Seo title={H.seo.title} description={H.seo.description} path={H.path} />
       {/* 서버렌더 본문(2026-10-18) — 차트는 ssr:false 라 크롤러용 텍스트(h1·최근 종가·읽는 법·FAQ)를 위아래로 제공 */}
       <HubIntro hubKey="fx" hub={hub} />
+      {/* 제3자 검증 기록 링크(2026-10-19): FX Blue·Myfxbook·QuantConnect */}
+      <p style={{ maxWidth: 860, margin: "0 auto 8px", padding: "0 16px", color: "#999", fontSize: 13 }}>
+        이 계좌의 기록을 외부 서버가 집계·검증한 결과는 <Link href="/verified" style={{ color: "#00ffcc" }}>검증 기록</Link>에서 볼 수 있습니다.
+      </p>
       <Cfd variant="fx" />
       <HubGuide hubKey="fx" hub={hub} />
     </>
