@@ -159,3 +159,31 @@ export async function getMarketOverview() {
   }
   return out;
 }
+
+// 허브 페이지(/exchange·/indexes·/commodity·/cfd·/fx·/coin) 시세 목록 — 항목 [{cat, key, label, kind?}] 순서대로
+// 최근 종가·전일 대비·100일 이동평균 대비. 규칙은 키워드 페이지와 같다(오늘 KST 캔들 제외). 데이터 없는 항목은 건너뜀.
+// (2026-10-18) 반환: [{cat, key, label, kind, date, close, delta, vsMa, stale}] — delta·vsMa 는 금리면 bp, 그 외 %
+export async function getHubQuotes(items) {
+  if (!Array.isArray(items) || !items.length) return [];
+  const today = todayKST();
+  const cats = await loadCats(items.map((i) => i.cat));
+  const out = [];
+  for (const it of items) {
+    const series = cleanRows(cats[it.cat]?.[it.key]?.data, today);
+    if (!series.length) continue;
+    const kind = it.kind || "price";
+    const st = computeStats(series, { kind, today });
+    out.push({
+      cat: it.cat,
+      key: it.key,
+      label: it.label,
+      kind,
+      date: st.last.date,
+      close: st.last.close,
+      delta: st.prev ? st.prev.delta : null,
+      vsMa: st.ma.isPeriodAvg ? null : st.ma.delta,
+      stale: st.stale,
+    });
+  }
+  return out;
+}
