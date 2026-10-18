@@ -95,6 +95,7 @@ export default function VerifiedPage() {
           <>
             <iframe src={q.url} title="QuantConnect 공개 백테스트 결과" loading="lazy" style={{ ...frame, height: 620 }} />
             <Ext href={q.url}>QuantConnect 공개 결과 전체 보기</Ext>
+            {q.code_note && <p style={{ ...small, marginTop: 8 }}>{q.code_note}</p>}
           </>
         ) : (
           <p style={{ ...p, color: "#ffd479", fontSize: 14 }}>{q.public_note}</p>
