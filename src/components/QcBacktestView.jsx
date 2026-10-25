@@ -38,19 +38,22 @@ function ChartTip({ active, payload, label }) {
   return (
     <div className="inset" style={{ padding: "8px 10px", background: "rgba(6,10,20,0.95)", fontSize: "var(--fs-xs)", color: "var(--text-2)" }}>
       <div style={{ color: "var(--text)", fontWeight: 700, marginBottom: 2 }}>{label}</div>
-      <div>자본 <b style={{ color: "var(--text)" }}>{fmtUsd(p.equity)}</b></div>
+      <div>자본 <b style={{ color: "var(--text)" }}>{p.moneyText || fmtUsd(p.equity)}</b></div>
       <div>누적 <b style={{ color: "var(--text)" }}>{fmtPct(p.ret)}</b> · 낙폭 <b style={{ color: "var(--text)" }}>{p.dd.toFixed(1)}%</b></div>
     </div>
   );
 }
 
-export default function QcBacktestView({ data, caveats = [], expectation = "", compact = false }) {
+export default function QcBacktestView({ data, caveats = [], expectation = "", compact = false, currency = "USD", feeNote = "" }) {
   const [tab, setTab] = useState("chart");
   const s = data?.stats || {};
   const meta = data?.meta || {};
+  // 통화: USD(환율 계좌) 또는 KRW(코스피 — QuantConnect 는 $ 로 집계하지만 숫자는 원 단위)
+  const money = (v) => (currency === "KRW" ? `${Math.round(v).toLocaleString("en-US")}원` : fmtUsd(v));
+  const axisMoney = (v) => (currency === "KRW" ? `${Math.round(v / 10000).toLocaleString("en-US")}만` : `$${Math.round(v / 1000)}k`);
   const rows = useMemo(() => (data?.equity || []).map(([d, eq, dd]) => ({
-    d, equity: eq, dd, ret: s.start_equity ? (eq / s.start_equity - 1) * 100 : 0,
-  })), [data, s.start_equity]);
+    d, equity: eq, dd, ret: s.start_equity ? (eq / s.start_equity - 1) * 100 : 0, moneyText: money(eq),
+  })), [data, s.start_equity, currency]); // eslint-disable-line react-hooks/exhaustive-deps
   const yearTicks = useMemo(() => {
     const seen = new Set(); const out = [];
     rows.forEach((r) => { const y = r.d.slice(0, 4); if (!seen.has(y)) { seen.add(y); out.push(r.d); } });
@@ -75,12 +78,12 @@ export default function QcBacktestView({ data, caveats = [], expectation = "", c
     <div style={{ display: "grid", gap: 14 }}>
       {/* 핵심 숫자 */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 10 }}>
-        <StatTile label="순이익 (5년)" value={fmtPct(s.net_profit_pct, 1)} sub={`${fmtUsd(s.start_equity)} → ${fmtUsd(s.end_equity)}`} tone="var(--up)" />
+        <StatTile label="순이익 (5년)" value={fmtPct(s.net_profit_pct, 1)} sub={`${money(s.start_equity)} → ${money(s.end_equity)}`} tone="var(--up)" />
         <StatTile label="연복리 수익률" value={fmtPct(s.cagr_pct, 1)} sub="CAGR" />
         <StatTile label="최대 낙폭" value={`−${Number(s.max_dd_pct).toFixed(1)}%`} sub={s.dd_recovery_days ? `회복 ${s.dd_recovery_days}일` : ""} tone="var(--down)" />
         <StatTile label="샤프 / 소르티노" value={`${s.sharpe} / ${s.sortino}`} sub={s.psr_pct != null ? `확률적 샤프 ${s.psr_pct.toFixed(1)}%` : ""} />
         <StatTile label="승률" value={`${Math.round(s.win_rate_pct)}%`} sub={`청산 ${s.closed_trades}건 · 손익비 ${s.pl_ratio}`} />
-        <StatTile label="주문 수" value={s.orders?.toLocaleString("en-US")} sub={`수수료 $${s.fees ?? 0} (스프레드만)`} />
+        <StatTile label="주문 수" value={s.orders?.toLocaleString("en-US")} sub={feeNote || `수수료 $${s.fees ?? 0} (스프레드만)`} />
       </div>
 
       {/* 자본곡선 + 낙폭 */}
@@ -110,7 +113,7 @@ export default function QcBacktestView({ data, caveats = [], expectation = "", c
                   </defs>
                   <CartesianGrid vertical={false} stroke="rgba(148,163,255,0.10)" />
                   <XAxis dataKey="d" ticks={yearTicks} tickFormatter={(d) => d.slice(0, 4)} tick={{ fill: COLOR.muted, fontSize: 11 }} axisLine={{ stroke: "rgba(148,163,255,0.16)" }} tickLine={false} minTickGap={20} />
-                  <YAxis tickFormatter={(v) => `$${Math.round(v / 1000)}k`} tick={{ fill: COLOR.muted, fontSize: 11 }} axisLine={false} tickLine={false} width={48} domain={["dataMin - 5000", "dataMax + 5000"]} />
+                  <YAxis tickFormatter={axisMoney} tick={{ fill: COLOR.muted, fontSize: 11 }} axisLine={false} tickLine={false} width={currency === "KRW" ? 56 : 48} domain={["dataMin - 5000", "dataMax + 5000"]} />
                   <Tooltip content={<ChartTip />} cursor={{ stroke: "rgba(238,242,255,0.35)", strokeWidth: 1 }} />
                   <ReferenceLine y={s.start_equity} stroke="rgba(148,163,255,0.3)" />
                   <Area type="monotone" dataKey="equity" stroke="none" fill="url(#qcEq)" isAnimationActive={false} />
@@ -159,7 +162,7 @@ export default function QcBacktestView({ data, caveats = [], expectation = "", c
                 ))}
               </tbody>
             </table>
-            <div className="meta" style={{ marginTop: 8 }}>단위 %. 빨강 = 플러스 달, 파랑 = 마이너스 달(국내 등락 관례). 연간은 월 복리 합산. 2026년은 7월 20일까지.</div>
+            <div className="meta" style={{ marginTop: 8 }}>단위 %. 빨강 = 플러스 달, 파랑 = 마이너스 달(국내 등락 관례). 연간은 월 복리 합산. 마지막 달은 {meta.end}까지.</div>
           </div>
         )}
       </Panel>
@@ -173,12 +176,12 @@ export default function QcBacktestView({ data, caveats = [], expectation = "", c
       </div>
 
       {/* 심볼별 */}
-      <Panel icon="💱" title="통화쌍별 청산 거래" meta={`청산 ${s.closed_trades}건 · 손익은 달러`} pad={0}>
+      <Panel icon="💱" title={currency === "KRW" ? "종목별 청산 거래" : "통화쌍별 청산 거래"} meta={`청산 ${s.closed_trades}건 · 손익은 ${currency === "KRW" ? "원" : "달러"}`} pad={0}>
         <div style={{ overflowX: "auto" }}>
           <table style={{ borderCollapse: "collapse", width: "100%", fontSize: "var(--fs-sm)", fontVariantNumeric: "tabular-nums" }}>
             <thead>
               <tr style={{ color: "var(--muted)", fontSize: "var(--fs-xs)" }}>
-                {["통화쌍", "거래", "롱/숏", "승률", "총손익", "건당"].map((h, i) => (
+                {[currency === "KRW" ? "종목" : "통화쌍", "거래", "롱/숏", "승률", "총손익", "건당"].map((h, i) => (
                   <th key={h} style={{ textAlign: i === 0 ? "left" : "right", padding: "8px 12px", borderBottom: "1px solid var(--line)", fontWeight: 600 }}>{h}</th>
                 ))}
               </tr>
@@ -197,10 +200,10 @@ export default function QcBacktestView({ data, caveats = [], expectation = "", c
                         <span style={{ width: 70, height: 6, borderRadius: 3, background: "rgba(148,163,255,0.10)", overflow: "hidden", display: "inline-block" }}>
                           <span style={{ display: "block", width: `${w * 100}%`, height: "100%", background: r.pnl >= 0 ? "var(--up)" : "var(--down)" }} />
                         </span>
-                        <b style={{ color: r.pnl >= 0 ? "var(--up)" : "var(--down)", minWidth: 68, textAlign: "right" }}>{r.pnl >= 0 ? "+" : "−"}${Math.abs(r.pnl).toLocaleString("en-US")}</b>
+                        <b style={{ color: r.pnl >= 0 ? "var(--up)" : "var(--down)", minWidth: 68, textAlign: "right" }}>{r.pnl >= 0 ? "+" : "−"}{money(Math.abs(r.pnl))}</b>
                       </span>
                     </td>
-                    <td style={{ padding: "7px 12px", borderBottom: "1px solid var(--line)", textAlign: "right", color: "var(--text-2)" }}>{r.avg_pnl >= 0 ? "+" : "−"}${Math.abs(r.avg_pnl)}</td>
+                    <td style={{ padding: "7px 12px", borderBottom: "1px solid var(--line)", textAlign: "right", color: "var(--text-2)" }}>{r.avg_pnl >= 0 ? "+" : "−"}{money(Math.abs(r.avg_pnl))}</td>
                   </tr>
                 );
               })}

@@ -7,6 +7,7 @@ import Head from "next/head";
 import Link from "next/link";
 import V from "../src/data/verified.json";
 import QC from "../src/data/qc_backtest.json";
+import QCK from "../src/data/qc_backtest_kospi.json";
 import { ldJson, ORG } from "../src/lib/jsonLd";
 import SectionHead from "../src/components/ui/SectionHead";
 import Panel, { Chip, LiveBadge } from "../src/components/ui/Panel";
@@ -37,6 +38,7 @@ function Ext({ href, children }) {
 
 export default function VerifiedPage() {
   const q = V.quantconnect;
+  const k = V.kospi;
   return (
     <div style={wrap}>
       <Head>
@@ -81,6 +83,19 @@ export default function VerifiedPage() {
           {q.code_note ? ` ${q.code_note}` : ""}
         </p>
         <QcBacktestView data={QC} caveats={q.caveats} expectation={q.expectation} />
+
+        {/* 4. 코스피 — ALIGN3 를 QuantConnect 엔진으로 재현 (데이터는 자체 수집) */}
+        {k && QCK?.stats && (
+          <>
+            <SectionHead kicker="KOSPI · INDEPENDENT ENGINE" title="4. 코스피200 ETF 재현 — QuantConnect (데이터는 자체 수집)"
+              desc="한국투자증권 실계좌에서 돌아가는 ALIGN3(3층 정렬 추세롱) 규칙을 LEAN 엔진용으로 다시 구현해 돌린 결과. 엔진·체결 모델은 외부지만 5분봉 데이터는 자체 수집이라, 환율(외부 데이터)보다 한 단계 약한 검증입니다" />
+            <p style={p}>
+              {k.account_note} {k.how} {k.cell_match} 기간 {k.period}, 실행 {k.run_at}, {k.engine}. 결과 원본(자본곡선·월별 통계·청산 거래 {QCK.stats.closed_trades}건)은
+              QuantConnect API에서 내려받아 이 사이트가 직접 그립니다.
+            </p>
+            <QcBacktestView data={QCK} caveats={k.caveats} expectation={k.expectation} currency="KRW" feeNote={k.fee_note} />
+          </>
+        )}
       </div>
 
       <p className="meta" style={{ padding: "16px 8px 0", lineHeight: 1.7 }}>
