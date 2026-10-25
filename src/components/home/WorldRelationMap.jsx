@@ -9,7 +9,18 @@ import { useWorldStateData } from "../../hooks/useWorldStateData";
 const VW = 900, VH = 490, R = 36;
 
 // ── 나라 메타 ──────────────────────────────────────────────────────
-const FLAGS    = { USA:"🇺🇸", UK:"🇬🇧", Germany:"🇩🇪", China:"🇨🇳", Japan:"🇯🇵", India:"🇮🇳", Korea:"🇰🇷", HongKong:"🇭🇰" };
+// 국기는 이모지가 아니라 SVG 이미지(public/flags/*.svg, flagcdn 공개 도메인) — Windows 는 국기 이모지 글리프가 없어
+// "US" 같은 두 글자로 깨져 보이기 때문. 비율이 나라마다 달라 고정 크기 둥근 사각형에 cover 로 맞춘다.
+const FLAG_CODE = { USA:"us", UK:"gb", Germany:"de", China:"cn", Japan:"jp", India:"in", Korea:"kr", HongKong:"hk" };
+const flagSrc = (name) => `/flags/${FLAG_CODE[name] || "us"}.svg`;
+function FlagImg({ name, w = 24, style }) {
+  const h = Math.round(w * 2 / 3);
+  return (
+    <img src={flagSrc(name)} alt={`${NAMES_KR[name] || name} 국기`} width={w} height={h} draggable={false}
+      style={{ width:w, height:h, objectFit:"cover", borderRadius:Math.max(2, Math.round(w / 12)),
+               boxShadow:"0 0 0 1px rgba(255,255,255,0.18)", flex:"none", display:"block", ...style }} />
+  );
+}
 const NAMES_KR = { USA:"미국",  UK:"영국", Germany:"독일", China:"중국", Japan:"일본", India:"인도", Korea:"한국", HongKong:"홍콩" };
 const H_CODE   = { USA:"US",   UK:"GB",  Germany:"DE",   China:"CN",  Japan:"JP",  India:"IN",  Korea:"KR", HongKong:"HK" };
 
@@ -198,11 +209,15 @@ function CountryNode({ name, state, selected, dimmed, connected, onClick, hasHol
         stroke={mc}
         strokeWidth={selected ? 2.5 : 1.5}
       />
-      {/* 국기 이모지 */}
-      <text fontSize="24" textAnchor="middle" dominantBaseline="middle"
-        style={{ userSelect:"none" }}>
-        {FLAGS[name]}
-      </text>
+      {/* 국기 (SVG 이미지, 둥근 사각형 클립) */}
+      <clipPath id={`flagclip-${name}`}>
+        <rect x={-18} y={-13} width={36} height={24} rx={3} />
+      </clipPath>
+      <image href={flagSrc(name)} x={-18} y={-13} width={36} height={24}
+        preserveAspectRatio="xMidYMid slice" clipPath={`url(#flagclip-${name})`}
+        style={{ pointerEvents:"none" }} />
+      <rect x={-18} y={-13} width={36} height={24} rx={3} fill="none"
+        stroke="rgba(255,255,255,0.22)" strokeWidth="0.75" style={{ pointerEvents:"none" }} />
       {/* 나라 이름 */}
       <text y={R + 15} fontSize="11" fontWeight="bold"
         fill={selected ? "#ffffff" : "#c6d6ee"}
@@ -289,7 +304,7 @@ function DetailPanel({ name, weekHols, states, rels, sources }) {
       {/* ── 왼쪽: 기본 정보 + 스탯 + 공휴일 ── */}
       <div style={{ flex:"0 0 165px", minWidth:0 }}>
         <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10 }}>
-          <span style={{ fontSize:38 }}>{FLAGS[name]}</span>
+          <FlagImg name={name} w={48} />
           <div>
             <div style={{ fontSize:15, fontWeight:"bold", color:"#dce8ff" }}>{NAMES_KR[name]}</div>
             <div style={{ fontSize:11, color:mc, marginTop:3 }}>{s.icon} {s.mood}</div>
@@ -377,7 +392,7 @@ function DetailPanel({ name, weekHols, states, rels, sources }) {
               background: "var(--panel)", borderRadius:7,
             }}>
               <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-                <span style={{ fontSize:18 }}>{FLAGS[other]}</span>
+                <FlagImg name={other} w={24} />
                 <span style={{ fontSize:11, color:"#7a8fa8" }}>{NAMES_KR[other]}</span>
                 <span style={{ marginLeft:"auto", fontSize:10, color:relColor(r.s), whiteSpace:"nowrap" }}>
                   {r.label || relLabel(r.s)}
