@@ -13,6 +13,14 @@ const VW = 900, VH = 490, R = 36;
 // "US" 같은 두 글자로 깨져 보이기 때문. 비율이 나라마다 달라 고정 크기 둥근 사각형에 cover 로 맞춘다.
 const FLAG_CODE = { USA:"us", UK:"gb", Germany:"de", China:"cn", Japan:"jp", India:"in", Korea:"kr", HongKong:"hk" };
 const flagSrc = (name) => `/flags/${FLAG_CODE[name] || "us"}.svg`;
+// 백엔드가 분위기 아이콘(icon)으로 국기 이모지를 주는 경우가 있다 — 국기는 이미 이미지로 그리고,
+// Windows 에선 "GB" 두 글자로 깨지므로 지역표시문자(U+1F1E6~1F1FF)로만 된 아이콘은 목업 아이콘으로 대체.
+const RI_ONLY = /^[\u{1F1E6}-\u{1F1FF}\s]+$/u;
+const moodIcon = (icon, fallback) => {
+  const v = (icon ?? "").toString().trim();
+  if (!v || RI_ONLY.test(v)) return fallback;
+  return v;
+};
 function FlagImg({ name, w = 24, style }) {
   const h = Math.round(w * 2 / 3);
   return (
@@ -93,7 +101,7 @@ function normalizeStates(countries) {
     out[name] = {
       mood: c.mood ?? MOCK_STATES[name].mood,
       score: Number.isFinite(c.mood_score) ? c.mood_score : MOCK_STATES[name].score,
-      icon: c.icon ?? MOCK_STATES[name].icon,
+      icon: moodIcon(c.icon, MOCK_STATES[name].icon),
       eco: Number.isFinite(c.eco) ? c.eco : MOCK_STATES[name].eco,
       pol: Number.isFinite(c.pol) ? c.pol : MOCK_STATES[name].pol,
       dip: Number.isFinite(c.dip) ? c.dip : MOCK_STATES[name].dip,
