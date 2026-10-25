@@ -17,3 +17,7 @@ import Archive from "../pages/Archive";
 
 2. pages에 페이지 jsx 추가
 3. 
+## 디자인 시스템
+
+전 페이지를 "딥 스페이스 + 유리 패널(3D 웹)" 스타일로 통일하는 규칙과 부품은 [docs/DESIGN.md](docs/DESIGN.md) 를 따른다.
+토큰은 `src/styles/globals.css`·`src/styles/system.css`, JS 쪽 같은 값은 `src/lib/theme.js`, 부품은 `src/components/ui/`(Panel·SectionHead·Flag).

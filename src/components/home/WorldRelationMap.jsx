@@ -1,18 +1,19 @@
 // src/components/home/WorldRelationMap.jsx
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { isSameWeek, parseISO, format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { useMarketHolidaysData } from "../../hooks/useCalendarData";
 import { useWorldStateData } from "../../hooks/useWorldStateData";
+import Panel, { Chip, LiveBadge, StatBar } from "../ui/Panel";
+import Flag, { SvgFlag } from "../ui/Flag";
+import { COLOR, COUNTRY, REL_SCALE, relColor, relLabel, moodColor } from "../../lib/theme";
 
 // ── 레이아웃 상수 ──────────────────────────────────────────────────
 const VW = 900, VH = 490, R = 36;
 
-// ── 나라 메타 ──────────────────────────────────────────────────────
-// 국기는 이모지가 아니라 SVG 이미지(public/flags/*.svg, flagcdn 공개 도메인) — Windows 는 국기 이모지 글리프가 없어
-// "US" 같은 두 글자로 깨져 보이기 때문. 비율이 나라마다 달라 고정 크기 둥근 사각형에 cover 로 맞춘다.
-const FLAG_CODE = { USA:"us", UK:"gb", Germany:"de", China:"cn", Japan:"jp", India:"in", Korea:"kr", HongKong:"hk" };
-const flagSrc = (name) => `/flags/${FLAG_CODE[name] || "us"}.svg`;
+// ── 나라 메타 — src/lib/theme.js COUNTRY 단일 소스 (한글명·ISO). 국기는 <Flag>/<SvgFlag> (이모지 금지)
+const NAMES_KR = Object.fromEntries(Object.entries(COUNTRY).map(([k, v]) => [k, v.ko]));
+const H_CODE   = Object.fromEntries(Object.entries(COUNTRY).map(([k, v]) => [k, v.iso]));
 // 백엔드가 분위기 아이콘(icon)으로 국기 이모지를 주는 경우가 있다 — 국기는 이미 이미지로 그리고,
 // Windows 에선 "GB" 두 글자로 깨지므로 지역표시문자(U+1F1E6~1F1FF)로만 된 아이콘은 목업 아이콘으로 대체.
 const RI_ONLY = /^[\u{1F1E6}-\u{1F1FF}\s]+$/u;
@@ -21,16 +22,6 @@ const moodIcon = (icon, fallback) => {
   if (!v || RI_ONLY.test(v)) return fallback;
   return v;
 };
-function FlagImg({ name, w = 24, style }) {
-  const h = Math.round(w * 2 / 3);
-  return (
-    <img src={flagSrc(name)} alt={`${NAMES_KR[name] || name} 국기`} width={w} height={h} draggable={false}
-      style={{ width:w, height:h, objectFit:"cover", borderRadius:Math.max(2, Math.round(w / 12)),
-               boxShadow:"0 0 0 1px rgba(255,255,255,0.18)", flex:"none", display:"block", ...style }} />
-  );
-}
-const NAMES_KR = { USA:"미국",  UK:"영국", Germany:"독일", China:"중국", Japan:"일본", India:"인도", Korea:"한국", HongKong:"홍콩" };
-const H_CODE   = { USA:"US",   UK:"GB",  Germany:"DE",   China:"CN",  Japan:"JP",  India:"IN",  Korea:"KR", HongKong:"HK" };
 
 // SVG viewBox 상의 노드 중심 좌표
 const NODES = {
@@ -132,15 +123,9 @@ const asClaim = (v) =>
 // 근거 날짜 표시
 const fmtClaimDate = (d) => { try { return format(parseISO(d), "M/d"); } catch { return String(d); } };
 
-// ── 색상 헬퍼 ──────────────────────────────────────────────────────
-const relColor = (s) =>
-  s >= 4 ? "#00e676" : s >= 2 ? "#69f0ae" : s >= 0 ? "#ffca28" : s >= -2 ? "#ff7043" : "#ef5350";
-
-const relLabel = (s) =>
-  s >= 4 ? "❤️ 동맹" : s >= 2 ? "😊 우호" : s >= 0 ? "🤝 중립" : s >= -2 ? "😤 긴장" : "⚔️ 적대";
-
-const moodColor = (score) =>
-  score >= 7 ? "#00e676" : score >= 5 ? "#ffca28" : "#ef5350";
+// ── 색 — src/lib/theme.js (히어로 지구본과 같은 관계·분위기 팔레트) ──
+const NODE_FILL = "rgba(9, 14, 26, 0.96)";
+const NODE_FILL_SEL = "rgba(20, 32, 58, 0.98)";
 
 // 두 노드 사이 선의 시작점 (원 테두리에서 출발)
 function edgePt(from, to) {
@@ -181,7 +166,7 @@ function RelLine({ rel, mode }) {
       <line x1={ax} y1={ay} x2={bx} y2={by}
         stroke={color} strokeWidth={abs * 1.4} strokeOpacity={0.95} strokeDasharray={dash} />
       <rect x={mx - 30} y={my - 11} width={60} height={20} rx={5}
-        fill="#070e1c" stroke={color} strokeWidth={0.8} strokeOpacity={0.8} />
+        fill={COLOR.panelSolid} stroke={color} strokeWidth={0.8} strokeOpacity={0.8} />
       <text x={mx} y={my + 1}
         textAnchor="middle" dominantBaseline="middle"
         fontSize={9} fill={color} style={{ pointerEvents:"none", userSelect:"none" }}>
@@ -213,34 +198,27 @@ function CountryNode({ name, state, selected, dimmed, connected, onClick, hasHol
       )}
       {/* 메인 원 */}
       <circle r={R}
-        fill={selected ? "rgba(20,32,58,0.98)" : "rgba(9,14,26,0.96)"}
+        fill={selected ? NODE_FILL_SEL : NODE_FILL}
         stroke={mc}
         strokeWidth={selected ? 2.5 : 1.5}
       />
       {/* 국기 (SVG 이미지, 둥근 사각형 클립) */}
-      <clipPath id={`flagclip-${name}`}>
-        <rect x={-18} y={-13} width={36} height={24} rx={3} />
-      </clipPath>
-      <image href={flagSrc(name)} x={-18} y={-13} width={36} height={24}
-        preserveAspectRatio="xMidYMid slice" clipPath={`url(#flagclip-${name})`}
-        style={{ pointerEvents:"none" }} />
-      <rect x={-18} y={-13} width={36} height={24} rx={3} fill="none"
-        stroke="rgba(255,255,255,0.22)" strokeWidth="0.75" style={{ pointerEvents:"none" }} />
+      <g transform="translate(0,-1)"><SvgFlag country={name} w={36} h={24} id={`wmap-${name}`} /></g>
       {/* 나라 이름 */}
-      <text y={R + 15} fontSize="11" fontWeight="bold"
-        fill={selected ? "#ffffff" : "#c6d6ee"}
+      <text y={R + 16} fontSize="12" fontWeight="bold"
+        fill={selected ? "#ffffff" : COLOR.text}
         textAnchor="middle" style={{ userSelect:"none" }}>
         {NAMES_KR[name]}
       </text>
       {/* 상태 문구 */}
-      <text y={R + 27} fontSize="9" fill={mc}
+      <text y={R + 29} fontSize="10" fontWeight="600" fill={mc}
         textAnchor="middle" style={{ userSelect:"none" }}>
         {s.icon} {s.mood}
       </text>
       {/* 공휴일 배지 */}
       {hasHoliday && (
         <g transform={`translate(${R - 3},${-(R - 3)})`}>
-          <circle r={9} fill="#f59e0b" stroke="#07101e" strokeWidth="1.5" />
+          <circle r={9} fill={COLOR.warn} stroke={COLOR.panelSolid} strokeWidth="1.5" />
           <text fontSize="11" textAnchor="middle" dominantBaseline="middle"
             style={{ userSelect:"none" }}>🗓</text>
         </g>
@@ -249,42 +227,16 @@ function CountryNode({ name, state, selected, dimmed, connected, onClick, hasHol
   );
 }
 
-// ── HTML: 스탯바 ───────────────────────────────────────────────────
-function StatBar({ label, val }) {
-  const color = val >= 7 ? "#00e676" : val >= 5 ? "#ffca28" : "#ef5350";
-  return (
-    <div style={{ marginBottom:6 }}>
-      <div style={{ display:"flex", justifyContent:"space-between", marginBottom:2 }}>
-        <span style={{ fontSize:10, color:"#607080" }}>{label}</span>
-        <span style={{ fontSize:10, color:"#3a4a58" }}>{val}/10</span>
-      </div>
-      <div style={{ height:5, background:"#101828", borderRadius:3, overflow:"hidden" }}>
-        <div style={{
-          width:`${val * 10}%`, height:"100%",
-          background:color, borderRadius:3,
-          boxShadow:`0 0 6px ${color}88`,
-          transition:"width 0.5s",
-        }} />
-      </div>
-    </div>
-  );
-}
-
 // ── HTML: 근거 출처 칩 (날짜 → 원문 링크) ──────────────────────────
 function SourceChips({ dates, srcMap }) {
   if (!dates || !dates.length) return null;
   return (
-    <span style={{ display:"inline-flex", flexWrap:"wrap", gap:4, marginLeft:6, verticalAlign:"middle" }}>
+    <span className="wmap-src">
       {dates.map((d, i) => {
         const src = srcMap && srcMap[d];
-        const base = { fontSize:8.5, borderRadius:4, padding:"1px 5px", whiteSpace:"nowrap", textDecoration:"none" };
-        return src && src.url ? (
-          <a key={i} href={src.url} target="_blank" rel="noreferrer" title={src.title || d}
-             style={{ ...base, color:"#4a9eda", background:"#0a1622", border:"1px solid #15324a" }}>🔗 {fmtClaimDate(d)}</a>
-        ) : (
-          <span key={i} title={d}
-             style={{ ...base, color:"#52708a", background:"#0a1420", border:"1px solid #18293a" }}>{fmtClaimDate(d)}</span>
-        );
+        return src && src.url
+          ? <Chip key={i} href={src.url} title={src.title || d} color={COLOR.cyan}>🔗 {fmtClaimDate(d)}</Chip>
+          : <Chip key={i} title={d}>{fmtClaimDate(d)}</Chip>;
       })}
     </span>
   );
@@ -302,112 +254,89 @@ function DetailPanel({ name, weekHols, states, rels, sources }) {
   const hope  = asClaim(s.hope);
 
   return (
-    <div style={{
-      borderTop:"1px solid #101828",
-      background:"rgba(6,10,20,0.98)",
-      padding:"14px 18px",
-      display:"flex", gap:20, flexWrap:"wrap", alignItems:"flex-start",
-    }}>
-
+    <div className="wmap-detail">
       {/* ── 왼쪽: 기본 정보 + 스탯 + 공휴일 ── */}
-      <div style={{ flex:"0 0 165px", minWidth:0 }}>
-        <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10 }}>
-          <FlagImg name={name} w={48} />
+      <div>
+        <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:12 }}>
+          <Flag country={name} w={54} />
           <div>
-            <div style={{ fontSize:15, fontWeight:"bold", color:"#dce8ff" }}>{NAMES_KR[name]}</div>
-            <div style={{ fontSize:11, color:mc, marginTop:3 }}>{s.icon} {s.mood}</div>
+            <div style={{ fontSize:18, fontWeight:800, letterSpacing:"-0.02em" }}>{NAMES_KR[name]}</div>
+            <div style={{ fontSize:"var(--fs-sm)", color:mc, marginTop:2, fontWeight:600 }}>{s.icon} {s.mood} · {s.score}/10</div>
           </div>
         </div>
-        <StatBar label="💰 경제" val={s.eco} />
-        <StatBar label="🏛 정치" val={s.pol} />
-        <StatBar label="🌐 외교" val={s.dip} />
+        <StatBar label="💰 경제" val={s.eco} color={moodColor(s.eco)} />
+        <StatBar label="🏛 정치" val={s.pol} color={moodColor(s.pol)} />
+        <StatBar label="🌐 외교" val={s.dip} color={moodColor(s.dip)} />
 
-        {/* 점수 근거 */}
         {scoreBasis.text && (
-          <div style={{ marginTop:8, padding:"7px 9px", background: "var(--panel)", borderRadius:7, border:"1px solid #14202e" }}>
-            <div style={{ fontSize:9, color:"#445566", marginBottom:4 }}>📊 점수 근거</div>
-            <div style={{ fontSize:10, color:"#90a4bc", lineHeight:1.5 }}>{scoreBasis.text}</div>
-            {scoreBasis.dates.length > 0 && (
-              <div style={{ marginTop:4 }}><SourceChips dates={scoreBasis.dates} srcMap={countrySrc} /></div>
-            )}
+          <div className="wmap-box inset">
+            <h4>📊 점수 근거</h4>
+            <p>{scoreBasis.text}</p>
+            <SourceChips dates={scoreBasis.dates} srcMap={countrySrc} />
           </div>
         )}
 
-        {/* 이번 주 공휴일 (실데이터만) */}
-        <div style={{ marginTop:8, padding:"8px 10px", background: "var(--panel)", borderRadius:7, border:"1px solid #18263a" }}>
-          <div style={{ fontSize:10, color:"#445566", marginBottom:6, letterSpacing:".5px" }}>🗓 이번 주 공휴일</div>
-          {hols.length === 0 ? (
-            <div style={{ fontSize:10, color:"#2e3e4e" }}>— 공휴일 없음</div>
-          ) : hols.map((h, i) => (
-            <div key={i} style={{ fontSize:10, color:"#f59e0b", marginBottom:3 }}>
-              ✦ {h.name}
-              <span style={{ color:"#7a6020", marginLeft:4 }}>
-                ({format(parseISO(h.date), "M/d(E)", { locale:ko })})
-              </span>
-            </div>
-          ))}
+        <div className="wmap-box inset">
+          <h4>🗓 이번 주 공휴일</h4>
+          {hols.length === 0
+            ? <p className="meta">공휴일 없음</p>
+            : hols.map((h, i) => (
+              <p key={i} style={{ color:"var(--warn)" }}>
+                ✦ {h.name} <span className="meta">({format(parseISO(h.date), "M/d(E)", { locale:ko })})</span>
+              </p>
+            ))}
         </div>
 
-        {/* 특이사항 (공휴일과 분리) */}
         {s.special_note && String(s.special_note).trim() && (
-          <div style={{ marginTop:8, padding:"8px 10px", background:"#141019", borderRadius:7, border:"1px solid #2a1e3a" }}>
-            <div style={{ fontSize:10, color:"#7a5a8a", marginBottom:5, letterSpacing:".5px" }}>💬 특이사항</div>
-            <div style={{ fontSize:10, color:"#b09ac0", lineHeight:1.5 }}>{s.special_note}</div>
+          <div className="wmap-box inset note">
+            <h4>💬 특이사항</h4>
+            <p>{s.special_note}</p>
           </div>
         )}
       </div>
 
       {/* ── 가운데: 걱정/기대 + 주요 현안 ── */}
-      <div style={{ flex:"1 1 190px", minWidth:0 }}>
-        <div style={{ display:"flex", gap:6, marginBottom:8 }}>
-          <div style={{ flex:1, padding:"7px 9px", background:"#15110b", borderRadius:7, border:"1px solid #3a2a12" }}>
-            <div style={{ fontSize:9, color:"#a06a3a", marginBottom:3 }}>😟 걱정</div>
-            <div style={{ fontSize:10, color:"#d8b888", lineHeight:1.4 }}>{worry.text}</div>
-            {worry.dates.length > 0 && <div style={{ marginTop:4 }}><SourceChips dates={worry.dates} srcMap={countrySrc} /></div>}
+      <div>
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8, marginBottom:10 }}>
+          <div className="wmap-box inset worry">
+            <h4>😟 걱정</h4>
+            <p>{worry.text}</p>
+            <SourceChips dates={worry.dates} srcMap={countrySrc} />
           </div>
-          <div style={{ flex:1, padding:"7px 9px", background:"#0b1510", borderRadius:7, border:"1px solid #143a28" }}>
-            <div style={{ fontSize:9, color:"#3a9a6a", marginBottom:3 }}>✨ 기대</div>
-            <div style={{ fontSize:10, color:"#88d8b0", lineHeight:1.4 }}>{hope.text}</div>
-            {hope.dates.length > 0 && <div style={{ marginTop:4 }}><SourceChips dates={hope.dates} srcMap={countrySrc} /></div>}
+          <div className="wmap-box inset hope">
+            <h4>✨ 기대</h4>
+            <p>{hope.text}</p>
+            <SourceChips dates={hope.dates} srcMap={countrySrc} />
           </div>
         </div>
-        <div style={{ fontSize:10, color:"#3a5060", marginBottom:8, letterSpacing:".5px" }}>📋 주요 현안</div>
+        <h4 className="meta" style={{ margin:"0 0 8px", fontWeight:700, letterSpacing:".06em" }}>📋 주요 현안</h4>
         {s.issues.map((issue, i) => {
           const it = asClaim(issue);
           return (
-            <div key={i} style={{
-              fontSize:11, color:"#b0c4dc",
-              padding:"7px 10px", marginBottom:6,
-              background: "var(--panel)", borderRadius:7,
-              borderLeft:`3px solid ${mc}`,
-            }}>
-              <span style={{ fontSize:9, color:"#2a3a48", marginRight:6 }}>0{i + 1}</span>{it.text}
-              <SourceChips dates={it.dates} srcMap={countrySrc} />
+            <div key={i} className="wmap-issue inset" style={{ borderLeft:`3px solid ${mc}` }}>
+              <span className="meta" style={{ fontFamily:"var(--mono)", flex:"none" }}>0{i + 1}</span>
+              <span style={{ minWidth:0 }}>
+                {it.text}
+                {it.dates.length > 0 && <div><SourceChips dates={it.dates} srcMap={countrySrc} /></div>}
+              </span>
             </div>
           );
         })}
       </div>
 
       {/* ── 오른쪽: 대외 관계 ── */}
-      <div style={{ flex:"1 1 190px", minWidth:0 }}>
-        <div style={{ fontSize:10, color:"#3a5060", marginBottom:8, letterSpacing:".5px" }}>🌐 대외 관계</div>
+      <div>
+        <h4 className="meta" style={{ margin:"0 0 8px", fontWeight:700, letterSpacing:".06em" }}>🌐 대외 관계</h4>
         {myRels.map((r, i) => {
           const other = r.a === name ? r.b : r.a;
           const relSrc = { ...((sources && sources[other]) || {}), ...countrySrc };
           return (
-            <div key={i} style={{
-              padding:"6px 10px", marginBottom:5,
-              background: "var(--panel)", borderRadius:7,
-            }}>
-              <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-                <FlagImg name={other} w={24} />
-                <span style={{ fontSize:11, color:"#7a8fa8" }}>{NAMES_KR[other]}</span>
-                <span style={{ marginLeft:"auto", fontSize:10, color:relColor(r.s), whiteSpace:"nowrap" }}>
-                  {r.label || relLabel(r.s)}
-                </span>
-              </div>
+            <div key={i} className="wmap-rel inset">
+              <Flag country={other} w={26} />
+              <span>{NAMES_KR[other]}</span>
+              <span className="lab" style={{ color:relColor(r.s) }}>{r.label || relLabel(r.s)}</span>
               {r.dates && r.dates.length > 0 && (
-                <div style={{ marginTop:4 }}><SourceChips dates={r.dates} srcMap={relSrc} /></div>
+                <div style={{ flexBasis:"100%" }}><SourceChips dates={r.dates} srcMap={relSrc} /></div>
               )}
             </div>
           );
@@ -420,6 +349,11 @@ function DetailPanel({ name, weekHols, states, rels, sources }) {
 // ── 메인 컴포넌트 ──────────────────────────────────────────────────
 export default function WorldRelationMap() {
   const [selected, setSelected] = useState(null);
+  // 딥링크: /#state=Korea 로 열면 그 나라가 선택된 채 시작 (공유·점검용)
+  useEffect(() => {
+    const m = /[#&]state=([A-Za-z]+)/.exec(window.location.hash || "");
+    if (m && NODES[m[1]]) setSelected(m[1]);
+  }, []);
   const { holidaysData } = useMarketHolidaysData();
   const { data: worldData, updatedAt } = useWorldStateData();
 
@@ -456,50 +390,39 @@ export default function WorldRelationMap() {
 
   const handleSelect = (name) => setSelected((p) => (p === name ? null : name));
 
-  return (
-    <div style={{
-      background:"#060a17",
-      borderRadius:12,
-      border:"1px solid #121c2e",
-      overflow:"hidden",
-      marginBottom:28,
-    }}>
-      {/* 제목 바 */}
-      <div style={{
-        padding:"10px 16px",
-        background:"linear-gradient(90deg,#0b1528 0%,#060a17 100%)",
-        borderBottom:"1px solid #121c2e",
-        display:"flex", justifyContent:"space-between", alignItems:"center",
-      }}>
-        <div>
-          <span style={{ fontSize:15, fontWeight:"bold", color:"#d4e4ff" }}>🌍 세계 정세 현황판</span>
-          <span style={{ marginLeft:8, fontSize:10, color:"#283848" }}>뉴스 AI 분석 기반</span>
-          {isLive && updatedAt && (
-            <span style={{ marginLeft:8, fontSize:9, color:"#2e4250" }}>
-              · {(() => { try { return format(parseISO(updatedAt), "M/d HH:mm"); } catch { return ""; } })()} 기준
-            </span>
-          )}
-        </div>
-        <span style={{
-          fontSize:9,
-          color: isLive ? "#1a6f4a" : "#253545",
-          background: isLive ? "#08160f" : "#0c1828",
-          padding:"2px 8px", borderRadius:4,
-          border: `1px solid ${isLive ? "#13402a" : "#182535"}`,
-        }}>{isLive ? "● LIVE" : "MOCK DATA"}</span>
-      </div>
+  const updatedLabel = (() => { try { return isLive && updatedAt ? `${format(parseISO(updatedAt), "M/d HH:mm")} 기준` : ""; } catch { return ""; } })();
 
+  return (
+    <Panel
+      icon="🌍"
+      title="세계 정세 현황판"
+      meta={["뉴스 AI 분석 기반", updatedLabel].filter(Boolean).join(" · ")}
+      badge={<LiveBadge live={isLive} offText="MOCK DATA" />}
+      pad={0}
+      hover={false}
+      footer={
+        <>
+          <div className="legend">
+            {REL_SCALE.map((r) => (
+              <span key={r.key} style={{ color: r.color }}><i className={r.dash ? "dash" : ""} /><em style={{ fontStyle:"normal", color:"var(--text-2)" }}>{r.label}</em></span>
+            ))}
+          </div>
+          <span className="spacer" />
+          <span className="meta">🗓 이번 주 공휴일 · 클릭 → 상세 보기</span>
+        </>
+      }
+    >
       {/* SVG 맵 — viewBox로 반응형, 가로 스크롤 없음 */}
       <div style={{ lineHeight:0 }}>
         <svg
           viewBox={`0 0 ${VW} ${VH}`}
           width="100%"
-          style={{ display:"block", background:"#070b18" }}
+          style={{ display:"block" }}
           preserveAspectRatio="xMidYMid meet"
         >
           <defs>
             <pattern id="wg" width="50" height="50" patternUnits="userSpaceOnUse">
-              <path d="M 50 0 L 0 0 0 50" fill="none" stroke="#0e1828" strokeWidth="0.7" />
+              <path d="M 50 0 L 0 0 0 50" fill="none" stroke="rgba(148,163,255,0.07)" strokeWidth="0.7" />
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#wg)" />
@@ -538,34 +461,7 @@ export default function WorldRelationMap() {
       {/* 상세 패널 */}
       {selected && <DetailPanel name={selected} weekHols={weekHols} states={states} rels={rels} sources={sources} />}
 
-      {/* 범례 */}
-      <div style={{
-        padding:"8px 16px",
-        borderTop:"1px solid #0d1828",
-        background:"#050811",
-        display:"flex", gap:14, flexWrap:"wrap", alignItems:"center",
-      }}>
-        {[
-          { c:"#00e676", label:"동맹", dash:false },
-          { c:"#69f0ae", label:"우호", dash:false },
-          { c:"#ffca28", label:"중립", dash:false },
-          { c:"#ff7043", label:"긴장", dash:true  },
-          { c:"#ef5350", label:"적대", dash:true  },
-        ].map(({ c, label, dash }) => (
-          <div key={label} style={{ display:"flex", alignItems:"center", gap:5 }}>
-            <svg width={24} height={8}>
-              <line x1={0} y1={4} x2={24} y2={4}
-                stroke={c} strokeWidth={2} strokeDasharray={dash ? "4 2" : undefined} />
-            </svg>
-            <span style={{ fontSize:9, color:"#384858" }}>{label}</span>
-          </div>
-        ))}
-        <div style={{ marginLeft:"auto", fontSize:9, color:"#283848", display:"flex", gap:10 }}>
-          <span>🗓 이번 주 공휴일</span>
-          <span>·</span>
-          <span>클릭 → 상세 보기</span>
-        </div>
-      </div>
-    </div>
+    </Panel>
   );
 }
+

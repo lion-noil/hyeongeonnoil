@@ -31,42 +31,38 @@ function kdate(day) {
   return `${y}년 ${Number(m)}월 ${Number(d)}일`;
 }
 
-const linkBox = { maxWidth: 1400, margin: "0 auto", padding: "6px 16px 0", color: "var(--text-2)", fontSize: 13, lineHeight: 1.7 };
-const chip = { color: "#9bd", fontSize: 12, textDecoration: "none", border: "1px solid var(--line)", borderRadius: 6, padding: "3px 8px", whiteSpace: "nowrap" };
-
-// 크롤러가 읽는 서버렌더 링크 블록 — 홈 본문(ssr:false)에는 당일 글 링크가 0개라 당일 색인이 늦었다(2026-10-09).
-//   최신 브리핑·최신 뉴스 요약·시세 페이지 전부를 텍스트 링크로 둔다. 데이터 없는 항목은 생략.
 function TodayLinks({ briefing, archiveDay, market }) {
   if (!briefing && !archiveDay && !market?.length) return null;
   return (
-    <nav aria-label="오늘의 글" style={linkBox}>
+    <nav aria-label="오늘의 글" className="links">
       {briefing && (
-        <p style={{ margin: "0 0 4px" }}>
-          <span style={{ color: "var(--muted)" }}>오늘의 시장 브리핑 · </span>
-          <Link href={`/briefing/${briefing.day}`} style={{ color: "var(--cyan)", fontWeight: 600 }}>{briefing.title}</Link>
-          {briefing.lead ? <span style={{ color: "var(--muted)" }}> — {String(briefing.lead).slice(0, 90)}…</span> : null}
+        <p>
+          <span className="meta">오늘의 시장 브리핑 · </span>
+          <Link href={`/briefing/${briefing.day}`}>{briefing.title}</Link>
+          {briefing.lead ? <span className="meta"> — {String(briefing.lead).slice(0, 90)}…</span> : null}
         </p>
       )}
       {archiveDay && (
-        <p style={{ margin: "0 0 6px" }}>
-          <span style={{ color: "var(--muted)" }}>오늘의 세계 뉴스 요약 · </span>
-          <Link href={`/archive/${archiveDay}`} style={{ color: "var(--cyan)", fontWeight: 600 }}>{kdate(archiveDay)} 세계 뉴스 요약</Link>
-          <span style={{ color: "var(--muted)" }}> · <Link href="/archive" style={{ color: "var(--muted)" }}>전체 아카이브</Link></span>
+        <p>
+          <span className="meta">오늘의 세계 뉴스 요약 · </span>
+          <Link href={`/archive/${archiveDay}`}>{kdate(archiveDay)} 세계 뉴스 요약</Link>
+          <span className="meta"> · <Link href="/archive" style={{ color: "var(--muted)" }}>전체 아카이브</Link></span>
         </p>
       )}
       {market?.length > 0 && (
         <>
-          <p style={{ margin: "0 0 4px", color: "var(--muted)" }}>
-            <Link href="/market" style={{ color: "var(--text-2)", fontWeight: 600 }}>시세 페이지</Link> (최근 종가 · 전일 대비)
+          <p className="meta">
+            <Link href="/market" style={{ color: "var(--text-2)" }}>시세 페이지</Link> (최근 종가 · 전일 대비)
           </p>
-          <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexWrap: "wrap", gap: 6 }}>
+          <ul>
             {market.map((o) => {
               const t = MARKET_TOPICS.find((x) => x.slug === o.slug);
               if (!t) return null;
+              const dir = o.delta > 0 ? "up" : o.delta < 0 ? "down" : "flat";
               return (
                 <li key={o.slug}>
-                  <Link href={`/market/${o.slug}`} style={chip}>
-                    {t.ko.seo} {fmtNum(o.close, t.dec)}{t.kind === "rate" ? "%" : ""} <span style={{ color: o.delta > 0 ? "#ff6b6b" : o.delta < 0 ? "#4dabf7" : "#bbb" }}>{fmtDelta(o.delta, t.kind)}</span>
+                  <Link href={`/market/${o.slug}`} className="chip">
+                    {t.ko.seo} <b>{fmtNum(o.close, t.dec)}{t.kind === "rate" ? "%" : ""}</b> <span className={dir}>{fmtDelta(o.delta, t.kind)}</span>
                   </Link>
                 </li>
               );
@@ -92,8 +88,9 @@ export default function HomePage({ briefing = null, archiveDay = null, market = 
           "매일 8개국(미국·중국·일본·인도·홍콩·한국·독일·영국) 뉴스 방송을 한국어로 요약해 날짜별로 보관하고, 어제 세계 핵심 뉴스 5선과 나라별 분위기·관계를 담은 세계 정세 현황판을 보여줍니다.",
           "환율·채권 금리·주가지수·원자재·코인 시세 차트, 매일 아침 시장 브리핑, Bybit·MT5 자동매매 봇의 실계좌 성적과 보고서를 함께 제공합니다. 정보 제공 목적이며 투자 권유가 아닙니다.",
         ]}
-      />
-      <TodayLinks briefing={briefing} archiveDay={archiveDay} market={market} />
+      >
+        <TodayLinks briefing={briefing} archiveDay={archiveDay} market={market} />
+      </SeoSummary>
       <Home />
     </>
   );

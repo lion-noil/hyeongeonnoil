@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Rank } from "../ui/Panel";
 
 /* -------------------------------------------------------------------------- */
 /* 옛 텍스트 요약(summary_result) -> 구조화 items 파서                          */
@@ -95,70 +96,20 @@ function SummaryItem({ item, index }) {
   const hasDetail = !!item.summary || points.length > 0;
 
   return (
-    <div
-      style={{
-        border: "1px solid var(--line)",
-        borderRadius: "8px",
-        marginBottom: "6px",
-        backgroundColor: "var(--panel-2)",
-        overflow: "hidden",
-      }}
-    >
-      <button
-        onClick={() => hasDetail && setOpen((v) => !v)}
-        style={{
-          width: "100%",
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          padding: "8px 10px",
-          background: "none",
-          border: "none",
-          color: "#fff",
-          textAlign: "left",
-          cursor: hasDetail ? "pointer" : "default",
-          fontSize: "13px",
-        }}
-      >
-        <span
-          style={{
-            flexShrink: 0,
-            width: "20px",
-            height: "20px",
-            borderRadius: "50%",
-            backgroundColor: "#00ffcc22",
-            border: "1px solid #00ffcc",
-            color: "#00ffcc",
-            fontSize: "11px",
-            fontWeight: 700,
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          {rank}
-        </span>
-        <span style={{ flex: 1, lineHeight: 1.35 }}>{title}</span>
-        {hasDetail && (
-          <span style={{ flexShrink: 0, color: "#888", fontSize: "11px" }}>
-            {open ? "▲" : "▼"}
-          </span>
-        )}
+    <div className={`acc ${open ? "is-open" : ""}`}>
+      <button type="button" className="acc-btn" onClick={() => setOpen((v) => !v)} disabled={!hasDetail} aria-expanded={open}>
+        <Rank n={rank} size={22} />
+        <span style={{ flex: 1 }}>{title}</span>
+        {hasDetail && <span className="acc-arrow" aria-hidden>▼</span>}
       </button>
 
       {open && hasDetail && (
-        <div style={{ padding: "0 10px 10px 38px", fontSize: "12.5px" }}>
-          {item.summary && (
-            <div style={{ color: "#9fdcff", marginBottom: points.length ? "6px" : 0 }}>
-              ✅ {item.summary}
-            </div>
-          )}
+        <div className="acc-body">
+          {item.summary && <div className="lead">✅ {item.summary}</div>}
           {points.length > 0 && (
-            <ul style={{ margin: 0, paddingLeft: "16px", color: "#ddd" }}>
+            <ul>
               {points.map((p, i) => (
-                <li key={i} style={{ marginBottom: "3px", lineHeight: 1.4 }}>
-                  {p}
-                </li>
+                <li key={i}>{p}</li>
               ))}
             </ul>
           )}
@@ -192,11 +143,11 @@ export default function NewsSummary({ items: itemsProp, summaryText, emptyText =
   if (summaryText) {
     // 파싱이 안 되는 옛 포맷은 원문 텍스트 그대로 폴백
     return (
-      <div style={{ fontSize: "13px", whiteSpace: "pre-wrap", color: "#ddd" }}>
+      <div style={{ fontSize: "var(--fs-sm)", whiteSpace: "pre-wrap", color: "var(--text-2)" }}>
         {summaryText}
       </div>
     );
   }
 
-  return <div style={{ fontSize: "13px", color: "#888" }}>{emptyText}</div>;
+  return <div className="meta">{emptyText}</div>;
 }

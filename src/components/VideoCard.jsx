@@ -1,82 +1,52 @@
+// 나라별 뉴스 카드 — 공용 <Panel> + <Flag>. (2026-10-25 통일)
 import React from "react";
 import { isToday } from "../utils/date";
 import NewsSummary from "./common/NewsSummary";
+import Panel, { Chip } from "./ui/Panel";
+import Flag from "./ui/Flag";
+import { countryKo } from "../lib/theme";
 
-const VideoCard = ({ country, video }) => {
-  // ⏱️ 업로드된 시간 차이 계산
-  const uploadedAt = new Date(video.publishedAt); // 이미 한국 시간(KST)으로 되어 있음
-  const now = new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }); // 한국 시간으로 변환
-  const nowKST = new Date(now); // 문자열을 다시 Date 객체로 변환
-  const diffMs = nowKST - uploadedAt;
-  const diffMinutes = Math.floor(diffMs / 60000); // 1분 = 60000ms
+function timeAgo(publishedAt) {
+  const uploadedAt = new Date(publishedAt); // 이미 KST
+  const nowKST = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }));
+  const diffMinutes = Math.max(0, Math.floor((nowKST - uploadedAt) / 60000));
   const hours = Math.floor(diffMinutes / 60);
   const minutes = diffMinutes % 60;
-  const timeAgo =
-    hours > 0 ? `${hours}시간 ${minutes}분 전` : `${minutes}분 전`;
+  return hours > 0 ? `${hours}시간 ${minutes}분 전` : `${minutes}분 전`;
+}
 
+function fmtChecked(iso) {
+  const date = new Date(iso);
+  const o = { timeZone: "Asia/Seoul" };
+  const weekday = date.toLocaleDateString("ko-KR", { ...o, weekday: "short" });
+  const monthDay = date.toLocaleDateString("ko-KR", { ...o, month: "long", day: "numeric" });
+  const time = date.toLocaleTimeString("ko-KR", { ...o, hour: "2-digit", minute: "2-digit", hour12: false });
+  return `${monthDay} (${weekday}) ${time}`;
+}
+
+const VideoCard = ({ country, video }) => {
+  const fresh = isToday(video.publishedAt);
   return (
-    <div
-      style={{
-        border: "1px solid var(--line)",
-        padding: "15px",
-        borderRadius: "10px",
-        backgroundColor: "var(--panel-2)",
-        boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.3)",
-        width: "320px",
-        textAlign: "left",
-        position: "relative",
-      }}
+    <Panel
+      as="article"
+      className="news-card"
+      icon={<Flag country={country} w={30} />}
+      title={countryKo(country)}
+      meta={country}
+      badge={<span className={`badge ${fresh ? "badge--live" : "badge--off"}`}>{fresh ? "오늘" : "이전"}</span>}
+      pad={14}
     >
-      <div style={{ position: "absolute", top: "15px", right: "15px" }}>
-        <span
-          style={{
-            fontSize: "12px",
-            color: isToday(video.publishedAt) ? "limegreen" : "#555",
-          }}
-        >
-          ●
-        </span>
-      </div>
-
-      <h3 style={{ marginBottom: "10px", textAlign: "center" }}>{country}</h3>
-      <a
-        href={video.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{ color: "#00bfff", fontWeight: "bold" }}
-      >
+      <a className="news-title" href={video.url} target="_blank" rel="noopener noreferrer">
         {video.title}
       </a>
-      <div style={{ marginTop: "10px", fontSize: "13px", color: "#ccc" }}>
-        <div>🕒 업로드: {timeAgo}</div>
-        {video.processed_time && (
-          <div style={{ marginTop: "4px" }}>
-            ✅ 확인:{" "}
-            {(() => {
-              const date = new Date(video.processed_time);
-              const options = { timeZone: "Asia/Seoul" };
-              const weekday = date.toLocaleDateString("ko-KR", { ...options, weekday: "short" }); // 월, 화, 수 등
-              const monthDay = date.toLocaleDateString("ko-KR", {
-                ...options,
-                month: "long",
-                day: "numeric",
-              });
-              const time = date.toLocaleTimeString("ko-KR", {
-                ...options,
-                hour: "2-digit",
-                minute: "2-digit",
-              });
-              return `${monthDay} (${weekday}) ${time}`;
-            })()}
-          </div>
-        )}
+      <div className="news-meta">
+        <Chip title="업로드">🕒 {timeAgo(video.publishedAt)}</Chip>
+        {video.processed_time && <Chip title="요약 확인 시각">✅ {fmtChecked(video.processed_time)}</Chip>}
       </div>
-
-      {/* 뉴스 요약 — 국가별 순위 섹션(아코디언) */}
-      <div style={{ marginTop: "12px" }}>
+      <div style={{ marginTop: 12 }}>
         <NewsSummary items={video.summary_items} summaryText={video.summary_result} />
       </div>
-    </div>
+    </Panel>
   );
 };
 

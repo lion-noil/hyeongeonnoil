@@ -20,8 +20,8 @@ export const FALLBACK_RELS = [
   { a: "China", b: "HongKong", s: 3 }, { a: "Germany", b: "India", s: 2 },
 ];
 
-export const relColor = (s) => (s >= 4 ? "#34f5a4" : s >= 2 ? "#7cf7c0" : s >= 0 ? "#ffd166" : s >= -2 ? "#ff8a4c" : "#ff4d6d");
-export const moodColor = (v) => (v >= 7 ? "#34f5a4" : v >= 5 ? "#ffd166" : "#ff4d6d");
+// 색은 src/lib/theme.js 단일 소스 (세계정세 지도·범례와 동일 팔레트)
+export { relColor, moodColor } from "../../lib/theme";
 
 export function useGlobeData() {
   const { data, updatedAt } = useWorldStateData();

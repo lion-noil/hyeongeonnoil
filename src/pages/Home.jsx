@@ -1,3 +1,4 @@
+// 홈 — 히어로(3D 지구본) 아래 섹션들. 모든 섹션 = <SectionHead> + <Panel> 계열 (2026-10-25 통일, docs/DESIGN.md)
 import React from "react";
 import { useYoutubeData } from "../hooks/useYoutubeData";
 
@@ -6,19 +7,8 @@ import CalendarComponent from "../components/CalendarComponent";
 import WorldRelationMap from "../components/home/WorldRelationMap";
 import GlobalBriefingCard from "../components/home/GlobalBriefingCard";
 import HomeHero from "../components/home/HomeHero";
+import SectionHead from "../components/ui/SectionHead";
 import { newsParams } from "../constants/newsMeta";
-
-function SectionHead({ kicker, title, desc }) {
-  return (
-    <div className="section-head reveal">
-      <div>
-        <div className="kicker">{kicker}</div>
-        <h2>{title}</h2>
-        {desc && <p>{desc}</p>}
-      </div>
-    </div>
-  );
-}
 
 function Home() {
   const youtubeData = useYoutubeData();
@@ -37,15 +27,15 @@ function Home() {
         </div>
 
         {/* 세계 정세 현황판 */}
-        <SectionHead kicker="WORLD STATE" title="세계 정세 현황판" desc="나라별 분위기와 관계를 뉴스 근거와 함께" />
+        <SectionHead kicker="WORLD STATE" title="세계 정세 현황판" desc="나라별 분위기와 관계를 뉴스 근거와 함께 — 나라를 누르면 상세" />
         <div className="reveal" style={{ padding: "0 8px" }}>
           <WorldRelationMap />
         </div>
 
-        {/* 뉴스 카드 영역 */}
+        {/* 나라별 뉴스 카드 */}
         <SectionHead kicker="COUNTRY NEWS" title="나라별 뉴스 요약" desc="각국 대표 뉴스 채널을 매일 요약합니다" />
         {youtubeData ? (
-          <div style={{ display: "flex", justifyContent: "center", gap: "20px", flexWrap: "wrap", padding: "0 8px" }}>
+          <div className="card-grid">
             {order.map((country) => {
               const video = youtubeData[country];
               if (!video) return null;
@@ -57,19 +47,12 @@ function Home() {
             })}
           </div>
         ) : (
-          <p style={{ textAlign: "center", color: "var(--muted)" }}>불러오는 중…</p>
+          <p className="meta" style={{ textAlign: "center" }}>불러오는 중…</p>
         )}
 
-        {/* 달력 */}
-        <SectionHead kicker="CALENDAR" title="국제 공휴일 캘린더" desc="휴장일을 미리 확인하세요" />
-        <div
-          className="glass reveal"
-          style={{
-            padding: "20px",
-            maxWidth: "420px",
-            margin: "0 auto",
-          }}
-        >
+        {/* 휴장일 */}
+        <SectionHead kicker="CALENDAR" title="국제 공휴일 캘린더" desc="7개국 시장 휴장일을 2주 앞서 확인하세요" />
+        <div className="reveal" style={{ padding: "0 8px" }}>
           <CalendarComponent />
         </div>
       </div>

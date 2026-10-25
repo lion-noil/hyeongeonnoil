@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import SiteLayout from "../src/components/SiteLayout";
 import OgImageMeta from "../src/components/OgImageMeta";
 import "../src/styles/globals.css";
+import "../src/styles/system.css";
 import { initGA, trackPageview, trackEvent } from "../src/lib/ga";
 
 export default function MyApp({ Component, pageProps }) {

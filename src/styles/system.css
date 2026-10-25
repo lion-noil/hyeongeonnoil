@@ -1,0 +1,179 @@
+/* ═══════════════════════════════════════════════════════════════════
+   현건노일 디자인 시스템 — 공용 부품 레이어 (2026-10-25)
+   globals.css(토큰·배경·내비·히어로) 위에 얹는 재사용 부품: .panel/.chip/.rank/.stat/.legend/.card-grid …
+   규칙(docs/DESIGN.md):
+     · 컴포넌트에 hex 를 쓰지 않는다 → 여기 토큰 또는 src/lib/theme.js 의 값만 (두 파일 값은 항상 동일하게).
+     · 모든 카드는 <Panel>, 모든 큰 묶음 제목은 <SectionHead>, 국기는 <Flag>.
+     · 본문 글자 최소 13px, 보조 글자 최소 12px (시인성).
+   ═══════════════════════════════════════════════════════════════════ */
+:root {
+  --ok: #34f5a4;
+  --warn: #ffd166;
+  --neg: #ff4d6d;
+  --up: #ff6b7a;      /* 시세 상승(국내 관례 빨강) */
+  --down: #5eb3ff;    /* 시세 하락(파랑) */
+  --rel-ally: #34f5a4; --rel-friend: #7cf7c0; --rel-neutral: #ffd166; --rel-tense: #ff8a4c; --rel-hostile: #ff4d6d;
+  --panel-head: rgba(16, 22, 46, 0.55);
+  --panel-inset: rgba(148, 163, 255, 0.06);
+  --glow: 0 0 0 1px rgba(148, 163, 255, 0.22), 0 18px 50px -18px rgba(103, 232, 249, 0.35), 0 10px 40px -12px rgba(2, 6, 23, 0.9);
+  --fs-xs: 12px; --fs-sm: 13px; --fs-md: 14px; --fs-lg: 16px;
+}
+
+/* ── 패널(유리 카드) ───────────────────────────────── */
+.panel {
+  position: relative; display: flex; flex-direction: column; min-width: 0;
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  backdrop-filter: blur(16px) saturate(140%); -webkit-backdrop-filter: blur(16px) saturate(140%);
+  box-shadow: var(--shadow); overflow: hidden; color: var(--text);
+  transition: transform .25s ease-out, box-shadow .25s ease-out, border-color .25s;
+}
+.panel::before { /* 윗변 하이라이트 — 유리 두께감 */
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px; pointer-events: none; z-index: 1;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
+}
+.panel--hover:hover { border-color: var(--line-strong); box-shadow: var(--glow); }
+.panel-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  padding: 12px 16px; background: var(--panel-head); border-bottom: 1px solid var(--line);
+}
+.panel-head-main { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; min-width: 0; }
+.panel-head-side { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.panel-icon { font-size: 16px; line-height: 1; align-self: center; }
+.panel-title { margin: 0; font-size: var(--fs-lg); font-weight: 800; letter-spacing: -0.02em; color: var(--text); }
+.panel-meta { font-size: var(--fs-xs); color: var(--muted); }
+.panel-body { min-width: 0; }
+.panel-foot {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  padding: 10px 16px; border-top: 1px solid var(--line); background: rgba(4, 6, 15, 0.45);
+  font-size: var(--fs-xs); color: var(--text-2);
+}
+.panel-foot .spacer { margin-left: auto; }
+.inset { background: var(--panel-inset); border: 1px solid var(--line); border-radius: 10px; }
+
+/* ── 배지·칩·순위 ─────────────────────────────────── */
+.badge {
+  display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 999px;
+  font-size: 11px; font-weight: 800; letter-spacing: .12em; white-space: nowrap;
+}
+.badge--live { color: var(--ok); background: rgba(52, 245, 164, 0.10); border: 1px solid rgba(52, 245, 164, 0.35); }
+.badge--off { color: var(--muted); background: rgba(148, 163, 255, 0.08); border: 1px solid var(--line); }
+.chip {
+  display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px;
+  font-size: var(--fs-xs); font-weight: 700; line-height: 1.5; white-space: nowrap; text-decoration: none;
+  color: var(--text-2); background: rgba(148, 163, 255, 0.08); border: 1px solid var(--line);
+}
+a.chip:hover { filter: brightness(1.2); }
+.rank {
+  display: inline-flex; align-items: center; justify-content: center; flex: none; border-radius: 50%;
+  font-family: var(--mono); font-weight: 800; color: #05060f; background: var(--grad);
+  box-shadow: 0 0 12px rgba(167, 139, 250, 0.45);
+}
+.meta { font-size: var(--fs-xs); color: var(--muted); }
+
+/* ── 점수 막대 ─────────────────────────────────────── */
+.stat { margin-bottom: 8px; }
+.stat-row { display: flex; justify-content: space-between; font-size: var(--fs-xs); color: var(--text-2); margin-bottom: 3px; }
+.stat-row b { font-family: var(--mono); font-weight: 700; }
+.stat-track { height: 6px; border-radius: 3px; background: rgba(148, 163, 255, 0.10); overflow: hidden; }
+.stat-fill { height: 100%; border-radius: 3px; transition: width .5s; }
+
+/* ── 범례 ──────────────────────────────────────────── */
+.legend { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; font-size: var(--fs-xs); color: var(--text-2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 20px; height: 3px; border-radius: 2px; box-shadow: 0 0 8px currentColor; background: currentColor; }
+.legend i.dash { background: repeating-linear-gradient(90deg, currentColor 0 5px, transparent 5px 8px); box-shadow: none; }
+.legend .dot { width: 10px; height: 10px; border-radius: 50%; box-shadow: 0 0 8px currentColor; background: currentColor; }
+
+/* ── 카드 격자 (같은 폭·같은 줄) ───────────────────── */
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; padding: 0 8px; align-items: start; }
+.card-grid > * { min-width: 0; }
+
+/* ── 섹션 제목 보조 ───────────────────────────────── */
+.section-aside { display: flex; align-items: center; gap: 10px; flex: none; }
+
+/* ── 상단 서버렌더 요약(SEO) — 히어로 위 안내 띠 ────── */
+.seo-summary {
+  max-width: 1400px; margin: 10px auto 0; padding: 14px 18px; border-radius: 14px;
+  background: rgba(13, 18, 38, 0.45); border: 1px solid var(--line); color: var(--text-2); font-size: var(--fs-sm); line-height: 1.7;
+}
+.seo-summary h1 { margin: 0 0 4px; font-size: 17px; font-weight: 800; letter-spacing: -0.02em; color: var(--text); }
+.seo-summary p { margin: 0 0 4px; }
+.seo-summary .links { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--line); }
+.seo-summary .links p { margin: 0 0 4px; }
+.seo-summary .links a { color: var(--cyan); font-weight: 600; text-decoration: none; }
+.seo-summary .links a:hover { text-decoration: underline; }
+.seo-summary ul { list-style: none; padding: 0; margin: 6px 0 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.seo-summary ul.plain { display: flex; gap: 2px 14px; color: var(--muted); font-size: var(--fs-xs); }
+.seo-summary .chip { font-weight: 600; color: var(--text-2); }
+.seo-summary .chip b { font-weight: 700; color: var(--text); font-family: var(--mono); font-size: 12px; }
+.seo-summary .chip .up { color: var(--up); } .seo-summary .chip .down { color: var(--down); } .seo-summary .chip .flat { color: var(--muted); }
+
+/* ── 브리핑 카드 ──────────────────────────────────── */
+.brief-item { display: flex; gap: 12px; align-items: flex-start; padding: 10px 12px; }
+.brief-item + .brief-item { margin-top: 8px; }
+.brief-item .t { font-size: var(--fs-md); font-weight: 800; line-height: 1.45; color: var(--text); }
+.brief-item .t .chip { margin-left: 8px; vertical-align: middle; }
+.brief-item .s { font-size: var(--fs-sm); color: var(--text-2); line-height: 1.6; margin-top: 4px; white-space: pre-line; }
+.brief-item .src { margin-top: 5px; }
+
+/* ── 나라별 뉴스 카드 ─────────────────────────────── */
+.news-card .panel-head { padding: 10px 14px; }
+.news-card .news-title { display: block; font-size: var(--fs-md); font-weight: 700; line-height: 1.45; color: var(--text); text-decoration: none; }
+.news-card .news-title:hover { color: var(--cyan); }
+.news-card .news-meta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+.acc { border: 1px solid var(--line); border-radius: 10px; background: var(--panel-inset); overflow: hidden; margin-bottom: 6px; }
+.acc-btn { width: 100%; display: flex; align-items: center; gap: 9px; padding: 8px 10px; background: none; border: 0; color: var(--text); text-align: left; font: inherit; font-size: var(--fs-sm); line-height: 1.4; cursor: pointer; }
+.acc-btn:disabled { cursor: default; }
+.acc-btn:hover:not(:disabled) { background: rgba(148, 163, 255, 0.06); }
+.acc-arrow { flex: none; color: var(--muted); font-size: 10px; transition: transform .2s; }
+.acc.is-open .acc-arrow { transform: rotate(180deg); }
+.acc-body { padding: 0 10px 10px 41px; font-size: var(--fs-sm); color: var(--text-2); line-height: 1.55; }
+.acc-body .lead { color: var(--accent); margin-bottom: 6px; }
+.acc-body ul { margin: 0; padding-left: 16px; }
+.acc-body li { margin-bottom: 3px; }
+
+/* ── 공휴일 캘린더 ─────────────────────────────────── */
+.hol-strip { display: grid; grid-template-columns: repeat(14, minmax(0, 1fr)); gap: 4px; }
+.hol-day { position: relative; border-radius: 8px; padding: 6px 2px 5px; text-align: center; border: 1px solid transparent; min-height: 58px; }
+.hol-day .dow { font-size: 11px; color: var(--muted); }
+.hol-day .d { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--text-2); margin-top: 1px; }
+.hol-day.is-wknd .dow, .hol-day.is-wknd .d { opacity: .55; }
+.hol-day.is-today { border-color: rgba(52, 245, 164, 0.5); background: rgba(52, 245, 164, 0.08); }
+.hol-day.is-today .d { color: var(--ok); }
+.hol-day.has-hol { background: rgba(255, 209, 102, 0.10); border-color: rgba(255, 209, 102, 0.35); }
+.hol-day .flags { display: flex; justify-content: center; gap: 2px; flex-wrap: wrap; margin-top: 4px; min-height: 12px; }
+.hol-list { display: grid; gap: 8px; margin-top: 14px; }
+.hol-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; font-size: var(--fs-sm); }
+.hol-item .when { font-family: var(--mono); font-size: var(--fs-xs); color: var(--warn); flex: none; min-width: 76px; }
+.hol-item .who { color: var(--text-2); flex: none; }
+.hol-item .what { color: var(--text); font-weight: 600; min-width: 0; }
+.hol-item.is-today .when { color: var(--ok); }
+.hol-empty { font-size: var(--fs-sm); color: var(--muted); margin-top: 14px; }
+
+/* ── 세계정세 지도 (SVG 바깥 HTML 부분) ───────────── */
+.wmap-detail { display: grid; grid-template-columns: 210px minmax(0, 1.1fr) minmax(0, 1fr); gap: 16px; padding: 16px; border-top: 1px solid var(--line); background: rgba(4, 6, 15, 0.5); }
+.wmap-box { padding: 10px 12px; }
+.wmap-box + .wmap-box { margin-top: 8px; }
+.wmap-box h4 { margin: 0 0 6px; font-size: var(--fs-xs); font-weight: 700; letter-spacing: .06em; color: var(--muted); }
+.wmap-box p { margin: 0; font-size: var(--fs-sm); color: var(--text-2); line-height: 1.55; }
+.wmap-box.worry { border-color: rgba(255, 138, 76, 0.35); background: rgba(255, 138, 76, 0.07); }
+.wmap-box.worry h4 { color: var(--rel-tense); }
+.wmap-box.hope { border-color: rgba(52, 245, 164, 0.3); background: rgba(52, 245, 164, 0.06); }
+.wmap-box.hope h4 { color: var(--ok); }
+.wmap-box.note { border-color: rgba(167, 139, 250, 0.35); background: rgba(167, 139, 250, 0.08); }
+.wmap-box.note h4 { color: var(--accent-2); }
+.wmap-issue { display: flex; gap: 10px; align-items: flex-start; padding: 8px 10px; font-size: var(--fs-sm); color: var(--text); line-height: 1.5; }
+.wmap-issue + .wmap-issue { margin-top: 6px; }
+.wmap-rel { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 7px 10px; font-size: var(--fs-sm); }
+.wmap-rel > span:not(.lab) { flex: none; }
+.wmap-rel + .wmap-rel { margin-top: 6px; }
+.wmap-rel .lab { margin-left: auto; font-weight: 700; white-space: nowrap; font-size: var(--fs-xs); }
+.wmap-src { display: inline-flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.wmap-src .chip { font-size: 11px; padding: 1px 6px; }
+
+@media (max-width: 900px) {
+  .wmap-detail { grid-template-columns: 1fr; }
+  .card-grid { grid-template-columns: 1fr; padding: 0 14px; }
+  .hol-strip { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+  .seo-summary { margin: 8px 12px 0; }
+}
