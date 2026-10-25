@@ -33,8 +33,8 @@ const box = { maxWidth: 780, margin: "0 auto", padding: "8px 16px 40px", color: 
 const card = { background: "var(--panel-2)", borderRadius: 10, padding: "14px 18px", marginBottom: 12, display: "block", textDecoration: "none", color: "#eee" };
 const badge = (kind) => ({
   display: "inline-block", fontSize: 12, padding: "2px 8px", borderRadius: 6, marginRight: 8,
-  color: kind === "weekly" ? "#ffd479" : kind === "deep" ? "#c7a2ff" : "#00ffcc",
-  border: `1px solid ${kind === "weekly" ? "#8a6d2a" : kind === "deep" ? "#5f4a8a" : "#1f6b5e"}`,
+  color: kind === "weekly" ? "#ffd479" : kind === "deep" ? "#c7a2ff" : kind === "verify" ? "#67e8f9" : "#00ffcc",
+  border: `1px solid ${kind === "weekly" ? "#8a6d2a" : kind === "deep" ? "#5f4a8a" : kind === "verify" ? "#1f5f6b" : "#1f6b5e"}`,
 });
 
 function fmtTs(iso) {

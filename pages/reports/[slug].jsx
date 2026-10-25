@@ -7,6 +7,7 @@ import remarkGfm from "remark-gfm";
 import { getReport, listReports, slugToId, KIND_KO } from "../../src/lib/reportsDb";
 import WeeklyReportView from "../../src/components/WeeklyReportView";
 import PerfView from "../../src/components/PerfView";
+import QcBacktestView from "../../src/components/QcBacktestView";
 import { ldJson, ORG } from "../../src/lib/jsonLd";
 
 const box = { maxWidth: 900, margin: "0 auto", padding: "8px 16px 40px", color: "#eee" };
@@ -82,7 +83,18 @@ export default function ReportDetailPage({ report, prev, next }) {
         {"  ·  "}{kindKo} · {report.label} · 생성 {fmtTs(report.generated_at)}
       </p>
 
-      {report.data?.kind === "perf" ? (
+      {report.data?.kind === "qc_backtest" ? (
+        <>
+          <h1 style={{ color: "#00bfff", fontSize: 22, margin: "4px 0 12px" }}>{report.title}</h1>
+          <QcBacktestView data={report.data} caveats={report.data.caveats || []} expectation={report.data.expectation || ""} />
+          <details style={{ marginTop: 16 }}>
+            <summary style={{ color: "#00ffcc", cursor: "pointer", fontSize: 14 }}>📄 전체 텍스트(마크다운) 보기</summary>
+            <article style={{ ...card, marginTop: 10 }}>
+              <ReactMarkdown remarkPlugins={[remarkGfm]} components={md}>{report.md}</ReactMarkdown>
+            </article>
+          </details>
+        </>
+      ) : report.data?.kind === "perf" ? (
         <>
           <PerfView data={report.data} />
           <details style={{ marginTop: 16 }}>
