@@ -80,7 +80,7 @@ export default function ReportDetailPage({ report, prev, next }) {
 
       <p style={{ color: "#888", fontSize: 13, margin: "4px 0 10px" }}>
         <Link href="/reports" style={{ color: "#00ffcc" }}>← 보고서 목록</Link>
-        {"  ·  "}{kindKo} · {report.label} · 생성 {fmtTs(report.generated_at)}
+        {"  ·  "}{kindKo} · {report.kind === "verify" ? `유니버스 ${report.label} · 검증일 ${report.data?.verified_at || ""}` : report.label} · 생성 {fmtTs(report.generated_at)}
       </p>
 
       {report.data?.kind === "qc_backtest" ? (
