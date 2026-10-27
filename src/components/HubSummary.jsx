@@ -1,5 +1,5 @@
 // 허브 페이지(/exchange·/indexes·/commodity·/coin·/cfd·/fx·/others) 서버렌더 본문. (2026-10-18)
-// HubIntro = 차트 위(유일한 h1·한 줄 소개·최근 종가/참고 시세 목록), HubGuide = 차트 아래(읽는 법·시세 페이지 링크·FAQ+FAQPage JSON-LD).
+// HubIntro = 차트 위(유일한 h1 — 차트 허브는 화면 밖, 기타는 안내 목록), HubGuide = 차트 아래(읽는 법·다른 차트 페이지 링크·FAQ+FAQPage JSON-LD).
 // 문장은 src/lib/hubContent.js, 숫자는 src/lib/hubDb.js(getStaticProps)에서만 온다. 차트(ssr:false)는 건드리지 않는다.
 import React from "react";
 import Head from "next/head";
@@ -18,7 +18,6 @@ const guideWrap = { maxWidth: 960, margin: "0 auto", padding: "8px 16px 40px", c
 const card = { background: "var(--panel-2)", border: "1px solid var(--line)", borderRadius: 10, padding: "14px 18px", marginBottom: 14 };
 const h2s = { color: "var(--text)", fontSize: 16, fontWeight: 700, margin: "0 0 8px" };
 const h3s = { color: "var(--text)", fontSize: 14.5, fontWeight: 700, margin: "0 0 2px" };
-const chip = { color: "#9bd", fontSize: 13, textDecoration: "none", border: "1px solid var(--line)", borderRadius: 6, padding: "4px 8px", display: "inline-block" };
 const linkC = { color: "#9bd" };
 
 function fmtClose(v, kind, dec) {
@@ -57,25 +56,13 @@ function Name({ slug, children }) {
   );
 }
 
-function QuoteLine({ q }) {
-  return (
-    <>
-      <Name slug={q.slug}>{q.label}</Name> {fmtClose(q.close, q.kind, q.dec)}
-      <span style={{ color: "var(--muted)" }}> ({shortDate(q.date)})</span>{" "}
-      <span style={{ color: tone(q.delta) }}>전일 대비 {fmtDelta(q.delta, q.kind)}</span>
-      {q.vsMa != null && <span style={{ color: "var(--muted)" }}> · MA100 대비 {fmtDelta(q.vsMa, q.kind)}</span>}
-      {q.stale && <span style={{ color: "#ffd166" }}> · 데이터 지연</span>}
-    </>
-  );
-}
-
-// 차트 위 — 페이지의 유일한 h1
+// 차트 위 — 페이지의 유일한 h1.
+// (2026-10-27) 차트 허브(환율·지수·원자재·코인·CFD·FX)는 상단 긴 설명·종가 목록을 없앴다 — 화면이 차트로 바로 시작한다.
+//   검색엔진·스크린리더용 h1 만 화면 밖(.sr-only)에 남긴다. 기타(/others)는 안내 페이지라 그대로 보인다.
 export function HubIntro({ hubKey, hub = {} }) {
   const H = HUBS[hubKey];
-  const quotes = hub.quotes || [];
-  const symbols = hub.symbols || [];
+  if (hubKey !== "others") return <h1 className="sr-only">{H.h1}</h1>;
   const links = hub.links || [];
-  const note = symbols.find((s) => s.ref?.note)?.ref;
   return (
     <section aria-label="페이지 요약" style={wrap}>
       <h1 style={h1s}>{H.h1}</h1>
@@ -83,48 +70,7 @@ export function HubIntro({ hubKey, hub = {} }) {
         <p key={i} style={p}>{t}</p>
       ))}
 
-      {quotes.length > 0 && (
-        <>
-          <p style={{ ...p, color: "var(--muted)", fontSize: 12, margin: "6px 0 0" }}>
-            {H.quotesTitle} — 종목 · 종가 · (기준일) · 전일 대비 · 100일 이동평균(MA100) 대비
-          </p>
-          <ul style={ul}>
-            {quotes.map((q) => (
-              <li key={q.key}>
-                <QuoteLine q={q} />
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
-
-      {symbols.length > 0 && (
-        <>
-          <p style={{ ...p, color: "var(--muted)", fontSize: 12, margin: "6px 0 0" }}>
-            {H.quotesTitle} — 심볼 · 이름 · 참고 시세(사이트 일봉 데이터·시장 브리핑 기준)
-          </p>
-          <ul style={{ ...ul, flexDirection: "column", gap: 2 }}>
-            {symbols.map((s) => (
-              <li key={s.symbol}>
-                <b style={{ color: "var(--text)" }}>{s.symbol}</b> {s.name}
-                {s.ref ? (
-                  <>
-                    {" — 참고: "}
-                    <QuoteLine q={s.ref} />
-                  </>
-                ) : null}
-              </li>
-            ))}
-          </ul>
-          {note && (
-            <p style={{ ...p, color: "var(--muted)", fontSize: 12, margin: "4px 0 0" }}>
-              비트코인 참고 시세는 <Link href={note.briefingDay ? `/briefing/${note.briefingDay}` : "/briefing"} style={linkC}>{note.briefingDay ? `${note.briefingDay} 시장 브리핑` : "최신 시장 브리핑"}</Link> 시세표 값입니다({note.note}).
-            </p>
-          )}
-        </>
-      )}
-
-      {hubKey === "others" && links.length > 0 && (
+      {links.length > 0 && (
         <>
           <p style={{ ...p, color: "var(--muted)", fontSize: 12, margin: "6px 0 0" }}>{H.quotesTitle}</p>
           <ul style={ul}>
@@ -149,9 +95,8 @@ export function HubIntro({ hubKey, hub = {} }) {
 }
 
 // 차트 아래 — 읽는 법·링크·FAQ. FAQPage JSON-LD 도 여기서 넣는다.
-export function HubGuide({ hubKey, hub = {} }) {
+export function HubGuide({ hubKey }) {
   const H = HUBS[hubKey];
-  const links = hub.links || [];
   const faqLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -180,30 +125,13 @@ export function HubGuide({ hubKey, hub = {} }) {
         )}
       </section>
 
-      {hubKey !== "others" && (
-        <nav aria-label="관련 시세 페이지" style={card}>
-          <h2 style={h2s}>관련 시세 페이지</h2>
-          {links.length > 0 ? (
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-              {links.map((l) => (
-                <Link key={l.slug} href={`/market/${l.slug}`} style={chip}>
-                  {l.name}
-                  {l.close != null && (
-                    <span style={{ color: tone(l.delta), marginLeft: 6 }}>
-                      {fmtClose(l.close, l.kind, l.dec)} {fmtDelta(l.delta, l.kind)}
-                    </span>
-                  )}
-                </Link>
-              ))}
-            </div>
-          ) : null}
-          <p style={{ margin: "10px 0 0" }}>
-            <Link href="/briefing" style={{ color: "#00ffcc" }}>오늘의 시장 브리핑</Link>
-            {" · "}
-            <Link href="/market" style={linkC}>시세 페이지 전체 목록</Link>
-            {H.hubs.map((h) => (
+      {hubKey !== "others" && H.hubs?.length > 0 && (
+        <nav aria-label="다른 차트 페이지" style={card}>
+          <h2 style={h2s}>다른 차트 페이지</h2>
+          <p style={{ margin: 0 }}>
+            {H.hubs.map((h, i) => (
               <React.Fragment key={h}>
-                {" · "}
+                {i > 0 && " · "}
                 <Link href={h} style={linkC}>{hubName(h)}</Link>
               </React.Fragment>
             ))}

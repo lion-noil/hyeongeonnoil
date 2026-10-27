@@ -91,23 +91,6 @@ a.chip:hover { filter: brightness(1.2); }
 /* ── 섹션 제목 보조 ───────────────────────────────── */
 .section-aside { display: flex; align-items: center; gap: 10px; flex: none; }
 
-/* ── 상단 서버렌더 요약(SEO) — 히어로 위 안내 띠 ────── */
-.seo-summary {
-  max-width: 1400px; margin: 10px auto 0; padding: 14px 18px; border-radius: 14px;
-  background: rgba(13, 18, 38, 0.45); border: 1px solid var(--line); color: var(--text-2); font-size: var(--fs-sm); line-height: 1.7;
-}
-.seo-summary h1 { margin: 0 0 4px; font-size: 17px; font-weight: 800; letter-spacing: -0.02em; color: var(--text); }
-.seo-summary p { margin: 0 0 4px; }
-.seo-summary .links { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--line); }
-.seo-summary .links p { margin: 0 0 4px; }
-.seo-summary .links a { color: var(--cyan); font-weight: 600; text-decoration: none; }
-.seo-summary .links a:hover { text-decoration: underline; }
-.seo-summary ul { list-style: none; padding: 0; margin: 6px 0 0; display: flex; flex-wrap: wrap; gap: 6px; }
-.seo-summary ul.plain { display: flex; gap: 2px 14px; color: var(--muted); font-size: var(--fs-xs); }
-.seo-summary .chip { font-weight: 600; color: var(--text-2); }
-.seo-summary .chip b { font-weight: 700; color: var(--text); font-family: var(--mono); font-size: 12px; }
-.seo-summary .chip .up { color: var(--up); } .seo-summary .chip .down { color: var(--down); } .seo-summary .chip .flat { color: var(--muted); }
-
 /* ── 브리핑 카드 ──────────────────────────────────── */
 .brief-item { display: flex; gap: 12px; align-items: flex-start; padding: 10px 12px; }
 .brief-item + .brief-item { margin-top: 8px; }
@@ -204,7 +187,6 @@ a.chip:hover { filter: brightness(1.2); }
   .wmap-detail { grid-template-columns: 1fr; }
   .card-grid { grid-template-columns: 1fr; padding: 0 14px; }
   .hol-strip { grid-template-columns: repeat(7, minmax(0, 1fr)); }
-  .seo-summary { margin: 8px 12px 0; }
   .wstate { padding: 0 12px; }
   .cstrip { display: flex; overflow-x: auto; scrollbar-width: none; padding: 12px; }
   .cstrip::-webkit-scrollbar { display: none; }

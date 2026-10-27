@@ -59,7 +59,7 @@ export default function HomeHero() {
           <div className="eyebrow">
             <span className="live-dot" /> LIVE · GLOBAL MARKETS &amp; NEWS
           </div>
-          {/* h1 은 pages/index.jsx 의 서버렌더 요약(SeoSummary)이 맡음 → 히어로 제목은 h2(.hero-title 스타일 동일) */}
+          {/* h1 은 pages/index.jsx 의 화면 밖 제목(.sr-only)이 맡음 → 히어로 제목은 h2(.hero-title 스타일 동일) */}
           <h2 className="hero-title">
             세계의 흐름을
             <br />
@@ -73,8 +73,8 @@ export default function HomeHero() {
             <span>{now.date}</span>
           </div>
           <div className="hero-cta">
-            <Link href="/briefing" className="btn btn-primary">오늘 시장 브리핑 →</Link>
-            <Link href="/archive" className="btn btn-ghost">뉴스 아카이브</Link>
+            <Link href="/archive" className="btn btn-primary">뉴스 아카이브 →</Link>
+            <Link href="/verified" className="btn btn-ghost">검증 기록</Link>
           </div>
           <div className="hero-stats">
             <div><b>{TRACKED}</b><span>추적 국가</span></div>

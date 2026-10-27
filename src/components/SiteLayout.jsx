@@ -10,8 +10,7 @@ const CosmicBackground = dynamic(() => import("./three/CosmicBackground"), { ssr
 
 const navItems = [
   { path: "/", label: "홈" },
-  { path: "/briefing", label: "시장 브리핑" },
-  { path: "/market", label: "시세" },
+  // (2026-10-27) 시장 브리핑·시세는 메뉴에서 뺐다 — 페이지(/briefing·/market)는 검색 유입용으로 그대로 살아 있다.
   { path: "/exchange", label: "환율·채권" },
   { path: "/indexes", label: "지수" },
   { path: "/commodity", label: "원자재" },
@@ -145,7 +144,6 @@ export default function SiteLayout({ children }) {
               </div>
             </div>
             <div className="foot-links">
-              <Link href="/briefing">시장 브리핑</Link>
               <Link href="/archive">뉴스 아카이브</Link>
               <Link href="/reports">보고서</Link>
               <Link href="/verified">검증 기록</Link>
