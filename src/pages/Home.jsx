@@ -4,7 +4,6 @@ import { useYoutubeData } from "../hooks/useYoutubeData";
 
 import VideoCard from "../components/VideoCard";
 import CalendarComponent from "../components/CalendarComponent";
-import WorldRelationMap from "../components/home/WorldRelationMap";
 import GlobalBriefingCard from "../components/home/GlobalBriefingCard";
 import HomeHero from "../components/home/HomeHero";
 import SectionHead from "../components/ui/SectionHead";
@@ -24,12 +23,6 @@ function Home() {
         <SectionHead kicker="DAILY BRIEFING" title="어제 세계에서 일어난 일" desc="10개국 보도를 종합해 뽑은 핵심 뉴스" />
         <div className="reveal" style={{ padding: "0 8px" }}>
           <GlobalBriefingCard briefing={youtubeData?.global_briefing} />
-        </div>
-
-        {/* 세계 정세 현황판 */}
-        <SectionHead kicker="WORLD STATE" title="세계 정세 현황판" desc="나라별 분위기와 관계를 뉴스 근거와 함께 — 나라를 누르면 상세" />
-        <div className="reveal" style={{ padding: "0 8px" }}>
-          <WorldRelationMap />
         </div>
 
         {/* 나라별 뉴스 카드 */}

@@ -34,5 +34,6 @@ export function useGlobeData() {
       .map((r) => ({ a: r.a, b: r.b, s: Number(r.score) || 0, label: r.label }));
     return norm.length ? norm : FALLBACK_RELS;
   }, [data]);
-  return { countries: data?.countries || null, relations, updatedAt, live: !!data };
+  // data: 원본(countries 상세·relations 라벨/근거·sources) — 홈 세계정세 패널이 같은 응답을 재사용(중복 fetch 방지)
+  return { countries: data?.countries || null, relations, updatedAt, live: !!data, data };
 }

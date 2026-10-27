@@ -1,7 +1,9 @@
 // 홈 히어로 3D 지구본 — 육지 점묘 + 대기광 + 추적 국가 마커(분위기 점수 색) + 관계 호(관계 점수 색, 흐르는 빛).
-// 데이터: /api/world-state (세계정세 현황판과 같은 원천). 실데이터 없으면 목업 관계로 그림. (2026-09-28)
+// 데이터: /api/world-state. 실데이터 없으면 목업 관계로 그림. (2026-09-28)
+// 2026-10-27 세계정세 현황판 통합: selected/onSelect(선택) — 마커·이름표 클릭으로 나라 선택, 선택국 관계 호만 밝게,
+// 카메라가 그 나라를 정면으로 돌아감. 두 prop 은 선택 사항(앱 임베드 /embed/globe 는 안 넘김).
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html } from "@react-three/drei";
 import * as THREE from "three";
 import LAND from "./landDots.json";
@@ -86,7 +88,7 @@ const ARC_VERT = /* glsl */ `
   void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }
 `;
 const ARC_FRAG = /* glsl */ `
-  uniform vec3 uColor; uniform float uTime; uniform float uSpeed; uniform float uDash; uniform float uOffset;
+  uniform vec3 uColor; uniform float uTime; uniform float uSpeed; uniform float uDash; uniform float uOffset; uniform float uDim;
   varying vec2 vUv;
   void main() {
     float t = vUv.x;
@@ -95,11 +97,11 @@ const ARC_FRAG = /* glsl */ `
     float pulse = exp(-dist * 9.0);
     float dash = uDash > 0.5 ? step(0.45, fract(t * 22.0)) : 1.0;
     float ends = smoothstep(0.0, 0.06, t) * smoothstep(1.0, 0.94, t);
-    float a = (0.22 * dash + pulse * 0.95) * ends;
+    float a = min(1.0, (0.22 * dash + pulse * 0.95) * ends * uDim);
     gl_FragColor = vec4(uColor * (1.0 + pulse), a);
   }
 `;
-function Arc({ rel, index }) {
+function Arc({ rel, index, dim = 1 }) {
   const a = CAPITALS[rel.a], b = CAPITALS[rel.b];
   const [geo, uniforms] = useMemo(() => {
     const va = toVec3(a.lat, a.lon), vb = toVec3(b.lat, b.lon);
@@ -116,9 +118,11 @@ function Arc({ rel, index }) {
         uSpeed: { value: 0.18 + (index % 4) * 0.04 },
         uDash: { value: rel.s < 0 ? 1 : 0 },
         uOffset: { value: (index * 0.137) % 1 },
+        uDim: { value: 1 },
       },
     ];
   }, [a, b, rel.s, index]);
+  useEffect(() => { uniforms.uDim.value = dim; }, [uniforms, dim]);
   useFrame((_, dt) => { uniforms.uTime.value += dt; });
   return (
     <mesh geometry={geo}>
@@ -128,7 +132,7 @@ function Arc({ rel, index }) {
 }
 
 // ── 나라 마커 ──────────────────────────────────────────────
-function Marker({ code, score, occluder, onHover, active }) {
+function Marker({ code, score, occluder, onHover, active, selected, onSelect }) {
   const c = CAPITALS[code];
   const ring = useRef();
   const pos = useMemo(() => toVec3(c.lat, c.lon, R * 1.01), [c]);
@@ -143,8 +147,12 @@ function Marker({ code, score, occluder, onHover, active }) {
   });
   return (
     <group position={pos} quaternion={quat}>
-      <mesh onPointerOver={() => onHover(code)} onPointerOut={() => onHover(null)}>
-        <sphereGeometry args={[active ? 0.13 : 0.09, 16, 16]} />
+      <mesh
+        onPointerOver={() => { onHover(code); if (onSelect) document.body.style.cursor = "pointer"; }}
+        onPointerOut={() => { onHover(null); document.body.style.cursor = ""; }}
+        onClick={(e) => { if (!onSelect || e.delta > 4) return; e.stopPropagation(); onSelect(code); }}
+      >
+        <sphereGeometry args={[selected ? 0.16 : active ? 0.13 : 0.09, 16, 16]} />
         <meshBasicMaterial color={color} />
       </mesh>
       <mesh ref={ring}>
@@ -152,7 +160,12 @@ function Marker({ code, score, occluder, onHover, active }) {
         <meshBasicMaterial color={color} transparent side={THREE.DoubleSide} depthWrite={false} />
       </mesh>
       <Html center distanceFactor={11} occlude={[occluder]} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }} position={[0, 0, 0.35]}>
-        <div className={`globe-label${active ? " is-active" : ""}`}>
+        <div
+          className={`globe-label${active || selected ? " is-active" : ""}${selected ? " is-selected" : ""}`}
+          style={onSelect ? { pointerEvents: "auto", cursor: "pointer" } : undefined}
+          onClick={onSelect ? () => onSelect(code) : undefined}
+          role={onSelect ? "button" : undefined}
+        >
           <b>{c.name}</b>
           <i style={{ color }}>{Number.isFinite(score) ? score : "-"}</i>
         </div>
@@ -161,7 +174,7 @@ function Marker({ code, score, occluder, onHover, active }) {
   );
 }
 
-function Globe({ countries, relations, pixel, onHover, hovered }) {
+function Globe({ countries, relations, pixel, onHover, hovered, selected, onSelect }) {
   const core = useRef();
   return (
     <group rotation={[0.22, 0, 0]}>
@@ -175,16 +188,50 @@ function Globe({ countries, relations, pixel, onHover, hovered }) {
       </mesh>
       <LandDots pixel={pixel} />
       {relations.map((r, i) => (
-        <Arc key={`${r.a}-${r.b}`} rel={r} index={i} />
+        <Arc key={`${r.a}-${r.b}`} rel={r} index={i}
+          dim={!selected ? 1 : (r.a === selected || r.b === selected) ? 1.7 : 0.12} />
       ))}
       {Object.keys(CAPITALS).map((code) => (
-        <Marker key={code} code={code} score={countries?.[code]?.mood_score} occluder={core} onHover={onHover} active={hovered === code} />
+        <Marker key={code} code={code} score={countries?.[code]?.mood_score} occluder={core} onHover={onHover}
+          active={hovered === code} selected={selected === code} onSelect={onSelect} />
       ))}
     </group>
   );
 }
 
-export default function HeroGlobe({ countries, relations, height = 520 }) {
+const GLOBE_TILT = new THREE.Euler(0.22, 0, 0);
+function CameraRig({ selected }) {
+  const camera = useThree((st) => st.camera);
+  const controls = useThree((st) => st.controls);
+  const target = useRef(null);
+  useEffect(() => {
+    const c = selected && CAPITALS[selected];
+    if (!c) { target.current = null; return; }
+    const p = toVec3(c.lat, c.lon).applyEuler(GLOBE_TILT).normalize();
+    p.y += 0.15; // 살짝 위에서 내려다보게
+    target.current = p.normalize();
+  }, [selected]);
+  useEffect(() => {
+    if (!controls) return undefined;
+    const stop = () => { target.current = null; };
+    controls.addEventListener("start", stop);
+    return () => controls.removeEventListener("start", stop);
+  }, [controls]);
+  useFrame((_, dt) => {
+    const t = target.current;
+    if (!t) return;
+    const dist = camera.position.length();
+    const cur = camera.position.clone().normalize();
+    cur.lerp(t, 1 - Math.pow(0.03, dt)).normalize();
+    camera.position.copy(cur.multiplyScalar(dist));
+    camera.lookAt(0, 0, 0);
+    if (camera.position.clone().normalize().angleTo(t) < 0.004) target.current = null;
+    controls?.update?.();
+  });
+  return null;
+}
+
+export default function HeroGlobe({ countries, relations, height = 520, selected = null, onSelect = null }) {
   const [hovered, setHovered] = useState(null);
   const [pixel, setPixel] = useState(1);
   const [paused, setPaused] = useState(false);
@@ -204,8 +251,10 @@ export default function HeroGlobe({ countries, relations, height = 520 }) {
   return (
     <div ref={wrap} className="hero-globe" style={{ height }}>
       <Canvas frameloop={paused ? "demand" : "always"} dpr={[1, 2]} camera={{ position: cam, fov: 42 }} gl={{ antialias: true, alpha: true }}>
-        <Globe countries={countries} relations={relations} pixel={pixel} onHover={setHovered} hovered={hovered} />
-        <OrbitControls enableZoom={false} enablePan={false} autoRotate={!hovered} autoRotateSpeed={0.45} rotateSpeed={0.5} enableDamping dampingFactor={0.08} minPolarAngle={Math.PI * 0.2} maxPolarAngle={Math.PI * 0.8} />
+        <Globe countries={countries} relations={relations} pixel={pixel} onHover={setHovered} hovered={hovered}
+          selected={selected} onSelect={onSelect} />
+        <CameraRig selected={selected} />
+        <OrbitControls makeDefault enableZoom={false} enablePan={false} autoRotate={!hovered && !selected} autoRotateSpeed={0.45} rotateSpeed={0.5} enableDamping dampingFactor={0.08} minPolarAngle={Math.PI * 0.2} maxPolarAngle={Math.PI * 0.8} />
       </Canvas>
     </div>
   );
