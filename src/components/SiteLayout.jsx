@@ -20,6 +20,7 @@ const navItems = [
   { path: "/fx", label: "FX" },
   { path: "/archive", label: "아카이브" },
   { path: "/reports", label: "보고서" },
+  { path: "/verified", label: "검증 기록" },
   { path: "/updates", label: "업데이트" },
   { path: "/others", label: "기타" },
 ];
