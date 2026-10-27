@@ -21,7 +21,7 @@ function Home() {
 
       <div className="home-wrap">
         {/* 전일 글로벌 브리핑 — 각국 보도 종합 핵심 5선 */}
-        <SectionHead kicker="DAILY BRIEFING" title="어제 세계에서 일어난 일" desc="8개국 보도를 종합해 뽑은 핵심 뉴스" />
+        <SectionHead kicker="DAILY BRIEFING" title="어제 세계에서 일어난 일" desc="10개국 보도를 종합해 뽑은 핵심 뉴스" />
         <div className="reveal" style={{ padding: "0 8px" }}>
           <GlobalBriefingCard briefing={youtubeData?.global_briefing} />
         </div>

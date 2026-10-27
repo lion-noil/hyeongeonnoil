@@ -2,7 +2,7 @@
 // 입력 countries: { [country]: { summary } } (archiveDb.getDaySummaries / getRecentDaySummaries 결과)
 
 // 헤드라인 우선 국가 순서 — 검색 수요가 큰 나라부터
-const HEADLINE_ORDER = ["USA", "Korea", "China", "Japan", "UK", "Germany", "India", "HongKong"];
+const HEADLINE_ORDER = ["USA", "Korea", "China", "Japan", "UK", "Germany", "India", "HongKong", "SaudiArabia", "Australia"];
 
 // 나라별 요약(summary_result)에서 "1. 🗞️ 제목" 꼴 기사 제목을 뽑는다. 제목 없으면 [].
 export function extractHeadlines(countries, max = 3) {

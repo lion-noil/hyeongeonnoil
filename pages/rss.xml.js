@@ -7,6 +7,7 @@ const SITE = "https://hyeongeonnoil.com";
 const COUNTRY_KO = {
   USA: "미국", China: "중국", Japan: "일본", India: "인도",
   HongKong: "홍콩", Korea: "한국", Germany: "독일", UK: "영국",
+  Australia: "호주", SaudiArabia: "사우디",
   Russia: "러시아", France: "프랑스", Taiwan: "대만", Vietnam: "베트남",
 };
 

@@ -33,6 +33,8 @@ const NODES = {
   India:   { cx: 598, cy: 352 },
   Korea:   { cx: 745, cy: 285 },
   HongKong:{ cx: 660, cy: 300 },
+  SaudiArabia:{ cx: 470, cy: 395 },   // 2026-10-27
+  Australia:  { cx: 800, cy: 405 },
 };
 
 // ── 목업 데이터 (실데이터 없을 때 폴백) ────────────────────────────
@@ -63,6 +65,20 @@ const MOCK_STATES = {
   HongKong:{ mood:"관망중", score:5, icon:"🌉", eco:5, pol:4, dip:5,
              issues:["금융 허브 지위 유지 경쟁", "본토 경제 연동 심화", "관광·소비 회복 흐름"],
              worry:"본토 경기 둔화 전이", hope:"금융·관광 허브 회복", score_basis:"", special_note:"" },
+  SaudiArabia:{ mood:"분주한", score:6, icon:"🏗️", eco:6, pol:6, dip:6,
+             issues:["비전 2030 대형 프로젝트 조정", "예멘·후티 안보 위협", "유가·감산 정책"],
+             worry:"역내 안보 불안 장기화", hope:"투자 유치·관광 다변화", score_basis:"", special_note:"" },
+  Australia:{ mood:"안정적", score:6, icon:"🦘", eco:6, pol:6, dip:6,
+             issues:["주거비·생활비 부담", "중국과 교역 관계 관리", "기후·재난 대응"],
+             worry:"생활비 압박 지속", hope:"자원 수출·금리 안정", score_basis:"", special_note:"" },
+};
+
+// 실데이터(세계정세 분석)가 있는데 그 나라만 아직 없을 때 — 새로 추가된 나라 등.
+// 예시 데이터를 섞으면 실제 분석처럼 보이므로 '집계 중'으로 그린다(다음 06:55 분석부터 채워짐).
+const PENDING_STATE = {
+  pending: true, mood:"집계 중", score:5, icon:"⏳", eco:0, pol:0, dip:0,
+  issues:["다음 세계정세 분석(매일 06:55)부터 반영됩니다."],
+  worry:"", hope:"", score_basis:"", special_note:"",
 };
 
 const MOCK_RELS = [
@@ -88,7 +104,7 @@ function normalizeStates(countries) {
   const out = {};
   Object.keys(MOCK_STATES).forEach((name) => {
     const c = countries[name];
-    if (!c) { out[name] = MOCK_STATES[name]; return; }
+    if (!c) { out[name] = PENDING_STATE; return; }
     out[name] = {
       mood: c.mood ?? MOCK_STATES[name].mood,
       score: Number.isFinite(c.mood_score) ? c.mood_score : MOCK_STATES[name].score,
@@ -180,7 +196,7 @@ function RelLine({ rel, mode }) {
 function CountryNode({ name, state, selected, dimmed, connected, onClick, hasHoliday }) {
   const n  = NODES[name];
   const s  = state;
-  const mc = moodColor(s.score);
+  const mc = s.pending ? COLOR.muted : moodColor(s.score);
 
   return (
     <g
@@ -245,7 +261,7 @@ function SourceChips({ dates, srcMap }) {
 // ── HTML: 상세 패널 ────────────────────────────────────────────────
 function DetailPanel({ name, weekHols, states, rels, sources }) {
   const s  = states[name];
-  const mc = moodColor(s.score);
+  const mc = s.pending ? COLOR.muted : moodColor(s.score);
   const myRels = rels.filter(r => r.a === name || r.b === name);
   const hols = weekHols[name] || [];
   const countrySrc = (sources && sources[name]) || {};
@@ -261,12 +277,18 @@ function DetailPanel({ name, weekHols, states, rels, sources }) {
           <Flag country={name} w={54} />
           <div>
             <div style={{ fontSize:18, fontWeight:800, letterSpacing:"-0.02em" }}>{NAMES_KR[name]}</div>
-            <div style={{ fontSize:"var(--fs-sm)", color:mc, marginTop:2, fontWeight:600 }}>{s.icon} {s.mood} · {s.score}/10</div>
+            <div style={{ fontSize:"var(--fs-sm)", color:mc, marginTop:2, fontWeight:600 }}>{s.icon} {s.mood}{s.pending ? "" : ` · ${s.score}/10`}</div>
           </div>
         </div>
-        <StatBar label="💰 경제" val={s.eco} color={moodColor(s.eco)} />
-        <StatBar label="🏛 정치" val={s.pol} color={moodColor(s.pol)} />
-        <StatBar label="🌐 외교" val={s.dip} color={moodColor(s.dip)} />
+        {s.pending ? (
+          <p className="meta" style={{ margin: "4px 0 8px" }}>새로 추가된 나라라 점수는 다음 분석부터 나옵니다.</p>
+        ) : (
+          <>
+            <StatBar label="💰 경제" val={s.eco} color={moodColor(s.eco)} />
+            <StatBar label="🏛 정치" val={s.pol} color={moodColor(s.pol)} />
+            <StatBar label="🌐 외교" val={s.dip} color={moodColor(s.dip)} />
+          </>
+        )}
 
         {scoreBasis.text && (
           <div className="wmap-box inset">

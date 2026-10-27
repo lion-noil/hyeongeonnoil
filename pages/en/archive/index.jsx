@@ -8,14 +8,14 @@ import { getRecentDaySummaries } from "../../../src/lib/archiveDb";
 import { extractHeadlines } from "../../../src/lib/archiveHeadlines";
 
 const SITE = "https://hyeongeonnoil.com";
-const TITLE = "World News Digest (Korean) — daily summaries of broadcasts from 8 countries | NewsInsight";
+const TITLE = "World News Digest (Korean) — daily summaries of broadcasts from 10 countries | NewsInsight";
 const DESC =
   "Daily Korean-language summaries of the main news broadcasts from the US, China, Japan, India, Hong Kong, Korea, Germany and the UK. English summaries of yesterday's top stories are in each English market briefing.";
 
 const box = { maxWidth: 780, margin: "0 auto", padding: "8px 16px 40px", color: "#eee" };
 const card = { background: "var(--panel-2)", borderRadius: 10, padding: "16px 18px", marginBottom: 16 };
 const MONTH_EN = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-const COUNTRY_EN = { USA: "US", China: "China", Japan: "Japan", India: "India", HongKong: "Hong Kong", Korea: "Korea", Germany: "Germany", UK: "UK", Russia: "Russia", France: "France", Taiwan: "Taiwan", Vietnam: "Vietnam" };
+const COUNTRY_EN = { USA: "US", China: "China", Japan: "Japan", India: "India", HongKong: "Hong Kong", Korea: "Korea", Germany: "Germany", UK: "UK", Australia: "Australia", SaudiArabia: "Saudi Arabia", Russia: "Russia", France: "France", Taiwan: "Taiwan", Vietnam: "Vietnam" };
 
 function edate(day) {
   const [y, m, d] = String(day).split("-").map(Number);

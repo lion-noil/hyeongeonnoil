@@ -58,6 +58,8 @@ export const COUNTRY = {
   India: { ko: "인도", iso: "IN" },
   Korea: { ko: "한국", iso: "KR" },
   HongKong: { ko: "홍콩", iso: "HK" },
+  Australia: { ko: "호주", iso: "AU" },     // 2026-10-27 추가
+  SaudiArabia: { ko: "사우디", iso: "SA" },
 };
 const ISO_TO_KEY = Object.fromEntries(Object.entries(COUNTRY).map(([k, v]) => [v.iso, k]));
 // 내부 키("Korea")든 ISO("KR")든 받아 내부 키로

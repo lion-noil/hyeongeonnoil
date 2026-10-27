@@ -1,4 +1,4 @@
-// 홈 히어로 3D 지구본 — 육지 점묘 + 대기광 + 8개국 마커(분위기 점수 색) + 관계 호(관계 점수 색, 흐르는 빛).
+// 홈 히어로 3D 지구본 — 육지 점묘 + 대기광 + 추적 국가 마커(분위기 점수 색) + 관계 호(관계 점수 색, 흐르는 빛).
 // 데이터: /api/world-state (세계정세 현황판과 같은 원천). 실데이터 없으면 목업 관계로 그림. (2026-09-28)
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
@@ -6,6 +6,7 @@ import { OrbitControls, Html } from "@react-three/drei";
 import * as THREE from "three";
 import LAND from "./landDots.json";
 import { CAPITALS, relColor, moodColor } from "./globeData";
+import { COLOR } from "../../lib/theme";
 
 const R = 5;
 function toVec3(lat, lon, r = R) {
@@ -132,7 +133,8 @@ function Marker({ code, score, occluder, onHover, active }) {
   const ring = useRef();
   const pos = useMemo(() => toVec3(c.lat, c.lon, R * 1.01), [c]);
   const quat = useMemo(() => new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), pos.clone().normalize()), [pos]);
-  const color = moodColor(score);
+  // 점수 없음(새로 추가돼 아직 분석 전인 나라) = 흐린 색. moodColor(undefined) 는 '부정' 빨강이라 오해를 준다.
+  const color = Number.isFinite(score) ? moodColor(score) : COLOR.muted;
   useFrame(({ clock }) => {
     if (!ring.current) return;
     const t = (clock.elapsedTime * 0.8 + code.length * 0.3) % 1;

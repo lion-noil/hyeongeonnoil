@@ -11,6 +11,8 @@ export const CAPITALS = {
   India: { lat: 28.6, lon: 77.2, name: "인도", flag: "🇮🇳" },
   Korea: { lat: 37.57, lon: 126.98, name: "한국", flag: "🇰🇷" },
   HongKong: { lat: 22.3, lon: 114.2, name: "홍콩", flag: "🇭🇰" },
+  Australia: { lat: -35.28, lon: 149.13, name: "호주", flag: "🇦🇺" },   // 캔버라 (2026-10-27)
+  SaudiArabia: { lat: 24.71, lon: 46.68, name: "사우디", flag: "🇸🇦" }, // 리야드
 };
 
 export const FALLBACK_RELS = [

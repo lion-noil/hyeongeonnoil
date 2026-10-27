@@ -4,7 +4,9 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import useIsMobile from "../../hooks/useIsMobile";
 import { useCurrentTime } from "../../hooks/useCurrentTime";
-import { useGlobeData, relColor } from "../three/globeData";
+import { useGlobeData, relColor, CAPITALS } from "../three/globeData";
+
+const TRACKED = Object.keys(CAPITALS).length; // 추적 국가 수 — 지구본 수도 목록 기준(국가 추가 시 자동)
 
 const HeroGlobe = dynamic(() => import("../three/HeroGlobe"), {
   ssr: false,
@@ -48,7 +50,7 @@ export default function HomeHero() {
           <span className="grad-text">한 화면에서</span>
         </h2>
         <p className="hero-sub">
-          8개국 뉴스를 매일 요약하고, 나라 사이의 긴장과 협력을 지구본 위에 그립니다. 환율·지수·원자재·코인 시세와 자동매매 성적까지 함께 봅니다.
+          {TRACKED}개국 뉴스를 매일 요약하고, 나라 사이의 긴장과 협력을 지구본 위에 그립니다. 환율·지수·원자재·코인 시세와 자동매매 성적까지 함께 봅니다.
         </p>
         <div className="hero-clock">
           <b>{now.time}</b>
@@ -59,7 +61,7 @@ export default function HomeHero() {
           <Link href="/archive" className="btn btn-ghost">뉴스 아카이브</Link>
         </div>
         <div className="hero-stats">
-          <div><b>8</b><span>추적 국가</span></div>
+          <div><b>{TRACKED}</b><span>추적 국가</span></div>
           <div><b style={{ color: relColor(3) }}>{friendly}</b><span>우호 관계</span></div>
           <div><b style={{ color: relColor(-3) }}>{tense}</b><span>긴장 관계</span></div>
         </div>

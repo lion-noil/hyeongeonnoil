@@ -12,7 +12,7 @@ import { getMarketOverview } from "../../src/lib/marketDataDb";
 const SITE = "https://hyeongeonnoil.com";
 const TITLE = "NewsInsight — Daily Korea Market Briefing in English | FX, Rates, Equities";
 const DESC =
-  "Daily Korea market briefing in English, 13 live market pages (USD/KRW, JPY/KRW, US and Korean yields, KOSPI 200, Nasdaq 100, gold, WTI) updated every day, and a world news digest from 8 countries' broadcasts.";
+  "Daily Korea market briefing in English, 13 live market pages (USD/KRW, JPY/KRW, US and Korean yields, KOSPI 200, Nasdaq 100, gold, WTI) updated every day, and a world news digest from 10 countries' broadcasts.";
 
 const box = { maxWidth: 900, margin: "0 auto", padding: "8px 16px 40px", color: "#eee" };
 const card = { background: "var(--panel-2)", borderRadius: 10, padding: "16px 18px", marginBottom: 16 };
