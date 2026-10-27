@@ -158,6 +158,13 @@ a { color: var(--cyan); }
 .section-head h2 { margin: 0; font-size: clamp(22px, 2.4vw, 30px); font-weight: 800; letter-spacing: -0.03em; }
 .section-head p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
 .section-head .kicker { font-size: 12px; font-weight: 700; letter-spacing: .16em; color: var(--accent-2); }
+/* 페이지 안 목차 — 앵커 대상이 고정 상단바(약 53px)에 가리지 않게 */
+.section-head[id], .panel[id] { scroll-margin-top: 76px; }
+.toc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+.toc-card { display: block; padding: 12px 14px; text-decoration: none; color: inherit; transition: border-color .15s, transform .15s; }
+.toc-card:hover, .toc-card:focus-visible { border-color: var(--accent); transform: translateY(-2px); outline: none; }
+.toc-top { display: inline-block; font-size: var(--fs-xs); font-weight: 700; color: var(--muted); text-decoration: none; white-space: nowrap; }
+.toc-top:hover { color: var(--accent); }
 .glass {
   background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
   backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: var(--shadow);
