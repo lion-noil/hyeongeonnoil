@@ -11,9 +11,8 @@ const CosmicBackground = dynamic(() => import("./three/CosmicBackground"), { ssr
 const navItems = [
   { path: "/", label: "홈" },
   // (2026-10-27) 시장 브리핑·시세는 메뉴에서 뺐다 — 페이지(/briefing·/market)는 검색 유입용으로 그대로 살아 있다.
-  { path: "/exchange", label: "환율·채권" },
-  { path: "/indexes", label: "지수" },
-  { path: "/commodity", label: "원자재" },
+  // (2026-10-30) 환율·채권/지수/원자재 세 탭 → '시세 차트' 하나. 분류는 페이지 안 탭(ChartCategoryTabs)으로, URL 세 개는 유지.
+  { path: "/exchange", label: "시세 차트", also: ["/indexes", "/commodity"] },
   { path: "/coin", label: "코인" },
   { path: "/cfd", label: "CFD" },
   { path: "/fx", label: "FX" },
@@ -27,7 +26,8 @@ const navItems = [
 // 영문 경로(/en, /en/*)에서만 내비 맨 앞에 붙는 영문 허브 링크 (2026-10-09)
 const EN_HOME = { path: "/en", label: "EN Home" };
 
-const isActivePath = (pathname, path) => (path === "/" || path === "/en" ? pathname === path : pathname === path || pathname.startsWith(`${path}/`));
+const isActivePath = (pathname, path, also = []) =>
+  [path, ...also].some((p) => (p === "/" || p === "/en" ? pathname === p : pathname === p || pathname.startsWith(`${p}/`)));
 
 function TopBar() {
   const { pathname } = useRouter();
@@ -53,8 +53,8 @@ function TopBar() {
           </span>
         </Link>
         <nav className="nav" ref={navRef}>
-          {items.map(({ path, label }) => (
-            <Link key={path} href={path} className={isActivePath(pathname, path) ? "is-active" : undefined}>
+          {items.map(({ path, label, also }) => (
+            <Link key={path} href={path} className={isActivePath(pathname, path, also) ? "is-active" : undefined}>
               {label}
             </Link>
           ))}

@@ -193,3 +193,10 @@ a.chip:hover { filter: brightness(1.2); }
   .cbtn { flex: 0 0 auto; }
   .relrow { padding: 0 12px 12px; }
 }
+
+/* ── 시세 차트 분류 탭 (환율·채권/지수/원자재 — 한 메뉴 안 세 분류, 2026-10-30) ── */
+.cat-tabs { display: inline-flex; gap: 4px; padding: 4px; border-radius: 12px; background: var(--panel-inset); border: 1px solid var(--line); }
+.cat-tab { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 9px; font-size: var(--fs-sm); font-weight: 700; color: var(--text-2); text-decoration: none; white-space: nowrap; transition: background .2s, color .2s; }
+.cat-tab:hover { color: var(--text); background: rgba(148, 163, 255, 0.08); }
+.cat-tab.is-on { color: #05060f; background: var(--accent); box-shadow: 0 0 16px -4px var(--accent); }
+@media (max-width: 900px) { .section-head { flex-wrap: wrap; } .cat-tabs { width: 100%; justify-content: stretch; } .cat-tab { flex: 1; justify-content: center; padding: 8px 6px; } }

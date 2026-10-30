@@ -5,7 +5,7 @@ function Exchange() {
   return (
     <ChartPage
       chartType={["calculated_dxy", "currency", "treasury"]}  // 배열로 입력 가능
-      title="환율 및 채권 관련(+-3%)"
+      title="환율·채권 (100일 평균 ±3%)"
       envelop={3}
     />
   );

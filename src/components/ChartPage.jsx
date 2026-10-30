@@ -5,6 +5,7 @@ import IndexChart from "../components/indexChart";
 import { useAllChartData } from "../hooks/useAllChartData";
 import { chartParams } from "../constants/chartMeta"; // chartMeta.js에서 import
 import useIsMobile from "../hooks/useIsMobile";
+import ChartCategoryTabs from "./ChartCategoryTabs";
 
 const ChartPage = ({ chartType, title, envelop }) => {
   const isMobile = useIsMobile();
@@ -44,8 +45,14 @@ const ChartPage = ({ chartType, title, envelop }) => {
   return (
 
     <div style={{ padding: isMobile ? "12px 8px" : "40px", color: "#fff", background: "transparent", minHeight: "60vh" }}>
-      {/* h1 은 pages/*.jsx 의 HubIntro(화면 밖 .sr-only 제목)가 맡음 → 여기는 h2(크기는 h1 기본값 유지) */}
-      <h2 style={{ color: "#00ffcc", fontSize: isMobile ? 22 : "2em", margin: "0.67em 0" }}>{title}</h2>
+      {/* h1 은 pages/*.jsx 의 HubIntro(화면 밖 .sr-only 제목)가 맡음 → 여기는 h2. 분류 탭(환율·채권/지수/원자재)은 제목 옆. */}
+      <div className="section-head" style={{ margin: "0 auto 6px", padding: 0, maxWidth: "none" }}>
+        <div>
+          <div className="kicker">MARKET CHARTS</div>
+          <h2>{title}</h2>
+        </div>
+        <div className="section-aside"><ChartCategoryTabs /></div>
+      </div>
 
       <div
         style={{
