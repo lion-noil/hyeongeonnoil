@@ -67,7 +67,7 @@ function IndexChart({ processedData, dataName, band }) {
     if (m == null) return { ...d, ma: null, bUp: null, bLo: null };
     return useSigma
       ? { ...d, ma: m, bUp: m * (1 + want.k * sig), bLo: m * (1 - want.k * sig) }
-      : { ...d, ma: m, bUp: d[`envelope${fixedPct === 0.1 ? 10 : 3}_upper`] ?? m * (1 + fixedPct), bLo: d[`envelope${fixedPct === 0.1 ? 10 : 3}_lower`] ?? m * (1 - fixedPct) };
+      : { ...d, ma: m, bUp: m * (1 + fixedPct), bLo: m * (1 - fixedPct) }; // 폴백도 선택한 이평(m) 기준 — envelope 필드는 ma100 기준이라 ma250 과 섞이면 틀림
   }), [raw, maKey, useSigma, sig, want.k, fixedPct]);
   const winDays = maKey === "ma250" ? 250 : 100;
   const bandLabel = useSigma ? `${winDays}일 평균 ±${want.k}σ (≈±${(want.k * sig * 100).toFixed(1)}%)` : `${winDays}일 평균 ±${Math.round(fixedPct * 100)}%`;

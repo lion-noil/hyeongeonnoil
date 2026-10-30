@@ -38,6 +38,7 @@ export const useAllChartData = (endpointInput) => {
             mergedData[key] = {
               data: Array.isArray(originalArray) ? [...originalArray] : [],
               processed_time: processed_time || '',
+              stats: rawData.stats || null, // (2026-10-30) 이탈 σ(sig100/sig250) — indexChart 가 ±kσ 밴드에 씀
             };
           }
         }
