@@ -1,7 +1,7 @@
 // src/components/ChartPage.jsx
 // 시세 차트 페이지 — 종목 칩 줄(종가·등락 요약) + 누른 종목의 차트 1개만 바로 아래. (2026-10-30 사용자 요청: 전부 띄우지 않기)
 // 분류 탭(환율·채권/지수/원자재)은 제목 옆. 선택은 URL 해시(#s=<key>)에 반영해 공유·새로고침 유지.
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import IndexChart from "../components/indexChart";
 import { useAllChartData } from "../hooks/useAllChartData";
 import { chartParams } from "../constants/chartMeta";
@@ -38,9 +38,17 @@ const ChartPage = ({ chartType, title, envelop }) => {
     const fromHash = m && items.find((it) => it.key === m[1]) ? m[1] : null;
     setSelected((p) => (p && items.find((it) => it.key === p) ? p : fromHash || items[0].key));
   }, [items]);
+  const detailRef = useRef(null);
   const select = useCallback((key) => {
     setSelected(key);
     try { window.history.replaceState(null, "", `#s=${key}`); } catch { /* noop */ }
+    // 차트가 화면 밖(아래)에 걸리면 살짝 끌어올린다 — 칩을 누른 손가락 위치에서 바로 보이게
+    requestAnimationFrame(() => {
+      const el = detailRef.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      if (r.bottom > window.innerHeight || r.top < 60) el.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    });
   }, []);
 
   if (loading) return <p style={{ textAlign: "center", color: "var(--muted)", padding: 60 }}>시세 불러오는 중…</p>;
@@ -67,19 +75,22 @@ const ChartPage = ({ chartType, title, envelop }) => {
           const tone = d == null ? "var(--muted)" : d > 0 ? "var(--up)" : d < 0 ? "var(--down)" : "var(--muted)";
           const on = cur && it.key === cur.key;
           return (
-            <button key={it.key} type="button" role="tab" aria-selected={on} className={`sym-btn${on ? " is-on" : ""}`} onClick={() => select(it.key)}>
-              <span className="nm">{it.label}</span>
-              <span className="val"><b>{fmt(last?.close)}</b><em style={{ color: tone }}>{d == null ? "" : `${d > 0 ? "+" : d < 0 ? "−" : ""}${Math.abs(d).toFixed(2)}%`}</em></span>
-            </button>
+            <React.Fragment key={it.key}>
+              <button type="button" role="tab" aria-selected={on} className={`sym-btn${on ? " is-on" : ""}`} onClick={() => select(it.key)}>
+                <span className="nm">{isMobile ? it.label.replace(/^1 USD → /, "") : it.label}</span>
+                <span className="val"><b>{fmt(last?.close)}</b><em style={{ color: tone }}>{d == null ? "" : `${d > 0 ? "+" : d < 0 ? "−" : ""}${Math.abs(d).toFixed(2)}%`}</em></span>
+              </button>
+              {/* 선택한 칩 바로 다음에 차트를 끼워 넣는다 — 격자는 grid-auto-flow: dense 라 같은 줄의 나머지 칸이 뒤 칩으로 채워지고,
+                  차트(grid-column: 1/-1)는 그 줄 바로 아래에 온다. 칩을 아무리 많이 띄워도 차트는 누른 자리 근처. */}
+              {on && (
+                <div className="sym-detail" ref={detailRef}>
+                  <IndexChart dataName={it.label} processedData={it.chart} envelope={envelop} />
+                </div>
+              )}
+            </React.Fragment>
           );
         })}
       </div>
-
-      {cur && (
-        <div className="sym-detail" key={cur.key} style={{ maxWidth: 980, margin: "16px auto 0" }}>
-          <IndexChart dataName={cur.label} processedData={cur.chart} envelope={envelop} />
-        </div>
-      )}
       {!items.length && <p className="meta" style={{ padding: 40, textAlign: "center" }}>표시할 종목이 없습니다.</p>}
     </div>
   );
