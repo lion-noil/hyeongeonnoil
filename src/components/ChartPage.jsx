@@ -1,66 +1,57 @@
 // src/components/ChartPage.jsx
-
-import React, { useState, useEffect, useCallback, useRef } from "react";
+// 시세 차트 페이지 — 종목 칩 줄(종가·등락 요약) + 누른 종목의 차트 1개만 바로 아래. (2026-10-30 사용자 요청: 전부 띄우지 않기)
+// 분류 탭(환율·채권/지수/원자재)은 제목 옆. 선택은 URL 해시(#s=<key>)에 반영해 공유·새로고침 유지.
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import IndexChart from "../components/indexChart";
 import { useAllChartData } from "../hooks/useAllChartData";
-import { chartParams } from "../constants/chartMeta"; // chartMeta.js에서 import
+import { chartParams } from "../constants/chartMeta";
 import useIsMobile from "../hooks/useIsMobile";
 import ChartCategoryTabs from "./ChartCategoryTabs";
 
-// 화면 밖 차트는 가까이 스크롤될 때 그린다 — 한 페이지에 recharts 차트 9~15개를 한꺼번에 그리면 메인 스레드가 1초 넘게 막힘.
-// (2026-10-30) 첫 화면 2~4개만 즉시, 나머지는 자리(placeholder)만 잡아 두고 300px 앞에서 마운트.
-function LazyMount({ children, minHeight = 440 }) {
-  const ref = useRef(null);
-  const [on, setOn] = useState(false);
-  useEffect(() => {
-    if (on || !ref.current || typeof IntersectionObserver === "undefined") { setOn(true); return undefined; }
-    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setOn(true); io.disconnect(); } }, { rootMargin: "300px 0px" });
-    io.observe(ref.current);
-    return () => io.disconnect();
-  }, [on]);
-  return <div ref={ref} style={{ minHeight: on ? undefined : minHeight, width: "100%" }}>{on ? children : null}</div>;
+const decFor = (v) => (Math.abs(v) >= 100 ? 2 : Math.abs(v) >= 10 ? 3 : 4);
+const fmt = (v) => (typeof v === "number" && isFinite(v) ? v.toLocaleString("en-US", { minimumFractionDigits: decFor(v), maximumFractionDigits: decFor(v) }) : "-");
+
+function lastDelta(arr) {
+  const n = arr?.length || 0;
+  if (n < 2) return null;
+  const a = arr[n - 1]?.close, b = arr[n - 2]?.close;
+  return typeof a === "number" && typeof b === "number" && b ? ((a - b) / b) * 100 : null;
 }
 
 const ChartPage = ({ chartType, title, envelop }) => {
   const isMobile = useIsMobile();
-
   const { processedData, loading, error } = useAllChartData(chartType);
 
-  const envelope = envelop;
-  const chartTypeList = Array.isArray(chartType) ? chartType : [chartType];
+  // 데이터가 있는 종목만, chartMeta 순서대로
+  const items = useMemo(() => {
+    const list = (Array.isArray(chartType) ? chartType : [chartType]).flatMap((type) => chartParams[type] || []);
+    return list
+      .map((it) => ({ ...it, chart: processedData[it.key] }))
+      .filter((it) => it.chart && Array.isArray(it.chart.data) && it.chart.data.length > 0);
+  }, [processedData, chartType]);
 
-  const selectedList = chartTypeList.flatMap((type) => chartParams[type] || []);
-  const [gridColumns, setGridColumns] = useState("1fr");
-
-  const updateGridColumns = useCallback(() => {
-    const width = window.innerWidth;
-    if (width > 1900) {
-      setGridColumns("repeat(4, 1fr)");
-    } else if (width > 1400) {
-      setGridColumns("repeat(3, 1fr)");
-    } else if (width > 1000) {
-      setGridColumns("repeat(2, 1fr)");
-    } else {
-      setGridColumns("1fr");
-    }
+  const [selected, setSelected] = useState(null);
+  // 첫 진입: 해시(#s=key)가 있으면 그 종목, 없으면 첫 종목
+  useEffect(() => {
+    if (!items.length) return;
+    const m = /[#&]s=([A-Za-z0-9_-]+)/.exec(typeof window !== "undefined" ? window.location.hash : "");
+    const fromHash = m && items.find((it) => it.key === m[1]) ? m[1] : null;
+    setSelected((p) => (p && items.find((it) => it.key === p) ? p : fromHash || items[0].key));
+  }, [items]);
+  const select = useCallback((key) => {
+    setSelected(key);
+    try { window.history.replaceState(null, "", `#s=${key}`); } catch { /* noop */ }
   }, []);
 
-  useEffect(() => {
-    updateGridColumns();
-    window.addEventListener("resize", updateGridColumns);
-    return () => {
-      window.removeEventListener("resize", updateGridColumns);
-    };
-  }, [updateGridColumns]);
-
   if (loading) return <p style={{ textAlign: "center", color: "var(--muted)", padding: 60 }}>시세 불러오는 중…</p>;
-  if (error) return <p>❌ {error}</p>;
+  if (error) return <p className="meta" style={{ padding: 40, textAlign: "center" }}>❌ {error}</p>;
+
+  const cur = items.find((it) => it.key === selected) || items[0];
 
   return (
-
-    <div style={{ padding: isMobile ? "12px 8px" : "40px", color: "#fff", background: "transparent", minHeight: "60vh" }}>
-      {/* h1 은 pages/*.jsx 의 HubIntro(화면 밖 .sr-only 제목)가 맡음 → 여기는 h2. 분류 탭(환율·채권/지수/원자재)은 제목 옆. */}
-      <div className="section-head" style={{ margin: "0 auto 6px", padding: 0, maxWidth: "none" }}>
+    <div style={{ padding: isMobile ? "12px 8px" : "28px 40px 40px", color: "var(--text)", minHeight: "60vh" }}>
+      {/* h1 은 pages/*.jsx 의 HubIntro(화면 밖 .sr-only 제목)가 맡음 → 여기는 h2 */}
+      <div className="section-head" style={{ margin: "0 auto 10px", padding: 0, maxWidth: "none" }}>
         <div>
           <div className="kicker">MARKET CHARTS</div>
           <h2>{title}</h2>
@@ -68,36 +59,28 @@ const ChartPage = ({ chartType, title, envelop }) => {
         <div className="section-aside"><ChartCategoryTabs /></div>
       </div>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: gridColumns, // 동적으로 설정된 gridTemplateColumns
-          gap: isMobile ? "14px" : "22px",
-          marginTop: isMobile ? "14px" : "18px",
-        }}
-      >
-        {selectedList.map((index) => {
-  const chartData = processedData[index.key];
-
-  if (!chartData || !chartData.data || chartData.data.length === 0) return null;
-
-  return (
-    <div
-      key={index.label}
-      className="reveal tilt"
-      style={{ minWidth: 0, width: "100%" }}
-    >
-      <LazyMount>
-        <IndexChart
-          dataName={index.label}
-          processedData={chartData}
-          envelope={envelope}
-        />
-      </LazyMount>
-    </div>
-  );
-})}
+      {/* 종목 칩 — 누르면 아래에 그 차트 */}
+      <div className="sym-strip" role="tablist" aria-label="종목 선택">
+        {items.map((it) => {
+          const last = it.chart.data[it.chart.data.length - 1];
+          const d = lastDelta(it.chart.data);
+          const tone = d == null ? "var(--muted)" : d > 0 ? "var(--up)" : d < 0 ? "var(--down)" : "var(--muted)";
+          const on = cur && it.key === cur.key;
+          return (
+            <button key={it.key} type="button" role="tab" aria-selected={on} className={`sym-btn${on ? " is-on" : ""}`} onClick={() => select(it.key)}>
+              <span className="nm">{it.label}</span>
+              <span className="val"><b>{fmt(last?.close)}</b><em style={{ color: tone }}>{d == null ? "" : `${d > 0 ? "+" : d < 0 ? "−" : ""}${Math.abs(d).toFixed(2)}%`}</em></span>
+            </button>
+          );
+        })}
       </div>
+
+      {cur && (
+        <div className="sym-detail" key={cur.key} style={{ maxWidth: 980, margin: "16px auto 0" }}>
+          <IndexChart dataName={cur.label} processedData={cur.chart} envelope={envelop} />
+        </div>
+      )}
+      {!items.length && <p className="meta" style={{ padding: 40, textAlign: "center" }}>표시할 종목이 없습니다.</p>}
     </div>
   );
 };
