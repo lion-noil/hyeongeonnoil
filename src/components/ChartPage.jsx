@@ -9,7 +9,7 @@ import ChartCategoryTabs from "./ChartCategoryTabs";
 
 // 화면 밖 차트는 가까이 스크롤될 때 그린다 — 한 페이지에 recharts 차트 9~15개를 한꺼번에 그리면 메인 스레드가 1초 넘게 막힘.
 // (2026-10-30) 첫 화면 2~4개만 즉시, 나머지는 자리(placeholder)만 잡아 두고 300px 앞에서 마운트.
-function LazyMount({ children, minHeight = 520 }) {
+function LazyMount({ children, minHeight = 440 }) {
   const ref = useRef(null);
   const [on, setOn] = useState(false);
   useEffect(() => {
@@ -72,8 +72,8 @@ const ChartPage = ({ chartType, title, envelop }) => {
         style={{
           display: "grid",
           gridTemplateColumns: gridColumns, // 동적으로 설정된 gridTemplateColumns
-          gap: isMobile ? "16px" : "40px",
-          marginTop: isMobile ? "14px" : "40px",
+          gap: isMobile ? "14px" : "22px",
+          marginTop: isMobile ? "14px" : "18px",
         }}
       >
         {selectedList.map((index) => {
@@ -85,15 +85,7 @@ const ChartPage = ({ chartType, title, envelop }) => {
     <div
       key={index.label}
       className="reveal tilt"
-      style={{
-        backgroundColor: "transparent",
-        padding: isMobile ? "4px 0" : "20px",
-        borderRadius: "12px",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        minWidth: 0,
-      }}
+      style={{ minWidth: 0, width: "100%" }}
     >
       <LazyMount>
         <IndexChart
