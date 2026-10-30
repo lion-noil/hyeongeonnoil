@@ -32,6 +32,8 @@ export const CHART_BANDS = {
   },
 };
 
-export function bandFor(cat) {
+// key: 종목 키(dxy 는 currency 목록에 있지만 전용 문구를 쓴다)
+export function bandFor(cat, key) {
+  if (key === "dxy") return CHART_BANDS.calculated_dxy;
   return CHART_BANDS[cat] || CHART_BANDS.index;
 }

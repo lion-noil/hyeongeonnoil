@@ -85,7 +85,7 @@ const ChartPage = ({ chartType, title }) => {
                   차트(grid-column: 1/-1)는 그 줄 바로 아래에 온다. 칩을 아무리 많이 띄워도 차트는 누른 자리 근처. */}
               {on && (
                 <div className="sym-detail" ref={detailRef}>
-                  <IndexChart dataName={it.label} processedData={it.chart} band={bandFor(it.cat)} />
+                  <IndexChart dataName={it.label} processedData={it.chart} band={bandFor(it.cat, it.key)} />
                 </div>
               )}
             </React.Fragment>
