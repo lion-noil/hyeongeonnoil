@@ -115,13 +115,22 @@ function useTiltCards() {
 function useDeferredBackground() {
   const [ready, setReady] = useState(false);
   useEffect(() => {
-    const go = () => setReady(true);
-    if (typeof window.requestIdleCallback === "function") {
-      const id = window.requestIdleCallback(go, { timeout: 2500 });
-      return () => window.cancelIdleCallback(id);
-    }
-    const t = setTimeout(go, 1200);
-    return () => clearTimeout(t);
+    // load 이벤트(초기 청크·차트 번들·프리로드 데이터까지 끝난 시점) 뒤에, 그다음 한가할 때. 실측: idle 만 걸면 hydrate 직후(~1.6s)
+    // 바로 발화해 차트 번들과 또 겹쳤다.
+    let idle = null, timer = null, cancelled = false;
+    const go = () => { if (!cancelled) setReady(true); };
+    const afterLoad = () => {
+      if (typeof window.requestIdleCallback === "function") idle = window.requestIdleCallback(go, { timeout: 4000 });
+      else timer = setTimeout(go, 800);
+    };
+    if (document.readyState === "complete") afterLoad();
+    else window.addEventListener("load", afterLoad, { once: true });
+    return () => {
+      cancelled = true;
+      window.removeEventListener("load", afterLoad);
+      if (idle != null && typeof window.cancelIdleCallback === "function") window.cancelIdleCallback(idle);
+      if (timer != null) clearTimeout(timer);
+    };
   }, []);
   return ready;
 }
