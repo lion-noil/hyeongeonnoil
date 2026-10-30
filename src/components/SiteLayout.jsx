@@ -1,6 +1,6 @@
 // 공통 레이아웃 — 2026-09-28 3D 리디자인: 고정 유리 내비 + 전 페이지 3D 우주 배경 + 새 푸터.
 // ?embed=1(앱 WebView 임베드)은 예전처럼 본문만, 3D 배경 없음.
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
@@ -110,10 +110,27 @@ function useTiltCards() {
   }, []);
 }
 
+// 3D 우주 배경(three.js ≈ 원본 820KB, 전송 ~200KB)은 장식이라 본문·차트 데이터보다 뒤로 — 브라우저가 한가해진 뒤(최대 2.5s) 로드.
+// (2026-10-30 실측: 차트 페이지에서 가장 큰 JS 조각이 이 배경이었고 차트 번들과 대역폭을 나눠 먹었다.)
+function useDeferredBackground() {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    const go = () => setReady(true);
+    if (typeof window.requestIdleCallback === "function") {
+      const id = window.requestIdleCallback(go, { timeout: 2500 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const t = setTimeout(go, 1200);
+    return () => clearTimeout(t);
+  }, []);
+  return ready;
+}
+
 export default function SiteLayout({ children }) {
   const { query, pathname } = useRouter();
   useRevealObserver(pathname);
   useTiltCards();
+  const bgReady = useDeferredBackground();
 
   // 앱 전용 임베드 페이지(/embed/*): 레이아웃 전부 없이 페이지만 (지구본 등 — 배경 투명)
   if (pathname.startsWith("/embed/")) return <>{children}</>;
@@ -129,7 +146,7 @@ export default function SiteLayout({ children }) {
 
   return (
     <>
-      <CosmicBackground />
+      {bgReady && <CosmicBackground />}
       <div className="site-shell">
         <TopBar />
         <main className="site-main">{children}</main>

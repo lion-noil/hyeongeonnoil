@@ -1,11 +1,25 @@
 // src/components/ChartPage.jsx
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import IndexChart from "../components/indexChart";
 import { useAllChartData } from "../hooks/useAllChartData";
 import { chartParams } from "../constants/chartMeta"; // chartMeta.js에서 import
 import useIsMobile from "../hooks/useIsMobile";
 import ChartCategoryTabs from "./ChartCategoryTabs";
+
+// 화면 밖 차트는 가까이 스크롤될 때 그린다 — 한 페이지에 recharts 차트 9~15개를 한꺼번에 그리면 메인 스레드가 1초 넘게 막힘.
+// (2026-10-30) 첫 화면 2~4개만 즉시, 나머지는 자리(placeholder)만 잡아 두고 300px 앞에서 마운트.
+function LazyMount({ children, minHeight = 520 }) {
+  const ref = useRef(null);
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    if (on || !ref.current || typeof IntersectionObserver === "undefined") { setOn(true); return undefined; }
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setOn(true); io.disconnect(); } }, { rootMargin: "300px 0px" });
+    io.observe(ref.current);
+    return () => io.disconnect();
+  }, [on]);
+  return <div ref={ref} style={{ minHeight: on ? undefined : minHeight, width: "100%" }}>{on ? children : null}</div>;
+}
 
 const ChartPage = ({ chartType, title, envelop }) => {
   const isMobile = useIsMobile();
@@ -81,11 +95,13 @@ const ChartPage = ({ chartType, title, envelop }) => {
         minWidth: 0,
       }}
     >
-      <IndexChart
-        dataName={index.label}
-        processedData={chartData}
-        envelope={envelope}
-      />
+      <LazyMount>
+        <IndexChart
+          dataName={index.label}
+          processedData={chartData}
+          envelope={envelope}
+        />
+      </LazyMount>
     </div>
   );
 })}
