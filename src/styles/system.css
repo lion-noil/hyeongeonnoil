@@ -247,10 +247,12 @@ a.chip:hover { filter: brightness(1.2); }
 }
 
 /* ── 차트 ? 태그(대표값·밴드 근거) — 호버/포커스/탭으로 말풍선 (2026-10-30) ── */
-.whytag { position: relative; display: inline-flex; align-items: center; gap: 6px; }
+.whytag { display: inline-flex; align-items: center; gap: 6px; }
+/* 말풍선은 카드 머리(.panel-head) 기준으로 깔린다 — whytag 기준이면 카드 왼쪽(overflow:hidden)에서 잘림 */
+.qcard .panel-head { position: relative; }
 .whytag > button { width: 20px; height: 20px; border-radius: 50%; border: 1px solid var(--line-strong); background: rgba(148,163,255,0.10); color: var(--text-2); font: inherit; font-size: 12px; font-weight: 800; line-height: 1; cursor: help; padding: 0; }
 .whytag > button:hover, .whytag > button:focus-visible { color: var(--text); border-color: var(--accent); }
-.whytag .pop { display: none; position: absolute; right: 0; top: calc(100% + 8px); z-index: 30; width: min(360px, 86vw); padding: 12px 14px; border-radius: 12px;
+.whytag .pop { display: none; position: absolute; left: 12px; right: 12px; max-width: 440px; top: calc(100% - 4px); z-index: 30; padding: 12px 14px; border-radius: 12px;
   background: rgba(8, 12, 26, 0.97); border: 1px solid var(--line-strong); box-shadow: var(--glow); color: var(--text-2); font-size: var(--fs-sm); line-height: 1.65; text-align: left; font-weight: 500; white-space: normal; }
 .whytag .pop b { color: var(--text); display: block; margin-bottom: 4px; }
 .whytag:hover .pop, .whytag:focus-within .pop, .whytag.is-open .pop { display: block; }
