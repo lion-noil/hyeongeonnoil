@@ -5,8 +5,7 @@ function Commodity() {
   return (
     <ChartPage
       chartType="commodity"
-      title="원자재 (100일 평균 ±10%)"
-      envelop={10}
+      title="원자재"
     />
   );
 }

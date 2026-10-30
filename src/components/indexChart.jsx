@@ -18,16 +18,6 @@ dayjs.locale("ko");
 
 const LINE_CLOSE = COLOR.cyan;
 const LINE_MA = COLOR.accent2;
-const chartLinesConfig = {
-  10: [
-    { dataKey: "envelope10_upper", stroke: COLOR.up },
-    { dataKey: "envelope10_lower", stroke: COLOR.down },
-  ],
-  3: [
-    { dataKey: "envelope3_upper", stroke: COLOR.up },
-    { dataKey: "envelope3_lower", stroke: COLOR.down },
-  ],
-};
 
 // getLabelMap은 컴포넌트 외부에 정의해 매 렌더마다 재생성 방지
 function getLabelMap(data) {
@@ -61,10 +51,27 @@ function Row({ swatch, dash, label, value, tone, strong }) {
   );
 }
 
-function IndexChart({ processedData, dataName, envelope }) {
+function IndexChart({ processedData, dataName, band }) {
   const processedTime = processedData?.processed_time;
   const howLongAgo = processedTime ? dayjs.utc(processedTime).tz("Asia/Seoul").fromNow() : "";
-  const data = processedData.data;
+  // 자산군별 대표값(창)·밴드(σ배수) — chartBands.js. 백엔드가 ma250/stats 를 아직 안 주면 ma100 + 고정 3%/10% 로 폴백.
+  const want = band || { win: 100, k: 2, label: "100일 평균 ±2σ", why: "" };
+  const stats = processedData?.stats || {};
+  const raw = processedData.data || [];
+  const maKey = want.win === 250 && raw.some((d) => d.ma250 != null) ? "ma250" : "ma100";
+  const sig = maKey === "ma250" ? stats.sig250 : stats.sig100;
+  const useSigma = typeof sig === "number" && sig > 0;
+  const fixedPct = want.fixedPct ?? 0.03;
+  const data = useMemo(() => raw.map((d) => {
+    const m = d[maKey];
+    if (m == null) return { ...d, ma: null, bUp: null, bLo: null };
+    return useSigma
+      ? { ...d, ma: m, bUp: m * (1 + want.k * sig), bLo: m * (1 - want.k * sig) }
+      : { ...d, ma: m, bUp: d[`envelope${fixedPct === 0.1 ? 10 : 3}_upper`] ?? m * (1 + fixedPct), bLo: d[`envelope${fixedPct === 0.1 ? 10 : 3}_lower`] ?? m * (1 - fixedPct) };
+  }), [raw, maKey, useSigma, sig, want.k, fixedPct]);
+  const winDays = maKey === "ma250" ? 250 : 100;
+  const bandLabel = useSigma ? `${winDays}일 평균 ±${want.k}σ (≈±${(want.k * sig * 100).toFixed(1)}%)` : `${winDays}일 평균 ±${Math.round(fixedPct * 100)}%`;
+  const [whyOpen, setWhyOpen] = useState(false);
 
   // ── 모든 Hook은 early return 앞에 위치해야 함 (Rules of Hooks) ──
   const lastItem = data?.length ? data[data.length - 1] : null;
@@ -72,9 +79,10 @@ function IndexChart({ processedData, dataName, envelope }) {
   const { firstDaysByMonth, firstDaysByYear } = useMemo(() => getLabelMap(data || []), [data]);
   const chartLines = useMemo(() => [
     { dataKey: "close", stroke: LINE_CLOSE, strokeWidth: 2 },
-    { dataKey: "ma100", stroke: LINE_MA, strokeWidth: 1.5, dash: "4 3" },
-    ...(chartLinesConfig[envelope]?.map((line) => ({ ...line, strokeWidth: 1.25 })) || []),
-  ], [envelope]);
+    { dataKey: "ma", stroke: LINE_MA, strokeWidth: 1.5, dash: "4 3" },
+    { dataKey: "bUp", stroke: COLOR.up, strokeWidth: 1.25 },
+    { dataKey: "bLo", stroke: COLOR.down, strokeWidth: 1.25 },
+  ], []);
 
   const readoutAt = useCallback((item, label) => ({
     label,
@@ -101,7 +109,7 @@ function IndexChart({ processedData, dataName, envelope }) {
   if (!data?.length) return <p className="meta">차트 데이터 없음</p>;
 
   const close = lastItem?.close ?? 0;
-  const ma100 = lastItem?.ma100;
+  const ma100 = lastItem?.ma;
   const aboveMa = ma100 != null ? close >= ma100 : true;
   const prevClose = data.length >= 2 ? (data[data.length - 2]?.close ?? close) : close;
   const diffValue = close - prevClose;
@@ -129,7 +137,13 @@ function IndexChart({ processedData, dataName, envelope }) {
       as="article"
       className="qcard"
       title={dataName}
-      meta={howLongAgo ? `갱신 ${howLongAgo}` : ""}
+      meta={
+        <span className={`whytag${whyOpen ? " is-open" : ""}`}>
+          <span>{bandLabel}{howLongAgo ? ` · 갱신 ${howLongAgo}` : ""}</span>
+          <button type="button" aria-label="이 기준을 쓰는 이유" aria-expanded={whyOpen} onClick={() => setWhyOpen((v) => !v)} onBlur={() => setWhyOpen(false)}>?</button>
+          <span className="pop" role="tooltip"><b>{want.label} — 왜 이 기준인가</b>{want.why || "자산군별 일봉 실측으로 정한 대표값과 밴드입니다."}{useSigma ? "" : " (지금은 과거 데이터가 모자라 100일 평균·고정 % 밴드로 표시 중)"}</span>
+        </span>
+      }
       badge={
         <span className="qdelta" style={{ color: diffTone }}>
           <b>{safeFixed(close, dec)}</b>
@@ -162,10 +176,10 @@ function IndexChart({ processedData, dataName, envelope }) {
           <div className="qdate">{dayjs(customTooltip.label).format("M/D (dd)")}<span className="meta"> · 차트 위에서 날짜를 움직여 보세요</span></div>
           <div className="qgrid">
             <Row swatch={LINE_CLOSE} label="종가" value={safeFixed(vClose, dec)} strong />
-            <Row swatch={LINE_MA} dash label="이평선 100일" value={safeFixed(vMa, dec)} />
+            <Row swatch={LINE_MA} dash label={`이평선 ${winDays}일`} value={safeFixed(vMa, dec)} />
             <Row label="이평선 대비" value={`${signed(dMa, dec)} (${signed(dMaPct, 2, "%")})`} tone={toneOf(dMa ?? 0)} strong />
-            <Row swatch={COLOR.up} label={`이평선 +${envelope}%`} value={safeFixed(vUp, dec)} />
-            <Row swatch={COLOR.down} label={`이평선 −${envelope}%`} value={safeFixed(vLow, dec)} />
+            <Row swatch={COLOR.up} label={useSigma ? `상단 밴드 +${want.k}σ` : `이평선 +${Math.round(fixedPct * 100)}%`} value={safeFixed(vUp, dec)} />
+            <Row swatch={COLOR.down} label={useSigma ? `하단 밴드 −${want.k}σ` : `이평선 −${Math.round(fixedPct * 100)}%`} value={safeFixed(vLow, dec)} />
           </div>
         </div>
       )}

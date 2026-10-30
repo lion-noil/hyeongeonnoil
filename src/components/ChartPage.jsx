@@ -7,6 +7,7 @@ import { useAllChartData } from "../hooks/useAllChartData";
 import { chartParams } from "../constants/chartMeta";
 import useIsMobile from "../hooks/useIsMobile";
 import ChartCategoryTabs from "./ChartCategoryTabs";
+import { bandFor } from "../constants/chartBands";
 
 const decFor = (v) => (Math.abs(v) >= 100 ? 2 : Math.abs(v) >= 10 ? 3 : 4);
 const fmt = (v) => (typeof v === "number" && isFinite(v) ? v.toLocaleString("en-US", { minimumFractionDigits: decFor(v), maximumFractionDigits: decFor(v) }) : "-");
@@ -18,13 +19,13 @@ function lastDelta(arr) {
   return typeof a === "number" && typeof b === "number" && b ? ((a - b) / b) * 100 : null;
 }
 
-const ChartPage = ({ chartType, title, envelop }) => {
+const ChartPage = ({ chartType, title }) => {
   const isMobile = useIsMobile();
   const { processedData, loading, error } = useAllChartData(chartType);
 
   // 데이터가 있는 종목만, chartMeta 순서대로
   const items = useMemo(() => {
-    const list = (Array.isArray(chartType) ? chartType : [chartType]).flatMap((type) => chartParams[type] || []);
+    const list = (Array.isArray(chartType) ? chartType : [chartType]).flatMap((type) => (chartParams[type] || []).map((it) => ({ ...it, cat: type })));
     return list
       .map((it) => ({ ...it, chart: processedData[it.key] }))
       .filter((it) => it.chart && Array.isArray(it.chart.data) && it.chart.data.length > 0);
@@ -84,7 +85,7 @@ const ChartPage = ({ chartType, title, envelop }) => {
                   차트(grid-column: 1/-1)는 그 줄 바로 아래에 온다. 칩을 아무리 많이 띄워도 차트는 누른 자리 근처. */}
               {on && (
                 <div className="sym-detail" ref={detailRef}>
-                  <IndexChart dataName={it.label} processedData={it.chart} envelope={envelop} />
+                  <IndexChart dataName={it.label} processedData={it.chart} band={bandFor(it.cat)} />
                 </div>
               )}
             </React.Fragment>
