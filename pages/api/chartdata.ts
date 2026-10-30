@@ -20,8 +20,10 @@ function json(payload: unknown, status = 200): Response {
   return new Response(JSON.stringify(payload), {
     headers: {
       "content-type": "application/json",
-      // 매시 갱신 데이터 → CDN 캐시로 Upstash 읽기 절감
-      "cache-control": "public, s-maxage=120, stale-while-revalidate=600",
+      // 생산자(News_scrap)가 매시 :00 에 갱신 → CDN 에 15분 신선 + 1시간 stale 허용.
+      // (2026-10-30) 종전 s-maxage=120 은 거의 매 요청 MISS → 엣지 함수가 Upstash 에서 240~350KB 필드를 읽어
+      //   TTFB 0.5~1.2s 였음. HIT 이면 ~150ms. 갱신 지연은 최대 15분(그 사이는 직전 시각 데이터).
+      "cache-control": "public, s-maxage=900, stale-while-revalidate=3600",
     },
     status,
   });

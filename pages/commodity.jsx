@@ -3,6 +3,7 @@ import Seo from "../src/components/Seo";
 import { HubIntro, HubGuide } from "../src/components/HubSummary";
 import { HUBS } from "../src/lib/hubContent";
 import { hubStaticProps } from "../src/lib/hubDb";
+import ChartPreload from "../src/components/ChartPreload";
 const Commodity = dynamic(() => import("../src/pages/Commodity"), { ssr: false });
 
 export default function CommodityPage({ hub }) {
@@ -12,6 +13,7 @@ export default function CommodityPage({ hub }) {
       <Seo title={H.seo.title} description={H.seo.description} path={H.path} />
       {/* 서버렌더 본문(2026-10-18) — 차트는 ssr:false 라 크롤러용 텍스트(h1·최근 종가·읽는 법·FAQ)를 위아래로 제공 */}
       <HubIntro hubKey="commodity" hub={hub} />
+      <ChartPreload cats={["commodity"]} />
       <Commodity />
       <HubGuide hubKey="commodity" hub={hub} />
     </>
