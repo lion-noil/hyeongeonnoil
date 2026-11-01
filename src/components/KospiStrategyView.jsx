@@ -97,7 +97,7 @@ export default function KospiStrategyView({ data }) {
       {/* 퍼널 */}
       <Panel icon="🔻" title="조건 퍼널 — 연평균 발생일" meta="2017~2025 평균, 거래일 연 245일" hover={false}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 8, marginBottom: 10 }}>
-          {[["거래일", f.days], ["① 눌림", f.c1], ["② 갭업", f.c2], ["①∧②", f.c12], ["①∧②∧③ 터치", f.c123], ["①∧②∧③∧④ 진입", f.c1234]].map(([k, v]) => (
+          {(data.funnel_labels ? data.funnel_labels.map(([k, key]) => [k, f[key]]) : [["거래일", f.days], ["① 눌림", f.c1], ["② 갭업", f.c2], ["①∧②", f.c12], ["①∧②∧③ 터치", f.c123], ["①∧②∧③∧④ 진입", f.c1234]]).map(([k, v]) => (
             <div key={k} className="inset" style={{ padding: "10px 12px" }}>
               <div className="meta">{k}</div>
               <div style={{ fontSize: 20, fontWeight: 800, color: "var(--text)" }}>{v}일</div>
@@ -147,7 +147,7 @@ export default function KospiStrategyView({ data }) {
             </table>
           </div>
         ) : (
-          <p className="meta" style={{ margin: 0 }}>펼치면 65건 전체(진입·손절선·청산·수익)를 볼 수 있습니다. 수익은 숏 기준이라 가격이 내리면 양수입니다.</p>
+          <p className="meta" style={{ margin: 0 }}>펼치면 {data.trades.length}건 전체(진입·손절선·청산·수익)를 볼 수 있습니다. 수익은 숏 기준이라 가격이 내리면 양수입니다.</p>
         )}
       </Panel>
     </div>

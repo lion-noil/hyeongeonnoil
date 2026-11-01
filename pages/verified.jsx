@@ -15,6 +15,8 @@ import QC from "../src/data/qc_backtest.json";
 import QCK from "../src/data/qc_backtest_kospi.json";
 import KPG from "../src/data/kospi_pullback_gapshort.json";
 import QCP from "../src/data/qc_backtest_kospi_pgs.json";
+import NTD from "../src/data/kospi_noon_trendday.json";
+import QCN from "../src/data/qc_backtest_kospi_ntd.json";
 import { ldJson, ORG } from "../src/lib/jsonLd";
 import SectionHead from "../src/components/ui/SectionHead";
 import Panel, { Chip, LiveBadge } from "../src/components/ui/Panel";
@@ -103,6 +105,8 @@ export default function VerifiedPage() {
   const s10 = KPG.stats_10y;
   const kp = V.kospi_pgs;
   const hasPgsQc = Boolean(kp && QCP?.stats);
+  const kn = V.kospi_ntd;
+  const hasNtdQc = Boolean(kn && QCN?.stats);
   const tocFx = [
     { id: "v-fxblue", n: 1, src: "FX Blue", title: "실시간 현황판", level: "계좌가 직접 발행", color: "var(--cyan)",
       fact: ["환율 데모 계좌", "5분마다 발행", `${V.fxblue.since}~`] },
@@ -117,6 +121,9 @@ export default function VerifiedPage() {
     { id: "v-kospi-pgs", n: hasKospi ? 2 : 1, src: hasPgsQc ? "QuantConnect" : "자체 엔진 · 크레온 1분봉", title: `선물 전략 1 — ${KPG.name}`, level: hasPgsQc ? "외부 엔진 · 자체 데이터" : "자체 엔진 · 자체 데이터", color: "var(--warn)",
       fact: hasPgsQc ? [kp.period, `${QCP.three_way?.qc?.n}건 · 건당 ${pct(QCP.three_way?.qc?.mean)}`, `순이익 ${pct(QCP.stats.net_profit_pct)}`, `낙폭 −${QCP.stats.max_dd_pct}%`]
                      : [KPG.period, `${s10.n}건 · 건당 ${pct(s10.exp_pct)}`, `총 ${pct(s10.total_pct)}`, `낙폭 −${s10.mdd_pct}%`] },
+    { id: "v-kospi-ntd", n: hasKospi ? 3 : 2, src: hasNtdQc ? "QuantConnect" : "자체 엔진 · 크레온 1분봉", title: `선물 전략 2 — ${NTD.name}`, level: hasNtdQc ? "외부 엔진 · 자체 데이터" : "자체 엔진 · 자체 데이터", color: "var(--warn)",
+      fact: hasNtdQc ? [kn.period, `${QCN.three_way?.qc?.n}건 · 건당 ${pct(QCN.three_way?.qc?.mean)}`, `순이익 ${pct(QCN.stats.net_profit_pct)}`, `낙폭 −${QCN.stats.max_dd_pct}%`]
+                     : [NTD.period, `${NTD.stats_10y.n}건 · 건당 ${pct(NTD.stats_10y.exp_pct)}`, `총 ${pct(NTD.stats_10y.total_pct)}`, `낙폭 −${NTD.stats_10y.mdd_pct}%`] },
   ];
   const toc = tab === "kospi" ? tocKospi : tocFx;
   return (
@@ -144,7 +151,7 @@ export default function VerifiedPage() {
         </p>
       ) : (
         <p style={{ ...p, padding: "0 8px" }}>
-          코스피200 기록 두 가지입니다. {hasKospi ? "1번은 ETF 봇(ALIGN3), " : ""}{hasKospi ? "2번" : "1번"}은 지수선물 단타 전략 「{KPG.name}」.
+          코스피200 기록 세 가지입니다. {hasKospi ? "1번은 ETF 봇(ALIGN3), " : ""}{hasKospi ? "2·3번" : "1·2번"}은 지수선물 단타 전략 「{KPG.name}」과 「{NTD.name}」.
           둘 다 같은 규칙을 QuantConnect(LEAN) 엔진으로 다시 돌린 결과로 보여주며, 데이터는 자체 수집(크레온)입니다.
         </p>
       )}
@@ -195,6 +202,11 @@ export default function VerifiedPage() {
             <SectionHead id="v-kospi-pgs" aside={<TopLink />} kicker="KOSPI FUTURES · STRATEGY 1" title={`${hasKospi ? 2 : 1}. 선물 전략 1 — 「${KPG.name}」`}
               desc={hasPgsQc ? "네 조건이 모두 맞는 날만 숏, 손절 또는 마감 청산. 그래프와 성과는 QuantConnect(LEAN) 엔진 재현 기준(5년 1분봉)입니다." : `${KPG.market}. 자체 엔진·자체 데이터 결과입니다.`} />
             {hasPgsQc ? <StrategyRecord kpg={KPG} qc={QCP} meta={kp} /> : <KospiStrategyView data={KPG} />}
+
+            {/* 코스피 3. 선물 전략 2 — 정오 추세일 숏 */}
+            <SectionHead id="v-kospi-ntd" aside={<TopLink />} kicker="KOSPI FUTURES · STRATEGY 2" title={`${hasKospi ? 3 : 2}. 선물 전략 2 — 「${NTD.name}」`}
+              desc={hasNtdQc ? "11:30에 개장가·전일 종가보다 충분히 밀려 저점 근처에 있으면 숏, 손절 또는 마감 청산. 그래프와 성과는 QuantConnect(LEAN) 엔진 재현 기준(5년 1분봉)입니다." : `${NTD.market}. 자체 엔진·자체 데이터 결과입니다.`} />
+            {hasNtdQc ? <StrategyRecord kpg={NTD} qc={QCN} meta={kn} /> : <KospiStrategyView data={NTD} />}
           </>
         )}
       </div>
