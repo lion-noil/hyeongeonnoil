@@ -44,7 +44,7 @@ function ChartTip({ active, payload, label }) {
   );
 }
 
-export default function QcBacktestView({ data, caveats = [], expectation = "", compact = false, currency = "USD", feeNote = "" }) {
+export default function QcBacktestView({ data, caveats = [], expectation = "", compact = false, currency = "USD", feeNote = "", chartOnly = false }) {   // chartOnly: 자본곡선 패널만(전략 카드용)
   const [tab, setTab] = useState("chart");
   const s = data?.stats || {};
   const meta = data?.meta || {};
@@ -76,6 +76,7 @@ export default function QcBacktestView({ data, caveats = [], expectation = "", c
 
   return (
     <div style={{ display: "grid", gap: 14 }}>
+      {!chartOnly && (<>
       {/* 핵심 숫자 */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 10 }}>
         <StatTile label="순이익 (5년)" value={fmtPct(s.net_profit_pct, 1)} sub={`${money(s.start_equity)} → ${money(s.end_equity)}`} tone="var(--up)" />
@@ -86,6 +87,7 @@ export default function QcBacktestView({ data, caveats = [], expectation = "", c
         <StatTile label="주문 수" value={s.orders?.toLocaleString("en-US")} sub={feeNote || `수수료 $${s.fees ?? 0} (스프레드만)`} />
       </div>
 
+      </>)}
       {/* 자본곡선 + 낙폭 */}
       <Panel icon="📈" title="자본곡선" meta={`${meta.start} ~ ${meta.end} · 거래일 ${meta.tradeable_days}일 · 일 1점`} pad={compact ? 10 : 14}
         badge={
@@ -167,6 +169,7 @@ export default function QcBacktestView({ data, caveats = [], expectation = "", c
         )}
       </Panel>
 
+      {!chartOnly && (<>
       {/* 월별 분포 요약 */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 10 }}>
         <StatTile label="플러스 달" value={`${ms.positive}/${ms.n}`} sub={`월 ${Math.round((ms.positive / ms.n) * 100)}% 확률`} />
@@ -264,6 +267,8 @@ export default function QcBacktestView({ data, caveats = [], expectation = "", c
         </Panel>
       )}
 
+      </>)}
+      {!chartOnly && (<>
       <div className="meta">
         원본: QuantConnect 프로젝트 {meta.project} · 백테스트 {meta.backtest_name} ({meta.backtest_id?.slice(0, 8)}) · {meta.engine} · {meta.node} · 실행 {String(meta.created || "").slice(0, 10)} · API로 내려받음 {String(meta.fetched_at || "").slice(0, 10)}.
         {meta.public_url ? (
@@ -272,6 +277,7 @@ export default function QcBacktestView({ data, caveats = [], expectation = "", c
           <>{" "}공개 결과 페이지는 아직 없습니다(비공개 프로젝트). 결과 원본은 API에서 내려받아 이 사이트가 직접 그립니다.</>
         )}
       </div>
+      </>)}
     </div>
   );
 }
