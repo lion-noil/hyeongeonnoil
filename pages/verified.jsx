@@ -14,6 +14,7 @@ import V from "../src/data/verified.json";
 import QC from "../src/data/qc_backtest.json";
 import QCK from "../src/data/qc_backtest_kospi.json";
 import KPG from "../src/data/kospi_pullback_gapshort.json";
+import QCP from "../src/data/qc_backtest_kospi_pgs.json";
 import { ldJson, ORG } from "../src/lib/jsonLd";
 import SectionHead from "../src/components/ui/SectionHead";
 import Panel, { Chip, LiveBadge } from "../src/components/ui/Panel";
@@ -99,6 +100,8 @@ export default function VerifiedPage() {
   const k = V.kospi;
   const hasKospi = Boolean(k && QCK?.stats);
   const s10 = KPG.stats_10y;
+  const kp = V.kospi_pgs;
+  const hasPgsQc = Boolean(kp && QCP?.stats);
   const tocFx = [
     { id: "v-fxblue", n: 1, src: "FX Blue", title: "실시간 현황판", level: "계좌가 직접 발행", color: "var(--cyan)",
       fact: ["환율 데모 계좌", "5분마다 발행", `${V.fxblue.since}~`] },
@@ -112,6 +115,8 @@ export default function VerifiedPage() {
       fact: [k.period, `순이익 ${pct(QCK.stats.net_profit_pct)}`, `낙폭 −${QCK.stats.max_dd_pct}%`] }] : []),
     { id: "v-kospi-pgs", n: hasKospi ? 2 : 1, src: "자체 엔진 · 크레온 1분봉", title: `선물 전략 1 — ${KPG.name}`, level: "자체 엔진 · 자체 데이터", color: "var(--warn)",
       fact: [KPG.period, `${s10.n}건 · 건당 ${pct(s10.exp_pct)}`, `총 ${pct(s10.total_pct)}`, `낙폭 −${s10.mdd_pct}%`] },
+    ...(hasPgsQc ? [{ id: "v-kospi-pgs-qc", n: `${hasKospi ? 2 : 1}-b`, src: "QuantConnect", title: `${KPG.name} 재현 (5년)`, level: "외부 엔진 · 자체 데이터", color: "var(--warn)",
+      fact: [kp.period, `순이익 ${pct(QCP.stats.net_profit_pct)}`, `낙폭 −${QCP.stats.max_dd_pct}%`] }] : []),
   ];
   const toc = tab === "kospi" ? tocKospi : tocFx;
   return (
@@ -141,7 +146,7 @@ export default function VerifiedPage() {
         <p style={{ ...p, padding: "0 8px" }}>
           코스피200 기록 두 가지입니다. {hasKospi ? "1번은 한국투자증권 실계좌에서 돌아가는 ETF 봇(ALIGN3)을 외부 엔진으로 재현한 것, " : ""}
           {hasKospi ? "2번" : "1번"}은 코스피200 지수선물 단타 전략 「{KPG.name}」을 자체 엔진·크레온 1분봉 10년으로 검증한 것입니다.
-          선물 전략은 아직 외부 재현도 실거래도 없는 자체 검증이라, 이 페이지에서 가장 약한 증거 수준입니다.
+          선물 전략은 자체 엔진 결과(2번)와 그 규칙을 QuantConnect 엔진으로 다시 돌린 재현(2-b)을 함께 두었고, 실거래 기록은 아직 없습니다.
         </p>
       )}
 
@@ -193,8 +198,21 @@ export default function VerifiedPage() {
 
             {/* 코스피 2. 선물 전략 1 — 눌림 갭업 숏 (자체 엔진·자체 데이터) */}
             <SectionHead id="v-kospi-pgs" aside={<TopLink />} kicker="KOSPI FUTURES · STRATEGY 1" title={`${hasKospi ? 2 : 1}. 선물 전략 1 — 「${KPG.name}」 10년 1분봉 검증`}
-              desc={`${KPG.market}. ${KPG.data}. 네 조건이 모두 맞는 날만 숏으로 들어가 손절 또는 마감에 나오는 단타 규칙입니다. 자체 엔진·자체 데이터 결과이며 실거래 기록은 아직 없습니다.`} />
+              desc={`${KPG.market}. ${KPG.data}. 네 조건이 모두 맞는 날만 숏으로 들어가 손절 또는 마감에 나오는 단타 규칙입니다. 자체 엔진·자체 데이터 결과이며, 같은 규칙의 QuantConnect 재현은 바로 아래 2-b 절에 있습니다. 실거래 기록은 아직 없습니다.`} />
             <KospiStrategyView data={KPG} />
+
+            {/* 코스피 2-b. 같은 전략을 QuantConnect 엔진으로 재현 (데이터는 자체 1분봉을 사이트에 호스팅) */}
+            {hasPgsQc && (
+              <>
+                <SectionHead id="v-kospi-pgs-qc" aside={<TopLink />} kicker="KOSPI FUTURES · INDEPENDENT ENGINE" title={`${hasKospi ? 2 : 1}-b. 「${KPG.name}」 QuantConnect 재현 (5년, 데이터는 자체 수집)`}
+                  desc="위 전략의 네 조건을 LEAN 엔진용으로 다시 구현해 QuantConnect 클라우드에서 돌린 결과. 엔진·체결 모델은 외부지만 1분봉은 자체 수집(크레온)이라 ETF 기록과 같은 '같은 데이터·다른 엔진' 수준의 검증입니다" />
+                <p style={p}>
+                  {kp.how} {kp.cell_match}. 기간 {kp.period}, 실행 {kp.run_at}, {kp.engine}. 결과 원본(자본곡선·월별 통계·청산 거래 {QCP.stats.closed_trades}건)은
+                  QuantConnect API에서 내려받아 이 사이트가 직접 그립니다.
+                </p>
+                <QcBacktestView data={QCP} caveats={kp.caveats} expectation={kp.expectation} currency="KRW" feeNote={kp.fee_note} />
+              </>
+            )}
           </>
         )}
       </div>

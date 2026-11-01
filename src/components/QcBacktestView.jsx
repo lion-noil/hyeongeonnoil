@@ -266,7 +266,11 @@ export default function QcBacktestView({ data, caveats = [], expectation = "", c
 
       <div className="meta">
         원본: QuantConnect 프로젝트 {meta.project} · 백테스트 {meta.backtest_name} ({meta.backtest_id?.slice(0, 8)}) · {meta.engine} · {meta.node} · 실행 {String(meta.created || "").slice(0, 10)} · API로 내려받음 {String(meta.fetched_at || "").slice(0, 10)}.
-        {" "}<a href={meta.public_url} target="_blank" rel="noopener noreferrer" style={{ color: "var(--cyan)" }}>QuantConnect 공개 결과 페이지 ↗</a> (외부 호스팅이라 접속이 안 될 때가 있습니다)
+        {meta.public_url ? (
+          <>{" "}<a href={meta.public_url} target="_blank" rel="noopener noreferrer" style={{ color: "var(--cyan)" }}>QuantConnect 공개 결과 페이지 ↗</a> (외부 호스팅이라 접속이 안 될 때가 있습니다)</>
+        ) : (
+          <>{" "}공개 결과 페이지는 아직 없습니다(비공개 프로젝트). 결과 원본은 API에서 내려받아 이 사이트가 직접 그립니다.</>
+        )}
       </div>
     </div>
   );
