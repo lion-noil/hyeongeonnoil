@@ -79,7 +79,7 @@ export default function KospiStrategyView({ data }) {
           </table>
         </div>
         <p className="meta" style={{ marginTop: 8, lineHeight: 1.6 }}>
-          10년 총수익 {fmtPct(s.total_pct)} 중 2026년이 {y26 ? fmtPct(y26.ret_pct) : "—"}입니다. 2026년을 빼면 총이익÷총손실 {data.stats_ex2026.pf}배로 평범합니다 — 아래 주의문 참고.
+          10년 총수익 {fmtPct(s.total_pct)} 중 2026년이 {y26 ? fmtPct(y26.ret_pct) : "—"}입니다. 2026년을 빼면 총이익÷총손실 {data.stats_ex2026.pf}배{data.stats_ex2026.pf >= 1.7 ? "로 비슷합니다" : "로 평범합니다"} — 아래 주의문 참고.
         </p>
       </Panel>
 
@@ -139,7 +139,7 @@ export default function KospiStrategyView({ data }) {
               <tbody>
                 {data.trades.map((t) => (
                   <tr key={t.date}>
-                    <td style={{ ...td, textAlign: "left" }}>{t.date}</td><td style={td}>{t.open}</td><td style={td}>{t.entry_time}</td><td style={td}>{t.entry}</td><td style={td}>{t.stop}</td>
+                    <td style={{ ...td, textAlign: "left" }}>{t.date}</td><td style={td}>{t.open}</td><td style={td}>{t.entry_time}</td><td style={td}>{t.entry}</td><td style={td}>{t.stop ? t.stop : "—"}</td>
                     <td style={td}>{t.exit_time}</td><td style={td}>{t.exit}</td><td style={td}>{t.why}</td><td style={{ ...td, color: tone(t.ret_pct), fontWeight: 700 }}>{fmtPct(t.ret_pct, 2)}</td>
                   </tr>
                 ))}
@@ -147,7 +147,7 @@ export default function KospiStrategyView({ data }) {
             </table>
           </div>
         ) : (
-          <p className="meta" style={{ margin: 0 }}>펼치면 {data.trades.length}건 전체(진입·손절선·청산·수익)를 볼 수 있습니다. 수익은 숏 기준이라 가격이 내리면 양수입니다.</p>
+          <p className="meta" style={{ margin: 0 }}>펼치면 {data.trades.length}건 전체(진입·손절선·청산·수익)를 볼 수 있습니다. {data.side === "롱" ? "수익은 롱 기준이라 가격이 오르면 양수입니다." : "수익은 숏 기준이라 가격이 내리면 양수입니다."}</p>
         )}
       </Panel>
     </div>
