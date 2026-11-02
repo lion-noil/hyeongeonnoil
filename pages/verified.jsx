@@ -19,6 +19,8 @@ import NTD from "../src/data/kospi_noon_trendday.json";
 import QCN from "../src/data/qc_backtest_kospi_ntd.json";
 import MBL from "../src/data/kospi_morning_long.json";
 import QCM from "../src/data/qc_backtest_kospi_mbl.json";
+import NTL from "../src/data/kospi_noon_long.json";
+import QCL from "../src/data/qc_backtest_kospi_ntl.json";
 import { ldJson, ORG } from "../src/lib/jsonLd";
 import SectionHead from "../src/components/ui/SectionHead";
 import Panel, { Chip, LiveBadge } from "../src/components/ui/Panel";
@@ -111,6 +113,8 @@ export default function VerifiedPage() {
   const hasNtdQc = Boolean(kn && QCN?.stats);
   const km = V.kospi_mbl;
   const hasMblQc = Boolean(km && QCM?.stats);
+  const kl = V.kospi_ntl;
+  const hasNtlQc = Boolean(kl && QCL?.stats);
   const tocFx = [
     { id: "v-fxblue", n: 1, src: "FX Blue", title: "실시간 현황판", level: "계좌가 직접 발행", color: "var(--cyan)",
       fact: ["환율 데모 계좌", "5분마다 발행", `${V.fxblue.since}~`] },
@@ -131,6 +135,9 @@ export default function VerifiedPage() {
     { id: "v-kospi-mbl", n: hasKospi ? 4 : 3, src: hasMblQc ? "QuantConnect" : "자체 엔진 · 크레온 1분봉", title: `선물 전략 3 — ${MBL.name}`, level: hasMblQc ? "외부 엔진 · 자체 데이터" : "자체 엔진 · 자체 데이터", color: "var(--warn)",
       fact: hasMblQc ? [km.period, `${QCM.three_way?.qc?.n}건 · 건당 ${pct(QCM.three_way?.qc?.mean)}`, `순이익 ${pct(QCM.stats.net_profit_pct)}`, `낙폭 −${QCM.stats.max_dd_pct}%`]
                      : [MBL.period, `${MBL.stats_10y.n}건 · 건당 ${pct(MBL.stats_10y.exp_pct)}`, `총 ${pct(MBL.stats_10y.total_pct)}`, `낙폭 −${MBL.stats_10y.mdd_pct}%`] },
+    { id: "v-kospi-ntl", n: hasKospi ? 5 : 4, src: hasNtlQc ? "QuantConnect" : "자체 엔진 · 크레온 1분봉", title: `선물 전략 4 — ${NTL.name}`, level: hasNtlQc ? "외부 엔진 · 자체 데이터" : "자체 엔진 · 자체 데이터", color: "var(--warn)",
+      fact: hasNtlQc ? [kl.period, `${QCL.three_way?.qc?.n}건 · 건당 ${pct(QCL.three_way?.qc?.mean)}`, `순이익 ${pct(QCL.stats.net_profit_pct)}`, `낙폭 −${QCL.stats.max_dd_pct}%`]
+                     : [NTL.period, `${NTL.stats_10y.n}건 · 건당 ${pct(NTL.stats_10y.exp_pct)}`, `총 ${pct(NTL.stats_10y.total_pct)}`, `낙폭 −${NTL.stats_10y.mdd_pct}%`] },
   ];
   const toc = tab === "kospi" ? tocKospi : tocFx;
   return (
@@ -162,7 +169,7 @@ export default function VerifiedPage() {
         <p style={{ ...p, padding: "0 8px" }}>
           <strong>코스피200은 밤에 오르고 낮에는 제자리입니다.</strong>{" "}
           2016년 이후 약 3.5배 오르는 동안 수익 합계는 밤 +179%, 낮 −20%였고, 낮의 상승일은 50.3%로 동전 던지기에 가깝습니다.
-          낮의 수익은 시간대가 아니라 특정 조건에서만 나옵니다. 정오에 저점 근처까지 밀린 날은 오후에도 더 밀리고, 변동성이 큰 장의 갭다운은 10:30까지 반등합니다.
+          낮의 수익은 시간대가 아니라 특정 조건에서만 나옵니다. 정오에 저점 근처까지 밀린 날은 오후에도 더 밀리고, 반대로 정오에 고가 근처에서 이미 하루치를 올라온 날은 오후에도 더 오르며, 변동성이 큰 장의 갭다운은 10:30까지 반등합니다.
           다만 2026년은 변동폭이 2017년의 5배인 이례적인 해라, 조용한 장으로 돌아가면 기회도 수익도 줄어들 수 있습니다.
         </p>
       )}
@@ -223,6 +230,11 @@ export default function VerifiedPage() {
             <SectionHead id="v-kospi-mbl" aside={<TopLink />} kicker="KOSPI FUTURES · STRATEGY 3" title={`${hasKospi ? 4 : 3}. 선물 전략 3 — 「${MBL.name}」`}
               desc={hasMblQc ? "변동성 장세에서 지난주 매수자 대부분이 물린 채 갭다운으로 열린 날, 09:00 매수 → 10:30 매도. 손절 없음. 그래프와 성과는 QuantConnect(LEAN) 엔진 재현 기준(5년 1분봉)입니다." : `${MBL.market}. 자체 엔진·자체 데이터 결과입니다.`} />
             {hasMblQc ? <StrategyRecord kpg={MBL} qc={QCM} meta={km} side="롱 · 하루 1회 · 90분" /> : <KospiStrategyView data={MBL} />}
+
+            {/* 코스피 5. 선물 전략 4 — 정오 추세일 롱 (정오 추세일 숏의 거울) */}
+            <SectionHead id="v-kospi-ntl" aside={<TopLink />} kicker="KOSPI FUTURES · STRATEGY 4" title={`${hasKospi ? 5 : 4}. 선물 전략 4 — 「${NTL.name}」`}
+              desc={hasNtlQc ? "변동성 장세에서 11:30~12:30 사이 오늘·어제 매수자가 모두 수익이고 오전 저점에서 하루치를 올라와 고가 근처에 있으면 매수, 마감 청산. 그래프와 성과는 QuantConnect(LEAN) 엔진 재현 기준(5년 1분봉)입니다." : `${NTL.market}. 자체 엔진·자체 데이터 결과입니다.`} />
+            {hasNtlQc ? <StrategyRecord kpg={NTL} qc={QCL} meta={kl} side="롱 · 하루 1회 · 오후 보유" /> : <KospiStrategyView data={NTL} />}
           </>
         )}
       </div>
