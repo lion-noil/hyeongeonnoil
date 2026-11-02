@@ -157,6 +157,15 @@ export default function VerifiedPage() {
           {" "}{V.account.note} 가동 {V.account.live_since}~.
         </p>
       )}
+      {/* 수치 출처: reversion_research/backtests/kospi_universe_profile.py (2026-11-02, 선물 1분봉 2016-08~2026-10) */}
+      {tab !== "fx" && (
+        <p style={{ ...p, padding: "0 8px" }}>
+          <strong>코스피200은 밤에 오르고 낮에는 제자리입니다.</strong>{" "}
+          2016년 이후 약 3.5배 오르는 동안 수익 합계는 밤 +179%, 낮 −20%였고, 낮의 상승일은 50.3%로 동전 던지기에 가깝습니다.
+          낮의 수익은 시간대가 아니라 특정 조건에서만 나옵니다. 정오에 저점 근처까지 밀린 날은 오후에도 더 밀리고, 변동성이 큰 장의 갭다운은 10:30까지 반등합니다.
+          다만 2026년은 변동폭이 2017년의 5배인 이례적인 해라, 조용한 장으로 돌아가면 기회도 수익도 줄어들 수 있습니다.
+        </p>
+      )}
 
       <div style={{ display: "grid", gap: 16, padding: "0 8px" }}>
         <Toc items={toc} />
