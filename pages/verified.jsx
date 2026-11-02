@@ -149,17 +149,12 @@ export default function VerifiedPage() {
         aside={<LiveBadge live liveText={`기준일 ${V.updated}`} />} />
       <div style={{ padding: "0 8px 12px" }}><VerifiedTabs tab={tab} /></div>
 
-      {tab === "fx" ? (
+      {tab === "fx" && (
         <p style={{ ...p, padding: "0 8px" }}>
           1~3번은 {V.account.label}에서 돌아가는 봇의 기록입니다.
           사이트의 <Link href="/reports" style={{ color: "var(--cyan)" }}>보고서</Link>와{" "}
           <Link href="/fx" style={{ color: "var(--cyan)" }}>FX 현황</Link>은 자체 장부 기준이고, 이 페이지는 그 장부를 바깥에서 대조하는 용도입니다.
           {" "}{V.account.note} 가동 {V.account.live_since}~.
-        </p>
-      ) : (
-        <p style={{ ...p, padding: "0 8px" }}>
-          코스피200 기록 네 가지입니다. {hasKospi ? "1번은 ETF 봇(ALIGN3), " : ""}{hasKospi ? "2·3·4번" : "1·2·3번"}은 지수선물 단타 전략 「{KPG.name}」·「{NTD.name}」(숏)과 「{MBL.name}」(롱).
-          모두 같은 규칙을 QuantConnect(LEAN) 엔진으로 다시 돌린 결과로 보여주며, 데이터는 자체 수집(크레온)입니다.
         </p>
       )}
 
