@@ -217,7 +217,7 @@ export default function VerifiedPage() {
 
             {/* 코스피 4. 선물 전략 3 — 아침 반등 롱 */}
             <SectionHead id="v-kospi-mbl" aside={<TopLink />} kicker="KOSPI FUTURES · STRATEGY 3" title={`${hasKospi ? 4 : 3}. 선물 전략 3 — 「${MBL.name}」`}
-              desc={hasMblQc ? "변동성 장세에서 전일 레인지가 크게 벌어졌거나 물린 갭다운으로 열린 날, 09:00 매수 → 10:30 매도. 손절 없음. 그래프와 성과는 QuantConnect(LEAN) 엔진 재현 기준(5년 1분봉)입니다." : `${MBL.market}. 자체 엔진·자체 데이터 결과입니다.`} />
+              desc={hasMblQc ? "변동성 장세에서 지난주 매수자 대부분이 물린 채 갭다운으로 열린 날, 09:00 매수 → 10:30 매도. 손절 없음. 그래프와 성과는 QuantConnect(LEAN) 엔진 재현 기준(5년 1분봉)입니다." : `${MBL.market}. 자체 엔진·자체 데이터 결과입니다.`} />
             {hasMblQc ? <StrategyRecord kpg={MBL} qc={QCM} meta={km} side="롱 · 하루 1회 · 90분" /> : <KospiStrategyView data={MBL} />}
           </>
         )}

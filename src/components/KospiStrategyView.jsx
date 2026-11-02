@@ -79,7 +79,7 @@ export default function KospiStrategyView({ data }) {
           </table>
         </div>
         <p className="meta" style={{ marginTop: 8, lineHeight: 1.6 }}>
-          10년 총수익 {fmtPct(s.total_pct)} 중 2026년이 {y26 ? fmtPct(y26.ret_pct) : "—"}입니다. 2026년을 빼면 총이익÷총손실 {data.stats_ex2026.pf}배{data.stats_ex2026.pf >= 1.7 ? "로 비슷합니다" : "로 평범합니다"} — 아래 주의문 참고.
+          10년 총수익 {fmtPct(s.total_pct)} 중 2026년이 {y26 ? fmtPct(y26.ret_pct) : "—"}입니다. 2026년을 빼면 총이익÷총손실 {data.stats_ex2026.pf}배{data.stats_ex2026.pf > s.pf + 0.3 ? "로 오히려 높습니다" : data.stats_ex2026.pf >= 1.7 ? "로 비슷합니다" : "로 평범합니다"} — 아래 주의문 참고.
         </p>
       </Panel>
 

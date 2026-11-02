@@ -14,167 +14,166 @@
   },
   {
    "no": 2,
-   "name": "전일 레인지 확장 또는 물린 갭다운",
-   "text": "둘 중 하나. (가) 전일 고가−저가가 평소 변동폭의 1.5배 이상이었다. (나) 개장가가 전일 종가보다 변동폭의 0.25배 이상 갭다운했고 개장가 위에 지난 5일 매물대의 70% 이상이 쌓여 있다(지난주 매수자 대부분이 물림)."
+   "name": "갭다운 개장",
+   "text": "08:45 개장가가 전일 종가보다 최근 20일 평균 하루 변동폭의 0.25배 이상 낮다."
   },
   {
    "no": 3,
-   "name": "진입",
-   "text": "09:00 현물 개장과 동시에 시장가 매수. 하루 1회."
+   "name": "물린 매물대",
+   "text": "개장가 위에 지난 5거래일 거래량의 70% 이상이 쌓여 있다. 지난주 매수자 대부분이 물린 채 열린 날."
   },
   {
    "no": 4,
-   "name": "청산",
-   "text": "10:30에 시장가 매도. 손절 없음(90분 보유, 손절을 넣으면 소폭 악화). 마감까지 들고 가면 오후에 되밀려 음수."
+   "name": "진입·청산",
+   "text": "09:00 현물 개장과 동시에 시장가 매수, 10:30에 시장가 매도. 하루 1회. 손절 없음(90분 보유, 손절을 넣으면 소폭 악화). 마감까지 들고 가면 오후에 되밀려 음수."
   }
  ],
  "exit": "10:30 고정 청산. 손절·익절 없음.",
- "logic": "밤새 악재나 큰 변동으로 눌린 상태에서 현물이 09:00에 열리면 저가 매수와 숏커버가 첫 15~30분에 몰려 선물이 튀고, 그 뒤 오전 중반까지 완만히 이어진다. 물린 사람들의 본전 매도가 시작되기 전인 첫 90분만 먹는 롱. 수익의 4분의 3이 09:00~09:15에 난다.",
+ "logic": "밤새 악재로 갭다운해 지난주 매수자가 대부분 물린 상태에서 현물이 09:00에 열리면 저가 매수와 숏커버가 첫 15~30분에 몰려 선물이 튀고, 그 뒤 오전 중반까지 완만히 이어진다. 물린 사람들의 본전 매도가 시작되기 전인 첫 90분만 먹는 롱. 수익의 4분의 3이 09:00~09:15에 난다.",
  "stats_10y": {
-  "n": 167,
-  "exp_pct": 0.282,
-  "win_rate": 64.1,
-  "pf": 1.74,
-  "total_pct": 47.2,
-  "mdd_pct": 7.3,
-  "neg_years": 1,
+  "n": 101,
+  "exp_pct": 0.25,
+  "win_rate": 63.4,
+  "pf": 1.64,
+  "total_pct": 25.2,
+  "mdd_pct": 9.7,
+  "neg_years": 0,
   "years": 7,
-  "per_year": 12.2,
+  "per_year": 7.6,
   "stops": 0,
-  "avg_win_pct": 1.04,
+  "avg_win_pct": 1.01,
   "avg_loss_pct": -1.06,
   "yearly": [
    {
     "year": 2018,
-    "ret_pct": -0.4,
-    "n": 4
+    "ret_pct": 0.4,
+    "n": 3
    },
    {
     "year": 2020,
-    "ret_pct": 6.3,
-    "n": 34
+    "ret_pct": 9.0,
+    "n": 21
    },
    {
     "year": 2021,
-    "ret_pct": 9.4,
-    "n": 20
+    "ret_pct": 2.5,
+    "n": 10
    },
    {
     "year": 2022,
-    "ret_pct": 1.4,
-    "n": 9
+    "ret_pct": 1.3,
+    "n": 5
    },
    {
     "year": 2024,
-    "ret_pct": 3.3,
-    "n": 17
+    "ret_pct": 3.9,
+    "n": 12
    },
    {
     "year": 2025,
-    "ret_pct": 6.4,
-    "n": 26
+    "ret_pct": 6.5,
+    "n": 17
    },
    {
     "year": 2026,
-    "ret_pct": 20.7,
-    "n": 57
+    "ret_pct": 1.6,
+    "n": 33
    }
   ]
  },
  "stats_5y": {
-  "n": 115,
-  "exp_pct": 0.302,
-  "win_rate": 66.1,
-  "pf": 1.73,
-  "total_pct": 34.8,
-  "mdd_pct": 7.3,
+  "n": 70,
+  "exp_pct": 0.211,
+  "win_rate": 64.3,
+  "pf": 1.48,
+  "total_pct": 14.7,
+  "mdd_pct": 9.7,
   "neg_years": 0,
   "years": 5,
-  "per_year": 6.4,
+  "per_year": 4.1,
   "stops": 0,
-  "avg_win_pct": 1.08,
+  "avg_win_pct": 1.0,
   "avg_loss_pct": -1.22,
   "yearly": [
    {
     "year": 2021,
-    "ret_pct": 2.9,
-    "n": 6
+    "ret_pct": 1.4,
+    "n": 3
    },
    {
     "year": 2022,
-    "ret_pct": 1.4,
-    "n": 9
+    "ret_pct": 1.3,
+    "n": 5
    },
    {
     "year": 2024,
-    "ret_pct": 3.3,
-    "n": 17
+    "ret_pct": 3.9,
+    "n": 12
    },
    {
     "year": 2025,
-    "ret_pct": 6.4,
-    "n": 26
+    "ret_pct": 6.5,
+    "n": 17
    },
    {
     "year": 2026,
-    "ret_pct": 20.7,
-    "n": 57
+    "ret_pct": 1.6,
+    "n": 33
    }
   ]
  },
  "stats_ex2026": {
-  "n": 110,
-  "exp_pct": 0.24,
-  "win_rate": 63.6,
-  "pf": 1.81,
-  "total_pct": 26.4,
-  "mdd_pct": 7.3,
-  "neg_years": 1,
+  "n": 68,
+  "exp_pct": 0.347,
+  "win_rate": 67.6,
+  "pf": 2.63,
+  "total_pct": 23.6,
+  "mdd_pct": 3.9,
+  "neg_years": 0,
   "years": 6,
-  "per_year": 12.2,
+  "per_year": 7.6,
   "stops": 0,
-  "avg_win_pct": 0.85,
-  "avg_loss_pct": -0.82,
+  "avg_win_pct": 0.83,
+  "avg_loss_pct": -0.66,
   "yearly": [
    {
     "year": 2018,
-    "ret_pct": -0.4,
-    "n": 4
+    "ret_pct": 0.4,
+    "n": 3
    },
    {
     "year": 2020,
-    "ret_pct": 6.3,
-    "n": 34
+    "ret_pct": 9.0,
+    "n": 21
    },
    {
     "year": 2021,
-    "ret_pct": 9.4,
-    "n": 20
+    "ret_pct": 2.5,
+    "n": 10
    },
    {
     "year": 2022,
-    "ret_pct": 1.4,
-    "n": 9
+    "ret_pct": 1.3,
+    "n": 5
    },
    {
     "year": 2024,
-    "ret_pct": 3.3,
-    "n": 17
+    "ret_pct": 3.9,
+    "n": 12
    },
    {
     "year": 2025,
-    "ret_pct": 6.4,
-    "n": 26
+    "ret_pct": 6.5,
+    "n": 17
    }
   ]
  },
  "funnel": {
   "days": 245.1,
   "c1": 56.2,
-  "cA": 26.7,
+  "gap": 60.6,
   "cB": 33.4,
-  "c2": 55.1,
-  "c12": 12.2
+  "c12": 7.6
  },
  "funnel_labels": [
   [
@@ -186,24 +185,21 @@
    "c1"
   ],
   [
-   "(가) 전일 레인지",
-   "cA"
+   "② 갭다운 개장",
+   "gap"
   ],
   [
-   "(나) 물린 갭다운",
+   "②∧③ 물린 갭다운",
    "cB"
   ],
   [
-   "② (가)∪(나)",
-   "c2"
-  ],
-  [
-   "①∧② 진입",
+   "①∧②∧③ 진입",
    "c12"
   ]
  ],
- "funnel_note": "연평균(2017~2025) 발생일. ②만으로 매수하면 564건·건당 +0.06%(배수 1.22)로 약하고, ① 변동성 게이트를 더하면 건당 +0.28%·배수 1.74로 바뀜. 저변동 장에서는 같은 규칙이 배수 0.86으로 음수.",
+ "funnel_note": "연평균(2017~2025) 발생일. ②∧③만으로 매수하면 342건·건당 +0.06%(배수 1.20)로 약하고, ① 변동성 게이트를 더하면 건당 +0.25%·배수 1.64로 바뀜. 저변동 장에서는 같은 규칙이 241건·배수 0.89.",
  "tested_and_rejected": [
+  "'전일 레인지 확장'(전일 고가−저가 ≥ 변동폭 1.5배) 경로: 처음엔 '또는'으로 포함했으나 그 경로만으로 들어간 66건이 2026년을 빼면 건당 +0.07%, 7년 중 4년 음수라 11/2 제거.",
   "진입 시각: 09:15·09:30 진입은 건당 +0.07%로 급락. 수익의 4분의 3이 09:00~09:15 현물 개장 직후 15분에 남 — 09:00:00 시장가가 아니면 엣지 대부분 소멸.",
   "청산 시각: 10:00~11:00 어디든 +0.24~0.35%로 평탄. 11:30 이후·마감 보유는 오후 되밀림으로 악화.",
   "손절 0.3~1.0×변동폭: 전부 소폭 악화(90분 보유라 불필요).",
@@ -214,27 +210,13 @@
  "caveats": [
   "자체 엔진·자체 데이터 결과입니다. 같은 규칙의 QuantConnect(LEAN) 재현은 아래에 있습니다. 데이터는 같은 크레온 1분봉이라 외부 데이터 검증은 아직 없습니다.",
   "진입 시각(09:00:00)에 극도로 민감합니다. 백테스트는 09:00 첫 봉 시가 체결을 가정했고, 실전 시장가 체결이 1~2틱(0.01~0.02%) 늦거나 불리하면 건당 수익이 그만큼 깎입니다.",
-  "표본이 작고 변동성 큰 해에 몰려 있습니다. 167건, 연 12.2건. 2016·2017·2019·2023년은 변동성 게이트 때문에 거래가 거의 없습니다.",
-  "데이터 채굴로 찾은 규칙입니다. 진입시각×보유×조건 약 1,500조합을 걸러 나온 뒤 누수 없는 조건만 남기고 이웃 파라미터(게이트 1.2~1.8%, 청산 10:00~11:00, 조건 (가)·(나) 각각)에서 전부 양수인 것을 확인했지만, 다중 검정 위험은 남아 있습니다.",
-  "2026년 비중: 10년 총수익 47.2% 중 2026년 20.7%. 2026년을 빼도 건당 0.24%, 배수 1.81.",
+  "표본이 작고 변동성 큰 해에 몰려 있습니다. 101건, 연 7.6건. 2016·2017·2019·2023년은 변동성 게이트 때문에 거래가 거의 없습니다.",
+  "데이터 채굴로 찾은 규칙입니다. 진입시각×보유×조건 약 1,500조합을 걸러 나온 뒤 누수 없는 조건만 남기고 이웃 파라미터(게이트 1.2~1.8%, 청산 10:00~11:00)에서 전부 양수인 것을 확인했지만, 다중 검정 위험은 남아 있습니다.",
+  "2026년 비중: 10년 총수익 25.2% 중 2026년 1.6%. 2026년을 빼도 건당 0.347%, 배수 2.63.",
   "실거래 기록이 없습니다."
  ],
- "expectation": "현실적인 기대치: 변동성 큰 해에만 연 10~20건, 건당 +0.2% 안팎(체결 품질에 따라 ±0.1%p), 조용한 해엔 거래 없음. 전략 1·2(숏)와 같은 날 겹쳐도 시간대가 달라 병행 가능.",
+ "expectation": "현실적인 기대치: 변동성 큰 해에만 연 7.6건 안팎, 건당 +0.2% 안팎(체결 품질에 따라 ±0.1%p), 조용한 해엔 거래 없음. 전략 1·2(숏)와 같은 날 겹쳐도 시간대가 달라 병행 가능.",
  "trades": [
-  {
-   "date": "2018-11-05",
-   "entry_time": "09:00",
-   "entry": 270.75,
-   "exit_time": "10:30",
-   "exit": 268.5,
-   "why": "10:30 청산",
-   "ret_pct": -0.851,
-   "open": 270.75,
-   "prev_close": 272.75,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
   {
    "date": "2018-11-12",
    "entry_time": "09:00",
@@ -376,20 +358,6 @@
    "trigger": "물린 갭다운"
   },
   {
-   "date": "2020-03-05",
-   "entry_time": "09:00",
-   "entry": 280.05,
-   "exit_time": "10:30",
-   "exit": 279.25,
-   "why": "10:30 청산",
-   "ret_pct": -0.306,
-   "open": 280.05,
-   "prev_close": 278.1,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
    "date": "2020-03-09",
    "entry_time": "09:00",
    "entry": 265.4,
@@ -429,7 +397,7 @@
    "prev_close": 257.0,
    "stop": 0,
    "speed_min": 0,
-   "trigger": "전일 레인지+물린 갭다운"
+   "trigger": "물린 갭다운"
   },
   {
    "date": "2020-03-13",
@@ -443,21 +411,7 @@
    "prev_close": 246.6,
    "stop": 0,
    "speed_min": 0,
-   "trigger": "전일 레인지+물린 갭다운"
-  },
-  {
-   "date": "2020-03-16",
-   "entry_time": "09:00",
-   "entry": 241.75,
-   "exit_time": "10:30",
-   "exit": 240.05,
-   "why": "10:30 청산",
-   "ret_pct": -0.723,
-   "open": 241.75,
-   "prev_close": 241.65,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
+   "trigger": "물린 갭다운"
   },
   {
    "date": "2020-03-17",
@@ -471,49 +425,7 @@
    "prev_close": 231.65,
    "stop": 0,
    "speed_min": 0,
-   "trigger": "전일 레인지+물린 갭다운"
-  },
-  {
-   "date": "2020-03-18",
-   "entry_time": "09:00",
-   "entry": 225.5,
-   "exit_time": "10:30",
-   "exit": 223.25,
-   "why": "10:30 청산",
-   "ret_pct": -1.018,
-   "open": 225.5,
-   "prev_close": 226.5,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
-   "date": "2020-03-19",
-   "entry_time": "09:00",
-   "entry": 218.0,
-   "exit_time": "10:30",
-   "exit": 209.6,
-   "why": "10:30 청산",
-   "ret_pct": -3.873,
-   "open": 218.0,
-   "prev_close": 213.85,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
-   "date": "2020-03-20",
-   "entry_time": "09:00",
-   "entry": 204.2,
-   "exit_time": "10:30",
-   "exit": 205.25,
-   "why": "10:30 청산",
-   "ret_pct": 0.494,
-   "open": 204.2,
-   "prev_close": 197.9,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
+   "trigger": "물린 갭다운"
   },
   {
    "date": "2020-03-23",
@@ -527,21 +439,7 @@
    "prev_close": 213.15,
    "stop": 0,
    "speed_min": 0,
-   "trigger": "전일 레인지+물린 갭다운"
-  },
-  {
-   "date": "2020-03-25",
-   "entry_time": "09:00",
-   "entry": 225.05,
-   "exit_time": "10:30",
-   "exit": 227.05,
-   "why": "10:30 청산",
-   "ret_pct": 0.869,
-   "open": 225.05,
-   "prev_close": 220.4,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
+   "trigger": "물린 갭다운"
   },
   {
    "date": "2020-04-22",
@@ -572,34 +470,6 @@
    "trigger": "물린 갭다운"
   },
   {
-   "date": "2020-06-04",
-   "entry_time": "09:00",
-   "entry": 290.0,
-   "exit_time": "10:30",
-   "exit": 290.35,
-   "why": "10:30 청산",
-   "ret_pct": 0.101,
-   "open": 290.0,
-   "prev_close": 285.85,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
-   "date": "2020-06-05",
-   "entry_time": "09:00",
-   "entry": 285.55,
-   "exit_time": "10:30",
-   "exit": 287.6,
-   "why": "10:30 청산",
-   "ret_pct": 0.698,
-   "open": 285.55,
-   "prev_close": 286.45,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
    "date": "2020-06-11",
    "entry_time": "09:00",
    "entry": 288.4,
@@ -625,7 +495,7 @@
    "prev_close": 286.9,
    "stop": 0,
    "speed_min": 0,
-   "trigger": "전일 레인지+물린 갭다운"
+   "trigger": "물린 갭다운"
   },
   {
    "date": "2020-06-15",
@@ -642,34 +512,6 @@
    "trigger": "물린 갭다운"
   },
   {
-   "date": "2020-06-16",
-   "entry_time": "09:00",
-   "entry": 273.05,
-   "exit_time": "10:30",
-   "exit": 276.9,
-   "why": "10:30 청산",
-   "ret_pct": 1.39,
-   "open": 273.05,
-   "prev_close": 266.25,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
-   "date": "2020-06-17",
-   "entry_time": "09:00",
-   "entry": 280.55,
-   "exit_time": "10:30",
-   "exit": 280.4,
-   "why": "10:30 청산",
-   "ret_pct": -0.073,
-   "open": 280.55,
-   "prev_close": 281.25,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
    "date": "2020-06-29",
    "entry_time": "09:00",
    "entry": 278.35,
@@ -682,20 +524,6 @@
    "stop": 0,
    "speed_min": 0,
    "trigger": "물린 갭다운"
-  },
-  {
-   "date": "2020-08-19",
-   "entry_time": "09:00",
-   "entry": 314.9,
-   "exit_time": "10:30",
-   "exit": 314.3,
-   "why": "10:30 청산",
-   "ret_pct": -0.211,
-   "open": 314.9,
-   "prev_close": 312.55,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
   },
   {
    "date": "2020-08-20",
@@ -712,34 +540,6 @@
    "trigger": "물린 갭다운"
   },
   {
-   "date": "2020-08-21",
-   "entry_time": "09:00",
-   "entry": 305.4,
-   "exit_time": "10:30",
-   "exit": 304.9,
-   "why": "10:30 청산",
-   "ret_pct": -0.184,
-   "open": 305.4,
-   "prev_close": 301.5,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
-   "date": "2020-09-01",
-   "entry_time": "09:00",
-   "entry": 307.35,
-   "exit_time": "10:30",
-   "exit": 307.75,
-   "why": "10:30 청산",
-   "ret_pct": 0.11,
-   "open": 307.35,
-   "prev_close": 307.4,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
    "date": "2020-09-04",
    "entry_time": "09:00",
    "entry": 308.0,
@@ -754,90 +554,6 @@
    "trigger": "물린 갭다운"
   },
   {
-   "date": "2021-01-04",
-   "entry_time": "10:00",
-   "entry": 389.15,
-   "exit_time": "10:30",
-   "exit": 390.45,
-   "why": "10:30 청산",
-   "ret_pct": 0.314,
-   "open": 389.15,
-   "prev_close": 389.6,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
-   "date": "2021-01-05",
-   "entry_time": "09:00",
-   "entry": 397.0,
-   "exit_time": "10:30",
-   "exit": 397.95,
-   "why": "10:30 청산",
-   "ret_pct": 0.219,
-   "open": 397.0,
-   "prev_close": 399.95,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
-   "date": "2021-01-07",
-   "entry_time": "09:00",
-   "entry": 406.9,
-   "exit_time": "10:30",
-   "exit": 409.3,
-   "why": "10:30 청산",
-   "ret_pct": 0.57,
-   "open": 406.9,
-   "prev_close": 402.1,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
-   "date": "2021-01-11",
-   "entry_time": "09:00",
-   "entry": 434.45,
-   "exit_time": "10:30",
-   "exit": 446.9,
-   "why": "10:30 청산",
-   "ret_pct": 2.846,
-   "open": 434.45,
-   "prev_close": 429.9,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
-   "date": "2021-01-12",
-   "entry_time": "09:00",
-   "entry": 428.3,
-   "exit_time": "10:30",
-   "exit": 427.25,
-   "why": "10:30 청산",
-   "ret_pct": -0.265,
-   "open": 428.3,
-   "prev_close": 430.9,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
-   "date": "2021-01-13",
-   "entry_time": "09:00",
-   "entry": 427.5,
-   "exit_time": "10:30",
-   "exit": 428.35,
-   "why": "10:30 청산",
-   "ret_pct": 0.179,
-   "open": 427.5,
-   "prev_close": 427.55,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
    "date": "2021-01-18",
    "entry_time": "09:00",
    "entry": 415.05,
@@ -849,7 +565,7 @@
    "prev_close": 419.9,
    "stop": 0,
    "speed_min": 0,
-   "trigger": "전일 레인지+물린 갭다운"
+   "trigger": "물린 갭다운"
   },
   {
    "date": "2021-01-28",
@@ -864,20 +580,6 @@
    "stop": 0,
    "speed_min": 0,
    "trigger": "물린 갭다운"
-  },
-  {
-   "date": "2021-02-01",
-   "entry_time": "09:00",
-   "entry": 403.6,
-   "exit_time": "10:30",
-   "exit": 410.25,
-   "why": "10:30 청산",
-   "ret_pct": 1.628,
-   "open": 403.6,
-   "prev_close": 404.05,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
   },
   {
    "date": "2021-02-23",
@@ -950,48 +652,6 @@
    "trigger": "물린 갭다운"
   },
   {
-   "date": "2021-12-01",
-   "entry_time": "09:00",
-   "entry": 376.15,
-   "exit_time": "10:30",
-   "exit": 377.8,
-   "why": "10:30 청산",
-   "ret_pct": 0.419,
-   "open": 376.15,
-   "prev_close": 374.35,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
-   "date": "2021-12-02",
-   "entry_time": "09:00",
-   "entry": 380.15,
-   "exit_time": "10:30",
-   "exit": 384.45,
-   "why": "10:30 청산",
-   "ret_pct": 1.111,
-   "open": 380.15,
-   "prev_close": 383.1,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
-   "date": "2021-12-03",
-   "entry_time": "09:00",
-   "entry": 387.45,
-   "exit_time": "10:30",
-   "exit": 387.3,
-   "why": "10:30 청산",
-   "ret_pct": -0.059,
-   "open": 387.45,
-   "prev_close": 389.2,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
    "date": "2021-12-14",
    "entry_time": "09:00",
    "entry": 390.3,
@@ -1032,34 +692,6 @@
    "stop": 0,
    "speed_min": 0,
    "trigger": "물린 갭다운"
-  },
-  {
-   "date": "2022-01-28",
-   "entry_time": "09:00",
-   "entry": 350.4,
-   "exit_time": "10:30",
-   "exit": 352.05,
-   "why": "10:30 청산",
-   "ret_pct": 0.451,
-   "open": 350.4,
-   "prev_close": 348.4,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
-   "date": "2022-02-03",
-   "entry_time": "09:00",
-   "entry": 364.8,
-   "exit_time": "10:30",
-   "exit": 362.7,
-   "why": "10:30 청산",
-   "ret_pct": -0.596,
-   "open": 364.8,
-   "prev_close": 358.1,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
   },
   {
    "date": "2022-02-21",
@@ -1118,34 +750,6 @@
    "trigger": "물린 갭다운"
   },
   {
-   "date": "2022-06-23",
-   "entry_time": "09:00",
-   "entry": 308.45,
-   "exit_time": "10:30",
-   "exit": 310.2,
-   "why": "10:30 청산",
-   "ret_pct": 0.547,
-   "open": 308.45,
-   "prev_close": 308.05,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
-   "date": "2022-07-04",
-   "entry_time": "09:00",
-   "entry": 304.95,
-   "exit_time": "10:30",
-   "exit": 304.1,
-   "why": "10:30 청산",
-   "ret_pct": -0.299,
-   "open": 304.95,
-   "prev_close": 304.9,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
    "date": "2022-07-14",
    "entry_time": "09:00",
    "entry": 304.95,
@@ -1160,34 +764,6 @@
    "trigger": "물린 갭다운"
   },
   {
-   "date": "2024-02-06",
-   "entry_time": "09:00",
-   "entry": 347.45,
-   "exit_time": "10:30",
-   "exit": 346.55,
-   "why": "10:30 청산",
-   "ret_pct": -0.279,
-   "open": 348.05,
-   "prev_close": 349.35,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
-   "date": "2024-08-06",
-   "entry_time": "09:00",
-   "entry": 346.75,
-   "exit_time": "10:30",
-   "exit": 344.9,
-   "why": "10:30 청산",
-   "ret_pct": -0.554,
-   "open": 343.9,
-   "prev_close": 332.05,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
    "date": "2024-08-07",
    "entry_time": "09:00",
    "entry": 339.45,
@@ -1199,7 +775,7 @@
    "prev_close": 341.55,
    "stop": 0,
    "speed_min": 0,
-   "trigger": "전일 레인지+물린 갭다운"
+   "trigger": "물린 갭다운"
   },
   {
    "date": "2024-08-08",
@@ -1213,7 +789,7 @@
    "prev_close": 350.0,
    "stop": 0,
    "speed_min": 0,
-   "trigger": "전일 레인지+물린 갭다운"
+   "trigger": "물린 갭다운"
   },
   {
    "date": "2024-08-23",
@@ -1258,20 +834,6 @@
    "trigger": "물린 갭다운"
   },
   {
-   "date": "2024-09-26",
-   "entry_time": "09:00",
-   "entry": 352.25,
-   "exit_time": "10:30",
-   "exit": 355.05,
-   "why": "10:30 청산",
-   "ret_pct": 0.775,
-   "open": 352.0,
-   "prev_close": 346.15,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
    "date": "2024-10-02",
    "entry_time": "09:00",
    "entry": 341.55,
@@ -1283,7 +845,7 @@
    "prev_close": 347.9,
    "stop": 0,
    "speed_min": 0,
-   "trigger": "전일 레인지+물린 갭다운"
+   "trigger": "물린 갭다운"
   },
   {
    "date": "2024-10-22",
@@ -1298,34 +860,6 @@
    "stop": 0,
    "speed_min": 0,
    "trigger": "물린 갭다운"
-  },
-  {
-   "date": "2024-11-19",
-   "entry_time": "09:00",
-   "entry": 327.3,
-   "exit_time": "10:30",
-   "exit": 328.65,
-   "why": "10:30 청산",
-   "ret_pct": 0.392,
-   "open": 327.7,
-   "prev_close": 327.85,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
-   "date": "2024-12-02",
-   "entry_time": "09:00",
-   "entry": 329.25,
-   "exit_time": "10:30",
-   "exit": 326.2,
-   "why": "10:30 청산",
-   "ret_pct": -0.946,
-   "open": 328.85,
-   "prev_close": 325.95,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
   },
   {
    "date": "2024-12-04",
@@ -1353,7 +887,7 @@
    "prev_close": 322.9,
    "stop": 0,
    "speed_min": 0,
-   "trigger": "전일 레인지+물린 갭다운"
+   "trigger": "물린 갭다운"
   },
   {
    "date": "2024-12-11",
@@ -1426,20 +960,6 @@
    "trigger": "물린 갭다운"
   },
   {
-   "date": "2025-01-06",
-   "entry_time": "09:00",
-   "entry": 325.6,
-   "exit_time": "10:30",
-   "exit": 329.5,
-   "why": "10:30 청산",
-   "ret_pct": 1.178,
-   "open": 325.15,
-   "prev_close": 324.6,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
    "date": "2025-01-31",
    "entry_time": "09:00",
    "entry": 331.75,
@@ -1507,7 +1027,7 @@
    "prev_close": 332.95,
    "stop": 0,
    "speed_min": 0,
-   "trigger": "전일 레인지+물린 갭다운"
+   "trigger": "물린 갭다운"
   },
   {
    "date": "2025-04-07",
@@ -1521,21 +1041,7 @@
    "prev_close": 329.95,
    "stop": 0,
    "speed_min": 0,
-   "trigger": "전일 레인지+물린 갭다운"
-  },
-  {
-   "date": "2025-04-08",
-   "entry_time": "09:00",
-   "entry": 317.05,
-   "exit_time": "10:30",
-   "exit": 314.5,
-   "why": "10:30 청산",
-   "ret_pct": -0.824,
-   "open": 317.5,
-   "prev_close": 310.25,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
+   "trigger": "물린 갭다운"
   },
   {
    "date": "2025-04-09",
@@ -1549,21 +1055,7 @@
    "prev_close": 310.45,
    "stop": 0,
    "speed_min": 0,
-   "trigger": "전일 레인지+물린 갭다운"
-  },
-  {
-   "date": "2025-06-18",
-   "entry_time": "09:00",
-   "entry": 392.85,
-   "exit_time": "10:30",
-   "exit": 398.7,
-   "why": "10:30 청산",
-   "ret_pct": 1.469,
-   "open": 393.7,
-   "prev_close": 396.2,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
+   "trigger": "물린 갭다운"
   },
   {
    "date": "2025-07-07",
@@ -1577,7 +1069,7 @@
    "prev_close": 413.2,
    "stop": 0,
    "speed_min": 0,
-   "trigger": "전일 레인지+물린 갭다운"
+   "trigger": "물린 갭다운"
   },
   {
    "date": "2025-07-21",
@@ -1594,20 +1086,6 @@
    "trigger": "물린 갭다운"
   },
   {
-   "date": "2025-08-04",
-   "entry_time": "09:00",
-   "entry": 420.45,
-   "exit_time": "10:30",
-   "exit": 425.3,
-   "why": "10:30 청산",
-   "ret_pct": 1.134,
-   "open": 420.4,
-   "prev_close": 420.3,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
    "date": "2025-08-20",
    "entry_time": "09:00",
    "entry": 422.4,
@@ -1620,76 +1098,6 @@
    "stop": 0,
    "speed_min": 0,
    "trigger": "물린 갭다운"
-  },
-  {
-   "date": "2025-10-15",
-   "entry_time": "09:00",
-   "entry": 499.7,
-   "exit_time": "10:30",
-   "exit": 504.75,
-   "why": "10:30 청산",
-   "ret_pct": 0.991,
-   "open": 502.25,
-   "prev_close": 497.5,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
-   "date": "2025-10-16",
-   "entry_time": "09:00",
-   "entry": 512.5,
-   "exit_time": "10:30",
-   "exit": 522.0,
-   "why": "10:30 청산",
-   "ret_pct": 1.834,
-   "open": 512.9,
-   "prev_close": 511.35,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
-   "date": "2025-10-17",
-   "entry_time": "09:00",
-   "entry": 522.0,
-   "exit_time": "10:30",
-   "exit": 529.8,
-   "why": "10:30 청산",
-   "ret_pct": 1.474,
-   "open": 522.7,
-   "prev_close": 525.05,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
-   "date": "2025-11-05",
-   "entry_time": "09:00",
-   "entry": 571.7,
-   "exit_time": "10:30",
-   "exit": 547.3,
-   "why": "10:30 청산",
-   "ret_pct": -4.288,
-   "open": 576.0,
-   "prev_close": 582.2,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
-   "date": "2025-11-06",
-   "entry_time": "09:00",
-   "entry": 580.95,
-   "exit_time": "10:30",
-   "exit": 563.65,
-   "why": "10:30 청산",
-   "ret_pct": -2.998,
-   "open": 580.45,
-   "prev_close": 566.05,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
   },
   {
    "date": "2025-11-07",
@@ -1762,118 +1170,6 @@
    "trigger": "물린 갭다운"
   },
   {
-   "date": "2026-01-05",
-   "entry_time": "09:00",
-   "entry": 639.2,
-   "exit_time": "10:30",
-   "exit": 641.45,
-   "why": "10:30 청산",
-   "ret_pct": 0.332,
-   "open": 634.35,
-   "prev_close": 625.45,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
-   "date": "2026-01-07",
-   "entry_time": "09:00",
-   "entry": 671.4,
-   "exit_time": "10:30",
-   "exit": 667.9,
-   "why": "10:30 청산",
-   "ret_pct": -0.541,
-   "open": 667.6,
-   "prev_close": 660.6,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
-   "date": "2026-01-08",
-   "entry_time": "09:00",
-   "entry": 659.3,
-   "exit_time": "10:30",
-   "exit": 676.75,
-   "why": "10:30 청산",
-   "ret_pct": 2.627,
-   "open": 664.3,
-   "prev_close": 665.1,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
-   "date": "2026-01-09",
-   "entry_time": "09:00",
-   "entry": 660.85,
-   "exit_time": "10:30",
-   "exit": 661.1,
-   "why": "10:30 청산",
-   "ret_pct": 0.018,
-   "open": 663.9,
-   "prev_close": 664.65,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
-   "date": "2026-01-28",
-   "entry_time": "09:00",
-   "entry": 755.4,
-   "exit_time": "10:30",
-   "exit": 757.0,
-   "why": "10:30 청산",
-   "ret_pct": 0.192,
-   "open": 755.55,
-   "prev_close": 746.05,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
-   "date": "2026-01-30",
-   "entry_time": "09:00",
-   "entry": 761.45,
-   "exit_time": "10:30",
-   "exit": 784.4,
-   "why": "10:30 청산",
-   "ret_pct": 2.994,
-   "open": 765.15,
-   "prev_close": 767.3,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
-   "date": "2026-02-03",
-   "entry_time": "09:00",
-   "entry": 753.3,
-   "exit_time": "10:30",
-   "exit": 765.35,
-   "why": "10:30 청산",
-   "ret_pct": 1.58,
-   "open": 749.5,
-   "prev_close": 723.3,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
-   "date": "2026-02-04",
-   "entry_time": "09:00",
-   "entry": 772.25,
-   "exit_time": "10:30",
-   "exit": 783.05,
-   "why": "10:30 청산",
-   "ret_pct": 1.379,
-   "open": 770.95,
-   "prev_close": 780.4,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
    "date": "2026-02-06",
    "entry_time": "09:00",
    "entry": 730.4,
@@ -1888,20 +1184,6 @@
    "trigger": "물린 갭다운"
   },
   {
-   "date": "2026-02-09",
-   "entry_time": "09:00",
-   "entry": 784.2,
-   "exit_time": "10:30",
-   "exit": 780.4,
-   "why": "10:30 청산",
-   "ret_pct": -0.505,
-   "open": 780.0,
-   "prev_close": 748.65,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
    "date": "2026-03-04",
    "entry_time": "09:00",
    "entry": 821.35,
@@ -1913,21 +1195,7 @@
    "prev_close": 861.85,
    "stop": 0,
    "speed_min": 0,
-   "trigger": "전일 레인지+물린 갭다운"
-  },
-  {
-   "date": "2026-03-05",
-   "entry_time": "09:00",
-   "entry": 822.3,
-   "exit_time": "10:30",
-   "exit": 845.2,
-   "why": "10:30 청산",
-   "ret_pct": 2.765,
-   "open": 822.3,
-   "prev_close": 757.15,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
+   "trigger": "물린 갭다운"
   },
   {
    "date": "2026-03-06",
@@ -1941,7 +1209,7 @@
    "prev_close": 831.05,
    "stop": 0,
    "speed_min": 0,
-   "trigger": "전일 레인지+물린 갭다운"
+   "trigger": "물린 갭다운"
   },
   {
    "date": "2026-03-09",
@@ -1956,20 +1224,6 @@
    "stop": 0,
    "speed_min": 0,
    "trigger": "물린 갭다운"
-  },
-  {
-   "date": "2026-03-11",
-   "entry_time": "09:00",
-   "entry": 844.25,
-   "exit_time": "10:30",
-   "exit": 848.75,
-   "why": "10:30 청산",
-   "ret_pct": 0.513,
-   "open": 845.5,
-   "prev_close": 824.3,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
   },
   {
    "date": "2026-03-13",
@@ -2042,62 +1296,6 @@
    "trigger": "물린 갭다운"
   },
   {
-   "date": "2026-04-03",
-   "entry_time": "09:00",
-   "entry": 798.3,
-   "exit_time": "10:30",
-   "exit": 804.2,
-   "why": "10:30 청산",
-   "ret_pct": 0.719,
-   "open": 800.2,
-   "prev_close": 777.5,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
-   "date": "2026-05-08",
-   "entry_time": "09:00",
-   "entry": 1123.4,
-   "exit_time": "10:30",
-   "exit": 1140.65,
-   "why": "10:30 청산",
-   "ret_pct": 1.516,
-   "open": 1126.8,
-   "prev_close": 1152.4,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
-   "date": "2026-05-13",
-   "entry_time": "09:00",
-   "entry": 1153.45,
-   "exit_time": "10:30",
-   "exit": 1193.6,
-   "why": "10:30 청산",
-   "ret_pct": 3.461,
-   "open": 1160.0,
-   "prev_close": 1186.15,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
-   "date": "2026-05-14",
-   "entry_time": "09:00",
-   "entry": 1224.95,
-   "exit_time": "10:30",
-   "exit": 1245.45,
-   "why": "10:30 청산",
-   "ret_pct": 1.654,
-   "open": 1229.25,
-   "prev_close": 1221.65,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
    "date": "2026-05-18",
    "entry_time": "09:00",
    "entry": 1150.75,
@@ -2109,7 +1307,7 @@
    "prev_close": 1169.05,
    "stop": 0,
    "speed_min": 0,
-   "trigger": "전일 레인지+물린 갭다운"
+   "trigger": "물린 갭다운"
   },
   {
    "date": "2026-05-19",
@@ -2123,7 +1321,7 @@
    "prev_close": 1170.8,
    "stop": 0,
    "speed_min": 0,
-   "trigger": "전일 레인지+물린 갭다운"
+   "trigger": "물린 갭다운"
   },
   {
    "date": "2026-06-08",
@@ -2140,20 +1338,6 @@
    "trigger": "물린 갭다운"
   },
   {
-   "date": "2026-06-10",
-   "entry_time": "09:00",
-   "entry": 1251.3,
-   "exit_time": "10:30",
-   "exit": 1257.3,
-   "why": "10:30 청산",
-   "ret_pct": 0.46,
-   "open": 1238.0,
-   "prev_close": 1292.75,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
    "date": "2026-06-11",
    "entry_time": "09:00",
    "entry": 1187.25,
@@ -2168,34 +1352,6 @@
    "trigger": "물린 갭다운"
   },
   {
-   "date": "2026-06-24",
-   "entry_time": "09:00",
-   "entry": 1350.2,
-   "exit_time": "10:30",
-   "exit": 1371.55,
-   "why": "10:30 청산",
-   "ret_pct": 1.561,
-   "open": 1343.5,
-   "prev_close": 1328.8,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
-   "date": "2026-06-29",
-   "entry_time": "09:00",
-   "entry": 1364.1,
-   "exit_time": "10:30",
-   "exit": 1340.9,
-   "why": "10:30 청산",
-   "ret_pct": -1.721,
-   "open": 1385.3,
-   "prev_close": 1377.95,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
    "date": "2026-07-02",
    "entry_time": "09:00",
    "entry": 1269.3,
@@ -2208,34 +1364,6 @@
    "stop": 0,
    "speed_min": 0,
    "trigger": "물린 갭다운"
-  },
-  {
-   "date": "2026-07-03",
-   "entry_time": "09:00",
-   "entry": 1242.3,
-   "exit_time": "10:30",
-   "exit": 1246.7,
-   "why": "10:30 청산",
-   "ret_pct": 0.334,
-   "open": 1236.0,
-   "prev_close": 1244.75,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
-   "date": "2026-07-06",
-   "entry_time": "09:00",
-   "entry": 1329.8,
-   "exit_time": "10:30",
-   "exit": 1316.65,
-   "why": "10:30 청산",
-   "ret_pct": -1.009,
-   "open": 1329.1,
-   "prev_close": 1315.8,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
   },
   {
    "date": "2026-07-07",
@@ -2277,7 +1405,7 @@
    "prev_close": 1089.3,
    "stop": 0,
    "speed_min": 0,
-   "trigger": "전일 레인지+물린 갭다운"
+   "trigger": "물린 갭다운"
   },
   {
    "date": "2026-07-16",
@@ -2320,20 +1448,6 @@
    "stop": 0,
    "speed_min": 0,
    "trigger": "물린 갭다운"
-  },
-  {
-   "date": "2026-07-30",
-   "entry_time": "09:00",
-   "entry": 890.7,
-   "exit_time": "10:30",
-   "exit": 912.65,
-   "why": "10:30 청산",
-   "ret_pct": 2.444,
-   "open": 883.65,
-   "prev_close": 895.55,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
   },
   {
    "date": "2026-08-19",
@@ -2462,20 +1576,6 @@
    "trigger": "물린 갭다운"
   },
   {
-   "date": "2026-10-14",
-   "entry_time": "09:00",
-   "entry": 950.75,
-   "exit_time": "10:30",
-   "exit": 955.1,
-   "why": "10:30 청산",
-   "ret_pct": 0.438,
-   "open": 950.8,
-   "prev_close": 946.55,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
-  },
-  {
    "date": "2026-10-15",
    "entry_time": "09:00",
    "entry": 888.95,
@@ -2487,21 +1587,7 @@
    "prev_close": 941.4,
    "stop": 0,
    "speed_min": 0,
-   "trigger": "전일 레인지+물린 갭다운"
-  },
-  {
-   "date": "2026-10-16",
-   "entry_time": "09:00",
-   "entry": 881.55,
-   "exit_time": "10:30",
-   "exit": 883.85,
-   "why": "10:30 청산",
-   "ret_pct": 0.241,
-   "open": 887.0,
-   "prev_close": 864.2,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
+   "trigger": "물린 갭다운"
   },
   {
    "date": "2026-10-19",
@@ -2516,20 +1602,6 @@
    "stop": 0,
    "speed_min": 0,
    "trigger": "물린 갭다운"
-  },
-  {
-   "date": "2026-10-20",
-   "entry_time": "09:00",
-   "entry": 887.1,
-   "exit_time": "10:30",
-   "exit": 866.45,
-   "why": "10:30 청산",
-   "ret_pct": -2.348,
-   "open": 890.75,
-   "prev_close": 892.75,
-   "stop": 0,
-   "speed_min": 0,
-   "trigger": "전일 레인지"
   },
   {
    "date": "2026-10-23",
