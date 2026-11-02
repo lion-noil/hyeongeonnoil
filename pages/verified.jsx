@@ -21,6 +21,8 @@ import MBL from "../src/data/kospi_morning_long.json";
 import QCM from "../src/data/qc_backtest_kospi_mbl.json";
 import NTL from "../src/data/kospi_noon_long.json";
 import QCL from "../src/data/qc_backtest_kospi_ntl.json";
+import ETFB from "../src/data/kospi_etf_book.json";
+import EtfBookView from "../src/components/EtfBookView";
 import { ldJson, ORG } from "../src/lib/jsonLd";
 import SectionHead from "../src/components/ui/SectionHead";
 import Panel, { Chip, LiveBadge } from "../src/components/ui/Panel";
@@ -115,6 +117,7 @@ export default function VerifiedPage() {
   const hasMblQc = Boolean(km && QCM?.stats);
   const kl = V.kospi_ntl;
   const hasNtlQc = Boolean(kl && QCL?.stats);
+  const hasEtfBook = Boolean(ETFB?.strategies?.length);
   const tocFx = [
     { id: "v-fxblue", n: 1, src: "FX Blue", title: "실시간 현황판", level: "계좌가 직접 발행", color: "var(--cyan)",
       fact: ["환율 데모 계좌", "5분마다 발행", `${V.fxblue.since}~`] },
@@ -138,6 +141,8 @@ export default function VerifiedPage() {
     { id: "v-kospi-ntl", n: hasKospi ? 5 : 4, src: hasNtlQc ? "QuantConnect" : "자체 엔진 · 크레온 1분봉", title: `선물 전략 4 — ${NTL.name}`, level: hasNtlQc ? "외부 엔진 · 자체 데이터" : "자체 엔진 · 자체 데이터", color: "var(--warn)",
       fact: hasNtlQc ? [kl.period, `${QCL.three_way?.qc?.n}건 · 건당 ${pct(QCL.three_way?.qc?.mean)}`, `순이익 ${pct(QCL.stats.net_profit_pct)}`, `낙폭 −${QCL.stats.max_dd_pct}%`]
                      : [NTL.period, `${NTL.stats_10y.n}건 · 건당 ${pct(NTL.stats_10y.exp_pct)}`, `총 ${pct(NTL.stats_10y.total_pct)}`, `낙폭 −${NTL.stats_10y.mdd_pct}%`] },
+    ...(hasEtfBook ? [{ id: "v-kospi-etf", n: hasKospi ? 6 : 5, src: "ETF 시세 재산정", title: "ETF 전용 책 — 4전략 실계좌 집행", level: "자체 엔진 · ETF 실제 시세", color: "var(--cyan)",
+      fact: [`실계좌 ${ETFB.live_since}~`, `${ETFB.book.n}건 · 합계 ${pct(ETFB.book.total_pct)}`, `낙폭 −${ETFB.book.mdd_pct}%`, ETFB.book.window] }] : []),
   ];
   const toc = tab === "kospi" ? tocKospi : tocFx;
   return (
@@ -216,6 +221,12 @@ export default function VerifiedPage() {
               </>
             )}
 
+            {/* 선물 전용 책 / ETF 전용 책 구분 (11/2) */}
+            <p style={{ ...p, padding: "4px 8px 0", margin: 0 }}>
+              <strong>{hasKospi ? "2~5번" : "1~4번"}은 선물 전용 책</strong>입니다. 코스피200 지수선물로 거래할 때의 규칙과 기록이고, 미니선물 1계약 기준입니다.{" "}
+              {hasEtfBook && <><strong>{hasKospi ? "6번" : "5번"}은 ETF 전용 책</strong>으로, 같은 신호를 KODEX 200·KODEX 인버스로 집행하며 실계좌에서 돌아갑니다.</>}
+            </p>
+
             {/* 코스피 2. 선물 전략 1 — 눌림 갭업 숏: 전략 / 그래프(QuantConnect) / 성과 세 덩어리, 나머지는 '자세히' */}
             <SectionHead id="v-kospi-pgs" aside={<TopLink />} kicker="KOSPI FUTURES · STRATEGY 1" title={`${hasKospi ? 2 : 1}. 선물 전략 1 — 「${KPG.name}」`}
               desc={hasPgsQc ? "네 조건이 모두 맞는 날만 숏, 손절 또는 마감 청산. 그래프와 성과는 QuantConnect(LEAN) 엔진 재현 기준(5년 1분봉)입니다." : `${KPG.market}. 자체 엔진·자체 데이터 결과입니다.`} />
@@ -235,6 +246,15 @@ export default function VerifiedPage() {
             <SectionHead id="v-kospi-ntl" aside={<TopLink />} kicker="KOSPI FUTURES · STRATEGY 4" title={`${hasKospi ? 5 : 4}. 선물 전략 4 — 「${NTL.name}」`}
               desc={hasNtlQc ? "변동성 장세에서 11:30~12:30 사이 오늘·어제 매수자가 모두 수익이고 오전 저점에서 하루치를 올라와 고가 근처에 있으면 매수, 마감 청산. 그래프와 성과는 QuantConnect(LEAN) 엔진 재현 기준(5년 1분봉)입니다." : `${NTL.market}. 자체 엔진·자체 데이터 결과입니다.`} />
             {hasNtlQc ? <StrategyRecord kpg={NTL} qc={QCL} meta={kl} side="롱 · 하루 1회 · 오후 보유" /> : <KospiStrategyView data={NTL} />}
+
+            {/* 코스피 6. ETF 전용 책 — 같은 신호, ETF 체결 (11/2 분리) */}
+            {hasEtfBook && (
+              <>
+                <SectionHead id="v-kospi-etf" aside={<TopLink />} kicker="KOSPI ETF BOOK · LIVE" title={`${hasKospi ? 6 : 5}. ETF 전용 책 — 4전략 실계좌 집행`}
+                  desc="위 선물 전략 네 개를 KODEX 200·KODEX 인버스로 집행하는 버전입니다. 신호는 같고, 아침 반등 롱만 ETF에 맞게 진입 방식을 바꿨습니다. 결과는 ETF 실제 시세로 다시 계산한 값입니다." />
+                <EtfBookView data={ETFB} />
+              </>
+            )}
           </>
         )}
       </div>
