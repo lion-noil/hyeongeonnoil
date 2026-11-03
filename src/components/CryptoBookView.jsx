@@ -129,7 +129,7 @@ export default function CryptoBookView({ data, sym }) {
       {S.map((s) => <StrategyCard key={s.id} s={s} />)}
 
       <Panel id="v-crypto-book" icon="🧮" title={`${(b.parts || []).length}개 전략 한 계좌`} meta={`${b.window} · ${b.n}건 · 연 ${b.per_year}건`} hover={false}>
-        <img src="/verified/crypto-btc-book.png" alt="BTCUSDT 숏 책 누적 수익" style={{ width: "100%", display: "block", borderRadius: 8, marginBottom: 12 }} loading="lazy" />
+        <img src={`/verified/crypto-btc-book.png?v=${data.updated}-${b.n}`} alt="BTCUSDT 책 누적 수익" style={{ width: "100%", display: "block", borderRadius: 8, marginBottom: 12 }} loading="lazy" />
         <p style={p}>
           숏 둘(장중)과 롱 둘(장 밖)을 한 계좌에서 돌린 결과입니다. 전략마다 평가액 100%를 쓰고, 청산한 날의 손익을 날마다 합쳐 복리로 쌓았습니다.
           보유가 겹치는 순간에는 총 노출이 2~3배가 되고, 롱과 숏이 겹치면 서로 상쇄됩니다. 레버리지를 올리면 수익과 낙폭이 거의 같은 비율로 커지므로 감당할 낙폭으로 배수를 정합니다.

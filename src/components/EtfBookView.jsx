@@ -55,7 +55,7 @@ export default function EtfBookView({ data }) {
       </Panel>
 
       <Panel icon="📈" title="전략별 누적 수익" meta="ETF 실제 시세 재산정 · 비용 후" hover={false} pad={0}>
-        <img src="/verified/kospi-etf-book.png" alt="ETF 전용 책 전략별 누적 수익" style={{ width: "100%", display: "block", borderRadius: "0 0 var(--radius) var(--radius)" }} loading="lazy" />
+        <img src={`/verified/kospi-etf-book.png?v=${data.updated}-${b.n}`} alt="ETF 전용 책 전략별 누적 수익" style={{ width: "100%", display: "block", borderRadius: "0 0 var(--radius) var(--radius)" }} loading="lazy" />
       </Panel>
 
       <Panel icon="⚠️" title="주의" meta={`${(data.caveats || []).length}가지`} hover={false}>
