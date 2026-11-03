@@ -35,7 +35,7 @@ import KospiStrategyView from "../src/components/KospiStrategyView";
 import StrategyRecord from "../src/components/StrategyRecord";
 
 const SITE = "https://hyeongeonnoil.com";
-const TITLE = "검증 기록 — 자동매매 봇의 제3자 검증(FX Blue·Myfxbook·QuantConnect)과 코스피200·나스닥100 전략 검증 | NewsInsight";
+const TITLE = "검증 기록 — 자동매매 봇의 제3자 검증(FX Blue·Myfxbook·QuantConnect)과 코스피200·나스닥100·금 전략 검증 | NewsInsight";
 const DESC = "환율 7종 자동매매 봇(MT5 데모), 지수(코스피200·나스닥100) 시간대 전략, 크립토(BTCUSDT) 시간대 전략의 검증 기록입니다. FX Blue 실시간 현황판, Myfxbook 검증 배지, QuantConnect 독립 백테스트, 그리고 코스피200 선물 전략과 나스닥100 여섯 전략의 1분봉 검증 결과와 그 한계를 함께 적었습니다.";
 
 const PAGE_LD = {
@@ -57,6 +57,11 @@ const TABS = [
   { key: "fx", label: "환율 봇", icon: "💱" },
   { key: "index", label: "지수", icon: "📈" },
   { key: "crypto", label: "크립토", icon: "₿" },
+  { key: "commodity", label: "원자재", icon: "🥇" },
+];
+// 원자재 탭(2026-11-04): ?tab=commodity[&cm=gold] — 금(XAUUSD)부터. 전략은 연구 중이라 지금은 "검증 예정" 안내만.
+const COMMODITIES = [
+  { key: "gold", label: "금 (XAUUSD)" },
 ];
 const INDEXES = [
   { key: "kospi", label: "코스피200" },
@@ -128,11 +133,28 @@ function IndexTabs({ idx }) {
   );
 }
 
+function CommodityTabs({ cm }) {
+  return (
+    <div className="cat-tabs" role="tablist" aria-label="원자재 종목">
+      {COMMODITIES.map((x) => {
+        const on = cm === x.key;
+        return (
+          <Link key={x.key} href={{ pathname: "/verified", query: x.key === "gold" ? { tab: "commodity" } : { tab: "commodity", cm: x.key } }} shallow scroll={false}
+            role="tab" aria-selected={on} className={`cat-tab${on ? " is-on" : ""}`}>
+            {x.label}
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function VerifiedPage() {
   const router = useRouter();
   const qt = router.query?.tab;
   // 예전 링크 ?tab=kospi → 지수 › 코스피200
-  const tab = ["index", "kospi", "ndx"].includes(qt) ? "index" : qt === "crypto" ? "crypto" : "fx";
+  const tab = ["index", "kospi", "ndx"].includes(qt) ? "index" : qt === "crypto" ? "crypto" : qt === "commodity" ? "commodity" : "fx";
+  const cm = "gold";
   const idx = router.query?.idx === "ndx" || qt === "ndx" ? "ndx" : "kospi";
   const sym = CRYPTO_SYMBOLS.includes(router.query?.sym) ? router.query.sym : "BTCUSDT";
   const q = V.quantconnect;
@@ -184,7 +206,7 @@ export default function VerifiedPage() {
     { id: `${NDXB.id_prefix}-book`, n: ns.length + 1, src: `${ns.length}개 전략 합산`, title: "한 계좌 운용 · 레버리지", level: "자체 엔진 · 공개 데이터", color: "var(--cyan)",
       fact: [`${NDXB.book.n}건`, ...(NDXB.book.leverage || []).slice(0, 2).map((r) => `${r.lev}배 연 ${pct(r.cagr_pct)} · 낙폭 −${r.mdd_pct}%`)] },
   ];
-  const toc = tab === "index" ? (idx === "ndx" ? tocNdx : tocKospi) : tab === "crypto" ? tocCrypto : tocFx;
+  const toc = tab === "index" ? (idx === "ndx" ? tocNdx : tocKospi) : tab === "crypto" ? tocCrypto : tab === "commodity" ? [] : tocFx;
   const kospi = tab === "index" && idx === "kospi";
   return (
     <div style={wrap}>
@@ -222,6 +244,7 @@ export default function VerifiedPage() {
 
       <div style={{ display: "grid", gap: 16, padding: "0 8px" }}>
         {tab === "crypto" && <CryptoSymbolTabs sym={sym} ready={[CRB.symbol]} />}
+        {tab === "commodity" && <CommodityTabs cm={cm} />}
         {toc.length > 0 && <Toc items={toc} />}
 
         {tab === "fx" && (
@@ -294,10 +317,19 @@ export default function VerifiedPage() {
         {tab === "index" && idx === "ndx" && <CryptoBookView data={NDXB} />}
 
         {tab === "crypto" && <CryptoBookView data={CRB} sym={sym} />}
+
+        {tab === "commodity" && (
+          <Panel icon="⏳" title="금 (XAUUSD) — 검증 예정" meta="MT5(HFM) 1분봉 · 자체 엔진" hover={false}>
+            <p style={{ ...p, margin: 0 }}>
+              금 시간대 전략을 만드는 중입니다. 코스피200·나스닥100·BTCUSDT 책과 같은 방식으로 장중 움직임의 특징을 먼저 살핀 뒤,
+              변동폭·매물대·달력 같은 단순한 조건으로 규칙을 정하고 10년 이상 1분봉으로 검증해 여기에 기록합니다.
+            </p>
+          </Panel>
+        )}
       </div>
 
       <p className="meta" style={{ padding: "16px 8px 0", lineHeight: 1.7 }}>
-        이 페이지는 투자 권유가 아닙니다. 환율 기록은 데모 계좌이고, 코스피 선물 전략은 실거래 전의 자체 백테스트(QuantConnect 재현 포함)이고, 코스피 ETF 전용 책은 같은 신호를 ETF 시세로 다시 계산한 기록이며 2026-11-02부터 소액 실계좌에서 돌아갑니다. 나스닥100 기록과 크립토 기록은 실거래 전의 자체 백테스트입니다.
+        이 페이지는 투자 권유가 아닙니다. 환율 기록은 데모 계좌이고, 코스피 선물 전략은 실거래 전의 자체 백테스트(QuantConnect 재현 포함)이고, 코스피 ETF 전용 책은 같은 신호를 ETF 시세로 다시 계산한 기록이며 2026-11-02부터 소액 실계좌에서 돌아갑니다. 나스닥100 기록과 크립토 기록은 실거래 전의 자체 백테스트입니다. 원자재(금)는 전략을 만드는 중이라 아직 기록이 없습니다.
         실제 성과·수수료·슬리피지는 다를 수 있습니다.
         월간·주간 자체 보고서는 <Link href="/reports" style={{ color: "var(--cyan)" }}>보고서</Link>에서 볼 수 있습니다.
       </p>
