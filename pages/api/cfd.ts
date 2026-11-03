@@ -33,6 +33,12 @@ export default async function handler(req: Request): Promise<Response> {
         return json({ error: "invalid path" }, 400);
     }
 
+    // 범위 모드(start_ms/end_ms)는 길이 제한이 없어 긴 구간 요청 한 번으로 mt5_server 이벤트 루프가
+    // 멈추고 MT5 신호 채널 전체가 끊길 수 있다. 사이트는 limit·end 페이지네이션만 쓰므로 공개 경로에서 막는다.
+    if (path === "/v5/market/candles/with-gaps" && (searchParams.has("start_ms") || searchParams.has("end_ms"))) {
+        return json({ error: "range mode not allowed" }, 400);
+    }
+
     const target = new URL(path, MT5_BASE);
     for (const [k, v] of searchParams) {
         if (k !== "_path") target.searchParams.set(k, v);
