@@ -5,6 +5,8 @@
 // 5) 코스피200 선물 「눌림 갭업 숏」(2026-11-01) — src/data/kospi_pullback_gapshort.json (reversion_research/backtests/build_pullback_gapshort_site.py), KospiStrategyView.
 // 탭(2026-11-01): '환율 봇'(1~3) / '코스피200'(선물 전용 책 1~4 + ETF 전용 책 5). ALIGN3 카드는 11/2 삭제(연구 기록에만 보존). ?tab=kospi 로 직접 진입. 상단 목차는 탭별로 바뀐다.
 // 크립토 탭(2026-11-02): ?tab=crypto[&sym=ETHUSDT…] — 종목 탭, BTCUSDT 책(숏 C1·C2 + 11/3 롱 L1·L2) = src/data/crypto_btc_book.json (reversion_research/backtests/build_crypto_btc_site.py), CryptoBookView.
+// 지수 탭(2026-11-03): 코스피200 탭을 '지수' 아래로 옮기고 나스닥100 추가 — ?tab=index[&idx=ndx]. 예전 ?tab=kospi 링크는 지수 › 코스피200으로 연결.
+//   나스닥100 책(N1~N6) = src/data/index_ndx_book.json (reversion_research/backtests/build_ndx_site.py), CryptoBookView 재사용(종목별 문구는 데이터에서).
 // 숫자·링크·주의문은 src/data/verified.json (publish_site.py 가 갱신). 정적 페이지.
 import React from "react";
 import Head from "next/head";
@@ -24,6 +26,7 @@ import ETFB from "../src/data/kospi_etf_book.json";
 import EtfBookView from "../src/components/EtfBookView";
 import CRB from "../src/data/crypto_btc_book.json";
 import CryptoBookView, { CryptoSymbolTabs, CRYPTO_SYMBOLS } from "../src/components/CryptoBookView";
+import NDXB from "../src/data/index_ndx_book.json";
 import { ldJson, ORG } from "../src/lib/jsonLd";
 import SectionHead from "../src/components/ui/SectionHead";
 import Panel, { Chip, LiveBadge } from "../src/components/ui/Panel";
@@ -32,8 +35,8 @@ import KospiStrategyView from "../src/components/KospiStrategyView";
 import StrategyRecord from "../src/components/StrategyRecord";
 
 const SITE = "https://hyeongeonnoil.com";
-const TITLE = "검증 기록 — 자동매매 봇의 제3자 검증(FX Blue·Myfxbook·QuantConnect)과 코스피200 전략 검증 | NewsInsight";
-const DESC = "환율 7종 자동매매 봇(MT5 데모), 코스피200 봇, 크립토(BTCUSDT) 시간대 전략의 검증 기록입니다. FX Blue 실시간 현황판, Myfxbook 검증 배지, QuantConnect 독립 백테스트, 그리고 코스피200 선물 전략(눌림 갭업 숏)의 10년 1분봉 검증 결과와 그 한계를 함께 적었습니다.";
+const TITLE = "검증 기록 — 자동매매 봇의 제3자 검증(FX Blue·Myfxbook·QuantConnect)과 코스피200·나스닥100 전략 검증 | NewsInsight";
+const DESC = "환율 7종 자동매매 봇(MT5 데모), 지수(코스피200·나스닥100) 시간대 전략, 크립토(BTCUSDT) 시간대 전략의 검증 기록입니다. FX Blue 실시간 현황판, Myfxbook 검증 배지, QuantConnect 독립 백테스트, 그리고 코스피200 선물 전략과 나스닥100 여섯 전략의 1분봉 검증 결과와 그 한계를 함께 적었습니다.";
 
 const PAGE_LD = {
   "@context": "https://schema.org",
@@ -52,8 +55,12 @@ const p = { lineHeight: 1.8, fontSize: "var(--fs-md)", margin: "0 0 10px", color
 
 const TABS = [
   { key: "fx", label: "환율 봇", icon: "💱" },
-  { key: "kospi", label: "코스피200", icon: "🇰🇷" },
+  { key: "index", label: "지수", icon: "📈" },
   { key: "crypto", label: "크립토", icon: "₿" },
+];
+const INDEXES = [
+  { key: "kospi", label: "코스피200" },
+  { key: "ndx", label: "나스닥100" },
 ];
 
 function Ext({ href, children }) {
@@ -104,9 +111,29 @@ function VerifiedTabs({ tab }) {
   );
 }
 
+// 지수 탭 안의 종목 탭 — 크립토 종목 탭과 같은 생김새. 코스피200이 기본(?tab=index), 나스닥100은 &idx=ndx.
+function IndexTabs({ idx }) {
+  return (
+    <div className="cat-tabs" role="tablist" aria-label="지수 종목">
+      {INDEXES.map((x) => {
+        const on = idx === x.key;
+        return (
+          <Link key={x.key} href={{ pathname: "/verified", query: x.key === "kospi" ? { tab: "index" } : { tab: "index", idx: x.key } }} shallow scroll={false}
+            role="tab" aria-selected={on} className={`cat-tab${on ? " is-on" : ""}`}>
+            {x.label}
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function VerifiedPage() {
   const router = useRouter();
-  const tab = ["kospi", "crypto"].includes(router.query?.tab) ? router.query.tab : "fx";
+  const qt = router.query?.tab;
+  // 예전 링크 ?tab=kospi → 지수 › 코스피200
+  const tab = ["index", "kospi", "ndx"].includes(qt) ? "index" : qt === "crypto" ? "crypto" : "fx";
+  const idx = router.query?.idx === "ndx" || qt === "ndx" ? "ndx" : "kospi";
   const sym = CRYPTO_SYMBOLS.includes(router.query?.sym) ? router.query.sym : "BTCUSDT";
   const q = V.quantconnect;
   const s10 = KPG.stats_10y;
@@ -150,7 +177,15 @@ export default function VerifiedPage() {
     { id: "v-crypto-book", n: cs.length + 1, src: `${cs.length}개 전략 합산`, title: "한 계좌 운용 · 레버리지", level: "자체 엔진 · 공개 데이터", color: "var(--cyan)",
       fact: [`${CRB.book.n}건`, ...(CRB.book.leverage || []).slice(0, 2).map((r) => `${r.lev}배 연 ${pct(r.cagr_pct)} · 낙폭 −${r.mdd_pct}%`)] },
   ];
-  const toc = tab === "kospi" ? tocKospi : tab === "crypto" ? tocCrypto : tocFx;
+  const ns = NDXB.strategies || [];
+  const tocNdx = [
+    ...ns.map((s, i) => ({ id: `${NDXB.id_prefix}-${s.id.toLowerCase()}`, n: i + 1, src: `${s.side} · 자체 엔진 · 지수 CFD 1분봉`, title: `${s.id} ${s.name}`, level: "자체 엔진 · 공개 데이터", color: "var(--warn)",
+      fact: [s.period, `${s.n}건 · 건당 ${pct(s.exp_pct)}`, `승률 ${s.win_rate}%`, `낙폭 −${s.mdd_pct}%`] })),
+    { id: `${NDXB.id_prefix}-book`, n: ns.length + 1, src: `${ns.length}개 전략 합산`, title: "한 계좌 운용 · 레버리지", level: "자체 엔진 · 공개 데이터", color: "var(--cyan)",
+      fact: [`${NDXB.book.n}건`, ...(NDXB.book.leverage || []).slice(0, 2).map((r) => `${r.lev}배 연 ${pct(r.cagr_pct)} · 낙폭 −${r.mdd_pct}%`)] },
+  ];
+  const toc = tab === "index" ? (idx === "ndx" ? tocNdx : tocKospi) : tab === "crypto" ? tocCrypto : tocFx;
+  const kospi = tab === "index" && idx === "kospi";
   return (
     <div style={wrap}>
       <Head>
@@ -166,6 +201,7 @@ export default function VerifiedPage() {
       <SectionHead kicker="VERIFIED" title="검증 기록" desc="제3자 서버가 집계·검증한 기록과, 아직 그 단계 전인 자체 검증 기록을 증거 수준을 표시해 함께 둡니다"
         aside={<LiveBadge live liveText={`기준일 ${V.updated}`} />} />
       <div style={{ padding: "0 8px 12px" }}><VerifiedTabs tab={tab} /></div>
+      {tab === "index" && <div style={{ padding: "0 8px 12px" }}><IndexTabs idx={idx} /></div>}
 
       {tab === "fx" && (
         <p style={{ ...p, padding: "0 8px" }}>
@@ -176,7 +212,7 @@ export default function VerifiedPage() {
         </p>
       )}
       {/* 수치 출처: reversion_research/backtests/kospi_universe_profile.py (2026-11-02, 선물 1분봉 2016-08~2026-10) */}
-      {tab === "kospi" && (
+      {kospi && (
         <ul style={{ ...p, padding: "0 8px 0 28px", display: "grid", gap: 2 }}>
           <li><strong>코스피200은 밤에 오르고 낮에는 제자리입니다</strong> (2016년 이후 밤 +179%, 낮 −20%).</li>
           <li>낮의 수익은 정오에 한쪽으로 크게 기운 날처럼 특정 조건에서만 나옵니다.</li>
@@ -216,7 +252,7 @@ export default function VerifiedPage() {
           </>
         )}
 
-        {tab === "kospi" && (
+        {kospi && (
           <>
             {/* 선물 전용 책 / ETF 전용 책 구분 (11/2) */}
             <p style={{ ...p, padding: "4px 8px 0", margin: 0 }}>
@@ -255,11 +291,13 @@ export default function VerifiedPage() {
           </>
         )}
 
+        {tab === "index" && idx === "ndx" && <CryptoBookView data={NDXB} />}
+
         {tab === "crypto" && <CryptoBookView data={CRB} sym={sym} />}
       </div>
 
       <p className="meta" style={{ padding: "16px 8px 0", lineHeight: 1.7 }}>
-        이 페이지는 투자 권유가 아닙니다. 환율 기록은 데모 계좌이고, 코스피 선물 전략은 실거래 전의 자체 백테스트(QuantConnect 재현 포함)이고, 코스피 ETF 전용 책은 같은 신호를 ETF 시세로 다시 계산한 기록이며 2026-11-02부터 소액 실계좌에서 돌아갑니다. 크립토 기록은 실거래 전의 자체 백테스트입니다.
+        이 페이지는 투자 권유가 아닙니다. 환율 기록은 데모 계좌이고, 코스피 선물 전략은 실거래 전의 자체 백테스트(QuantConnect 재현 포함)이고, 코스피 ETF 전용 책은 같은 신호를 ETF 시세로 다시 계산한 기록이며 2026-11-02부터 소액 실계좌에서 돌아갑니다. 나스닥100 기록과 크립토 기록은 실거래 전의 자체 백테스트입니다.
         실제 성과·수수료·슬리피지는 다를 수 있습니다.
         월간·주간 자체 보고서는 <Link href="/reports" style={{ color: "var(--cyan)" }}>보고서</Link>에서 볼 수 있습니다.
       </p>

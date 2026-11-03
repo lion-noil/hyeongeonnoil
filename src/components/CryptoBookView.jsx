@@ -2,6 +2,8 @@
 // 데이터: src/data/crypto_btc_book.json (reversion_research/backtests/build_crypto_btc_site.py)
 // 종목 탭(?tab=crypto&sym=…) → BTCUSDT: 특징 → 전략 카드 4개(숏 C1·C2, 롱 L1·L2, 11/3 롱 추가) → 한 계좌 운용(누적 차트·레버리지·1천만 원 연도별) → 공통 규칙·비용 → 버린 것 → 주의 → 거래 목록(접기)
 //                            그 밖 종목: 검증 예정 안내
+// 11/3: 지수 탭 나스닥100 책(src/data/index_ndx_book.json)도 같은 뷰로 그림 — 종목별 문구(badge·ret_label·id_prefix·chart·book_title·book_note·krw_label·krw_note)는
+//       데이터에 있으면 그걸 쓰고, 없으면 크립토 기본 문구. 종목 확인은 data.symbol 과 sym 비교(지수 탭은 sym 없이 호출).
 import React, { useState } from "react";
 import Link from "next/link";
 import Panel, { Chip } from "./ui/Panel";
@@ -41,10 +43,10 @@ function Stat({ label, value, color }) {
   );
 }
 
-function StrategyCard({ s }) {
+function StrategyCard({ s, cfg }) {
   return (
-    <Panel id={`v-crypto-${s.id.toLowerCase()}`} icon={s.side === "롱" ? "📈" : "📉"} title={`${s.id} ${s.name}`} meta={`${s.side} · ${s.hold} · ${s.zone}`} hover={false}
-      badge={<Chip color="var(--warn)">자체 엔진 · 바이비트 1분봉</Chip>}>
+    <Panel id={`${cfg.prefix}-${s.id.toLowerCase()}`} icon={s.side === "롱" ? "📈" : "📉"} title={`${s.id} ${s.name}`} meta={`${s.side} · ${s.hold} · ${s.zone}`} hover={false}
+      badge={<Chip color="var(--warn)">{cfg.badge}</Chip>}>
       <p style={p}>{s.why}</p>
       <div className="inset" style={{ padding: "10px 12px", marginBottom: 12, lineHeight: 1.8, fontSize: "var(--fs-sm)" }}>
         <div><b>진입</b> {s.entry}</div>
@@ -53,7 +55,7 @@ function StrategyCard({ s }) {
       </div>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
         <Stat label={`거래 (${s.period})`} value={`${s.n}건 · 연 ${s.per_year}`} />
-        <Stat label="건당 (수수료·펀딩 후)" value={fmtPct(s.exp_pct, 2)} color={tone(s.exp_pct)} />
+        <Stat label={cfg.retLabel} value={fmtPct(s.exp_pct, 2)} color={tone(s.exp_pct)} />
         <Stat label="큰 5건 뺀 건당" value={fmtPct(s.x5_pct, 2)} color={tone(s.x5_pct)} />
         <Stat label="승률" value={`${s.win_rate}%`} />
         <Stat label="총이익 ÷ 총손실" value={`${s.pf}배`} />
@@ -108,7 +110,7 @@ function Trades({ S }) {
   );
 }
 
-export default function CryptoBookView({ data, sym }) {
+export default function CryptoBookView({ data, sym = data.symbol }) {
   if (sym !== data.symbol) {
     const o = (data.other_symbols || []).find((x) => x.symbol === sym);
     return (
@@ -118,23 +120,29 @@ export default function CryptoBookView({ data, sym }) {
     );
   }
   const S = data.strategies || []; const b = data.book || {};
+  const cfg = {
+    prefix: data.id_prefix || "v-crypto",
+    badge: data.badge || "자체 엔진 · 바이비트 1분봉",
+    retLabel: data.ret_label || "건당 (수수료·펀딩 후)",
+    chart: data.chart || "/verified/crypto-btc-book.png",
+    bookTitle: data.book_title || `${(b.parts || []).length}개 전략 한 계좌`,
+    bookNote: data.book_note || "숏 둘(장중)과 롱 둘(장 밖)을 한 계좌에서 돌린 결과입니다. 전략마다 평가액 100%를 쓰고, 청산한 날의 손익을 날마다 합쳐 복리로 쌓았습니다. 보유가 겹치는 순간에는 총 노출이 2~3배가 되고, 롱과 숏이 겹치면 서로 상쇄됩니다. 레버리지를 올리면 수익과 낙폭이 거의 같은 비율로 커지므로 감당할 낙폭으로 배수를 정합니다. '운 나쁜 낙폭'은 하루 손익 순서를 2,000번 섞었을 때 상위 5%에 해당하는 낙폭입니다.",
+    krwLabel: data.krw_label || "2021년 초 1,000만 원으로 시작, 수익 재투자(단위 만 원)",
+    krwNote: data.krw_note || "표의 거래 수는 그해 네 전략 합계입니다. 환전·세금·슬리피지는 넣지 않았습니다.",
+  };
   return (
     <div style={{ display: "grid", gap: 14 }}>
-      <Panel icon="🧭" title={`${data.symbol} 시간대 특징`} meta={data.data_note} hover={false} badge={<Chip color="var(--warn)">{data.status}</Chip>}>
+      <Panel icon="🧭" title={`${data.label || data.symbol} 시간대 특징`} meta={data.data_note} hover={false} badge={<Chip color="var(--warn)">{data.status}</Chip>}>
         <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6 }}>
           {(data.facts || []).map((f, i) => <li key={i} style={li}>{f}</li>)}
         </ul>
       </Panel>
 
-      {S.map((s) => <StrategyCard key={s.id} s={s} />)}
+      {S.map((s) => <StrategyCard key={s.id} s={s} cfg={cfg} />)}
 
-      <Panel id="v-crypto-book" icon="🧮" title={`${(b.parts || []).length}개 전략 한 계좌`} meta={`${b.window} · ${b.n}건 · 연 ${b.per_year}건`} hover={false}>
-        <img src={`/verified/crypto-btc-book.png?v=${data.updated}-${b.n}`} alt="BTCUSDT 책 누적 수익" style={{ width: "100%", display: "block", borderRadius: 8, marginBottom: 12 }} loading="lazy" />
-        <p style={p}>
-          숏 둘(장중)과 롱 둘(장 밖)을 한 계좌에서 돌린 결과입니다. 전략마다 평가액 100%를 쓰고, 청산한 날의 손익을 날마다 합쳐 복리로 쌓았습니다.
-          보유가 겹치는 순간에는 총 노출이 2~3배가 되고, 롱과 숏이 겹치면 서로 상쇄됩니다. 레버리지를 올리면 수익과 낙폭이 거의 같은 비율로 커지므로 감당할 낙폭으로 배수를 정합니다.
-          '운 나쁜 낙폭'은 하루 손익 순서를 2,000번 섞었을 때 상위 5%에 해당하는 낙폭입니다.
-        </p>
+      <Panel id={`${cfg.prefix}-book`} icon="🧮" title={cfg.bookTitle} meta={`${b.window} · ${b.n}건 · 연 ${b.per_year}건`} hover={false}>
+        <img src={`${cfg.chart}?v=${data.updated}-${b.n}`} alt={`${data.label || data.symbol} 책 누적 수익`} style={{ width: "100%", display: "block", borderRadius: 8, marginBottom: 12 }} loading="lazy" />
+        <p style={p}>{cfg.bookNote}</p>
         <div style={{ overflowX: "auto", marginBottom: 14 }}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead><tr><th style={{ ...th, textAlign: "left" }}>레버리지</th><th style={th}>연 수익(복리)</th><th style={th}>과거 최대 낙폭</th><th style={th}>운 나쁜 낙폭</th><th style={th}>하루 최악</th></tr></thead>
@@ -146,7 +154,7 @@ export default function CryptoBookView({ data, sym }) {
             </tbody>
           </table>
         </div>
-        <div className="meta" style={{ marginBottom: 6, fontWeight: 700 }}>2021년 초 1,000만 원으로 시작, 수익 재투자(단위 만 원)</div>
+        <div className="meta" style={{ marginBottom: 6, fontWeight: 700 }}>{cfg.krwLabel}</div>
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
@@ -166,7 +174,7 @@ export default function CryptoBookView({ data, sym }) {
             </tbody>
           </table>
         </div>
-        <p className="meta" style={{ margin: "8px 0 0", lineHeight: 1.6 }}>1배 연도별: {(b.yearly_1x || []).map((y) => `${y.year} ${fmtPct(y.ret_pct, 0)}`).join(" · ")}. 표의 거래 수는 그해 네 전략 합계입니다. 환전·세금·슬리피지는 넣지 않았습니다.</p>
+        <p className="meta" style={{ margin: "8px 0 0", lineHeight: 1.6 }}>1배 연도별: {(b.yearly_1x || []).map((y) => `${y.year} ${fmtPct(y.ret_pct, 0)}`).join(" · ")}. {cfg.krwNote}</p>
       </Panel>
 
       <Panel icon="📐" title="공통 규칙 · 비용" hover={false}>
