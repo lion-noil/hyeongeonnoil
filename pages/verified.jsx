@@ -4,7 +4,7 @@
 //    src/data/qc_backtest.json 에 두고 QcBacktestView 가 직접 그린다 (reversion_research/platforms/quantconnect/qc_fetch_result.py → build_verified_data.py).
 // 5) 코스피200 선물 「눌림 갭업 숏」(2026-11-01) — src/data/kospi_pullback_gapshort.json (reversion_research/backtests/build_pullback_gapshort_site.py), KospiStrategyView.
 // 탭(2026-11-01): '환율 봇'(1~3) / '코스피200'(선물 전용 책 1~4 + ETF 전용 책 5). ALIGN3 카드는 11/2 삭제(연구 기록에만 보존). ?tab=kospi 로 직접 진입. 상단 목차는 탭별로 바뀐다.
-// 크립토 탭(2026-11-02): ?tab=crypto[&sym=ETHUSDT…] — 종목 탭, BTCUSDT 숏 책(C1·C2) = src/data/crypto_btc_book.json (reversion_research/backtests/build_crypto_btc_site.py), CryptoBookView.
+// 크립토 탭(2026-11-02): ?tab=crypto[&sym=ETHUSDT…] — 종목 탭, BTCUSDT 책(숏 C1·C2 + 11/3 롱 L1·L2) = src/data/crypto_btc_book.json (reversion_research/backtests/build_crypto_btc_site.py), CryptoBookView.
 // 숫자·링크·주의문은 src/data/verified.json (publish_site.py 가 갱신). 정적 페이지.
 import React from "react";
 import Head from "next/head";
@@ -145,9 +145,9 @@ export default function VerifiedPage() {
   ];
   const cs = CRB.strategies || [];
   const tocCrypto = sym !== CRB.symbol ? [] : [
-    ...cs.map((s, i) => ({ id: `v-crypto-${s.id.toLowerCase()}`, n: i + 1, src: "자체 엔진 · 바이비트 1분봉", title: `${CRB.symbol} — ${s.name}`, level: "자체 엔진 · 공개 데이터", color: "var(--warn)",
+    ...cs.map((s, i) => ({ id: `v-crypto-${s.id.toLowerCase()}`, n: i + 1, src: `${s.side} · 자체 엔진 · 바이비트 1분봉`, title: `${CRB.symbol} — ${s.name}`, level: "자체 엔진 · 공개 데이터", color: "var(--warn)",
       fact: [s.period, `${s.n}건 · 건당 ${pct(s.exp_pct)}`, `1배 누적 ${pct(s.total_pct)}`, `낙폭 −${s.mdd_pct}%`] })),
-    { id: "v-crypto-book", n: cs.length + 1, src: "두 전략 합산", title: "한 계좌 운용 · 레버리지", level: "자체 엔진 · 공개 데이터", color: "var(--cyan)",
+    { id: "v-crypto-book", n: cs.length + 1, src: `${cs.length}개 전략 합산`, title: "한 계좌 운용 · 레버리지", level: "자체 엔진 · 공개 데이터", color: "var(--cyan)",
       fact: [`${CRB.book.n}건`, ...(CRB.book.leverage || []).slice(0, 2).map((r) => `${r.lev}배 연 ${pct(r.cagr_pct)} · 낙폭 −${r.mdd_pct}%`)] },
   ];
   const toc = tab === "kospi" ? tocKospi : tab === "crypto" ? tocCrypto : tocFx;

@@ -1,6 +1,6 @@
 // 크립토 검증 기록 뷰 — /verified 크립토 탭 (2026-11-02)
 // 데이터: src/data/crypto_btc_book.json (reversion_research/backtests/build_crypto_btc_site.py)
-// 종목 탭(?tab=crypto&sym=…) → BTCUSDT: 특징 → 전략 카드 2개 → 한 계좌 운용(누적 차트·레버리지·1천만 원 연도별) → 공통 규칙·비용 → 버린 것 → 주의 → 거래 목록(접기)
+// 종목 탭(?tab=crypto&sym=…) → BTCUSDT: 특징 → 전략 카드 4개(숏 C1·C2, 롱 L1·L2, 11/3 롱 추가) → 한 계좌 운용(누적 차트·레버리지·1천만 원 연도별) → 공통 규칙·비용 → 버린 것 → 주의 → 거래 목록(접기)
 //                            그 밖 종목: 검증 예정 안내
 import React, { useState } from "react";
 import Link from "next/link";
@@ -43,7 +43,7 @@ function Stat({ label, value, color }) {
 
 function StrategyCard({ s }) {
   return (
-    <Panel id={`v-crypto-${s.id.toLowerCase()}`} icon="📉" title={`${s.id} ${s.name}`} meta={`${s.side} · ${s.zone}`} hover={false}
+    <Panel id={`v-crypto-${s.id.toLowerCase()}`} icon={s.side === "롱" ? "📈" : "📉"} title={`${s.id} ${s.name}`} meta={`${s.side} · ${s.hold} · ${s.zone}`} hover={false}
       badge={<Chip color="var(--warn)">자체 엔진 · 바이비트 1분봉</Chip>}>
       <p style={p}>{s.why}</p>
       <div className="inset" style={{ padding: "10px 12px", marginBottom: 12, lineHeight: 1.8, fontSize: "var(--fs-sm)" }}>
@@ -54,6 +54,7 @@ function StrategyCard({ s }) {
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
         <Stat label={`거래 (${s.period})`} value={`${s.n}건 · 연 ${s.per_year}`} />
         <Stat label="건당 (수수료·펀딩 후)" value={fmtPct(s.exp_pct, 2)} color={tone(s.exp_pct)} />
+        <Stat label="큰 5건 뺀 건당" value={fmtPct(s.x5_pct, 2)} color={tone(s.x5_pct)} />
         <Stat label="승률" value={`${s.win_rate}%`} />
         <Stat label="총이익 ÷ 총손실" value={`${s.pf}배`} />
         <Stat label="1배 복리 누적" value={fmtPct(s.total_pct, 0)} color={tone(s.total_pct)} />
@@ -70,7 +71,7 @@ function StrategyCard({ s }) {
           </tbody>
         </table>
       </div>
-      <p className="meta" style={{ margin: "8px 0 0" }}>손절 {s.stop_n}건 · 나머지는 시간 청산</p>
+      <p className="meta" style={{ margin: "8px 0 0" }}>{s.stop_n ? `손절 ${s.stop_n}건 · 나머지는 시간 청산` : "손절 없음 · 전부 시간 청산"} · 1건 최대 이익 {fmtPct(s.best_pct, 1)}</p>
     </Panel>
   );
 }
@@ -127,19 +128,20 @@ export default function CryptoBookView({ data, sym }) {
 
       {S.map((s) => <StrategyCard key={s.id} s={s} />)}
 
-      <Panel id="v-crypto-book" icon="📈" title="두 전략 한 계좌" meta={`${b.window} · ${b.n}건 · 연 ${b.per_year}건 · 건당 ${fmtPct(b.exp_pct, 2)}`} hover={false}>
+      <Panel id="v-crypto-book" icon="🧮" title={`${(b.parts || []).length}개 전략 한 계좌`} meta={`${b.window} · ${b.n}건 · 연 ${b.per_year}건`} hover={false}>
         <img src="/verified/crypto-btc-book.png" alt="BTCUSDT 숏 책 누적 수익" style={{ width: "100%", display: "block", borderRadius: 8, marginBottom: 12 }} loading="lazy" />
         <p style={p}>
-          두 전략은 보유 시간이 겹치지 않아 한 계좌에서 번갈아 돌릴 수 있습니다. 레버리지를 올리면 수익과 낙폭이 거의 같은 비율로 커지므로, 감당할 낙폭으로 배수를 정합니다.
-          '운 나쁜 낙폭'은 거래 순서를 2,000번 섞었을 때 상위 5%에 해당하는 낙폭입니다.
+          숏 둘(장중)과 롱 둘(장 밖)을 한 계좌에서 돌린 결과입니다. 전략마다 평가액 100%를 쓰고, 청산한 날의 손익을 날마다 합쳐 복리로 쌓았습니다.
+          보유가 겹치는 순간에는 총 노출이 2~3배가 되고, 롱과 숏이 겹치면 서로 상쇄됩니다. 레버리지를 올리면 수익과 낙폭이 거의 같은 비율로 커지므로 감당할 낙폭으로 배수를 정합니다.
+          '운 나쁜 낙폭'은 하루 손익 순서를 2,000번 섞었을 때 상위 5%에 해당하는 낙폭입니다.
         </p>
         <div style={{ overflowX: "auto", marginBottom: 14 }}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead><tr><th style={{ ...th, textAlign: "left" }}>레버리지</th><th style={th}>연 수익(복리)</th><th style={th}>과거 최대 낙폭</th><th style={th}>운 나쁜 낙폭</th><th style={th}>1건 최악</th></tr></thead>
+            <thead><tr><th style={{ ...th, textAlign: "left" }}>레버리지</th><th style={th}>연 수익(복리)</th><th style={th}>과거 최대 낙폭</th><th style={th}>운 나쁜 낙폭</th><th style={th}>하루 최악</th></tr></thead>
             <tbody>
               {(b.leverage || []).map((r) => (
                 <tr key={r.lev}><td style={{ ...td, textAlign: "left", fontWeight: 700 }}>{r.lev}배</td><td style={{ ...td, color: tone(r.cagr_pct) }}>{fmtPct(r.cagr_pct)}</td>
-                  <td style={td}>−{r.mdd_pct}%</td><td style={td}>−{r.bad_mdd_pct}%</td><td style={td}>{r.worst_trade_pct}%</td></tr>
+                  <td style={td}>−{r.mdd_pct}%</td><td style={td}>−{r.bad_mdd_pct}%</td><td style={td}>{r.worst_day_pct}%</td></tr>
               ))}
             </tbody>
           </table>
@@ -164,7 +166,7 @@ export default function CryptoBookView({ data, sym }) {
             </tbody>
           </table>
         </div>
-        <p className="meta" style={{ margin: "8px 0 0", lineHeight: 1.6 }}>표에 없는 2020년(4월~)은 1배 −14%였고, 과거 최대 낙폭은 그해에 나왔습니다. 환전·세금·슬리피지는 넣지 않았습니다.</p>
+        <p className="meta" style={{ margin: "8px 0 0", lineHeight: 1.6 }}>1배 연도별: {(b.yearly_1x || []).map((y) => `${y.year} ${fmtPct(y.ret_pct, 0)}`).join(" · ")}. 표의 거래 수는 그해 네 전략 합계입니다. 환전·세금·슬리피지는 넣지 않았습니다.</p>
       </Panel>
 
       <Panel icon="📐" title="공통 규칙 · 비용" hover={false}>
