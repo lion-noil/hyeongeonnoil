@@ -9,13 +9,16 @@
 //   나스닥100 책(N1~N6) = src/data/index_ndx_book.json (reversion_research/backtests/build_ndx_site.py), CryptoBookView 재사용(종목별 문구는 데이터에서).
 // 원자재 탭(2026-11-04): ?tab=commodity[&cm=gold] — 금(XAUUSD) 책 G1 = src/data/commodity_gold_book.json (reversion_research/backtests/build_gold_site.py), CommodityBookView.
 //   금은 '개발 2015-02~2022-12 / 독립 검증 2023-01~2026-10(규칙 확정 뒤 한 번만 개방, 사전 기준 P1~P4)' 분리가 핵심이라 결과 카드가 두 구간을 나눠 보여 준다.
+// 환율 탭 교체(2026-11-04, 사용자 지시로 내림): 기존 기본 탭 '환율 봇'(카드 1~3 — FX Blue 현황판·Myfxbook 배지·QuantConnect fx-majors 재현)은 페이지에서 내렸다.
+//   컴포넌트(QcBacktestView)·데이터(src/data/qc_backtest.json, verified.json 의 fxblue/myfxbook/quantconnect, verify:fx-majors 보고서)는 연구 기록으로 보존, 여기서 import 만 뺐다.
+//   같은 자리(key "fx", 기본 탭, 라벨 '환율')에 연준 결정 뒤 달러 바스켓 FX1 = src/data/fx_fed_basket.json (reversion_research/backtests/build_fx_site.py), FxBookView 하나만 보여 준다.
 // 숫자·링크·주의문은 src/data/verified.json (publish_site.py 가 갱신). 정적 페이지.
 import React from "react";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import V from "../src/data/verified.json";
-import QC from "../src/data/qc_backtest.json";
+// 2026-11-04 사용자 지시로 내림: import QC from "../src/data/qc_backtest.json" (환율 봇 QuantConnect 재현 — 파일은 보존)
 import KPG from "../src/data/kospi_pullback_gapshort.json";
 import QCP from "../src/data/qc_backtest_kospi_pgs.json";
 import NTD from "../src/data/kospi_noon_trendday.json";
@@ -31,21 +34,23 @@ import CryptoBookView, { CryptoSymbolTabs, CRYPTO_SYMBOLS } from "../src/compone
 import NDXB from "../src/data/index_ndx_book.json";
 import GOLD from "../src/data/commodity_gold_book.json";
 import CommodityBookView from "../src/components/CommodityBookView";
+import FXB from "../src/data/fx_fed_basket.json";
+import FxBookView from "../src/components/FxBookView";
 import { ldJson, ORG } from "../src/lib/jsonLd";
 import SectionHead from "../src/components/ui/SectionHead";
 import Panel, { Chip, LiveBadge } from "../src/components/ui/Panel";
-import QcBacktestView from "../src/components/QcBacktestView";
+// 2026-11-04 사용자 지시로 내림: import QcBacktestView from "../src/components/QcBacktestView" (환율 봇 카드 3 — 컴포넌트는 보존)
 import KospiStrategyView from "../src/components/KospiStrategyView";
 import StrategyRecord from "../src/components/StrategyRecord";
 
 const SITE = "https://hyeongeonnoil.com";
-const TITLE = "검증 기록 — 자동매매 봇의 제3자 검증(FX Blue·Myfxbook·QuantConnect)과 코스피200·나스닥100·금 전략 검증 | NewsInsight";
-const DESC = "환율 7종 자동매매 봇(MT5 데모), 지수(코스피200·나스닥100) 시간대 전략, 크립토(BTCUSDT) 시간대 전략, 원자재(금 XAUUSD) 시간대 전략의 검증 기록입니다. FX Blue 실시간 현황판, Myfxbook 검증 배지, QuantConnect 독립 백테스트, 그리고 코스피200 선물 전략·나스닥100 여섯 전략·금 뉴욕 마감 반등 전략의 1분봉 검증 결과(금은 개발 구간과 독립 검증 구간을 나눠서)와 그 한계를 함께 적었습니다.";
+const TITLE = "검증 기록 — 환율(연준 결정 뒤 달러 바스켓)·코스피200·나스닥100·크립토·금 전략의 1분봉 검증 | NewsInsight";
+const DESC = "환율 며칠 보유 전략(연준 결정 뒤 달러 바스켓 5일), 지수(코스피200·나스닥100) 시간대 전략, 크립토(BTCUSDT) 시간대 전략, 원자재(금 XAUUSD) 시간대 전략의 검증 기록입니다. 연준 결정 뒤 달러 바스켓 전략은 여섯 쌍 교차 확인과 사건 이동 대조로, 금은 개발 구간과 독립 검증 구간을 나눠서, 코스피200 선물 전략은 QuantConnect 재현까지 포함해 1분봉 검증 결과와 그 한계를 함께 적었습니다.";
 
 const PAGE_LD = {
   "@context": "https://schema.org",
   "@graph": [
-    { "@type": "WebPage", name: "검증 기록 — 자동매매 봇의 제3자 검증", url: `${SITE}/verified`, description: DESC, inLanguage: "ko",
+    { "@type": "WebPage", name: "검증 기록 — 환율·지수·크립토·금 전략 검증", url: `${SITE}/verified`, description: DESC, inLanguage: "ko",
       isPartOf: { "@type": "WebSite", name: "현건노일 NewsInsight", url: SITE }, publisher: ORG, dateModified: V.updated },
     { "@type": "BreadcrumbList", itemListElement: [
       { "@type": "ListItem", position: 1, name: "홈", item: `${SITE}/` },
@@ -54,11 +59,11 @@ const PAGE_LD = {
 };
 
 const wrap = { maxWidth: 1100, margin: "0 auto", padding: "8px 16px 40px" };
-const frame = { width: "100%", border: 0, borderRadius: 10, background: "var(--panel-solid)", display: "block" };
 const p = { lineHeight: 1.8, fontSize: "var(--fs-md)", margin: "0 0 10px", color: "var(--text-2)" };
 
+// 기본 탭 '환율'(key fx, /verified 또는 ?tab=fx) = 연준 결정 뒤 달러 바스켓. 예전 '환율 봇' 카드 1~3은 2026-11-04 사용자 지시로 내림.
 const TABS = [
-  { key: "fx", label: "환율 봇", icon: "💱" },
+  { key: "fx", label: "환율", icon: "💱" },
   { key: "index", label: "지수", icon: "📈" },
   { key: "crypto", label: "크립토", icon: "₿" },
   { key: "commodity", label: "원자재", icon: "🥇" },
@@ -71,10 +76,6 @@ const INDEXES = [
   { key: "kospi", label: "코스피200" },
   { key: "ndx", label: "나스닥100" },
 ];
-
-function Ext({ href, children }) {
-  return <Chip href={href} color="var(--cyan)">{children} ↗</Chip>;
-}
 
 const pct = (v) => (v == null ? "—" : `${v > 0 ? "+" : ""}${Number(v).toFixed(1)}%`);
 
@@ -161,7 +162,6 @@ export default function VerifiedPage() {
   const cm = "gold";
   const idx = router.query?.idx === "ndx" || qt === "ndx" ? "ndx" : "kospi";
   const sym = CRYPTO_SYMBOLS.includes(router.query?.sym) ? router.query.sym : "BTCUSDT";
-  const q = V.quantconnect;
   const s10 = KPG.stats_10y;
   const kp = V.kospi_pgs;
   const hasPgsQc = Boolean(kp && QCP?.stats);
@@ -172,14 +172,10 @@ export default function VerifiedPage() {
   const kl = V.kospi_ntl;
   const hasNtlQc = Boolean(kl && QCL?.stats);
   const hasEtfBook = Boolean(ETFB?.strategies?.length);
-  const tocFx = [
-    { id: "v-fxblue", n: 1, src: "FX Blue", title: "실시간 현황판", level: "계좌가 직접 발행", color: "var(--cyan)",
-      fact: ["환율 데모 계좌", "5분마다 발행", `${V.fxblue.since}~`] },
-    { id: "v-myfxbook", n: 2, src: "Myfxbook", title: "검증 배지", level: "제3자 검증", color: "var(--ok)",
-      fact: [...V.myfxbook.badges, `연결 ${V.myfxbook.since}`] },
-    { id: "v-qc-fx", n: 3, src: "QuantConnect", title: "환율 17셀 재현", level: "외부 엔진 · 외부 데이터", color: "var(--ok)",
-      fact: [q.period, `순이익 ${pct(QC.stats.net_profit_pct)}`, `낙폭 −${QC.stats.max_dd_pct}%`] },
-  ];
+  // 환율 목차 = 연준 결정 뒤 달러 바스켓(FX1). 예전 환율 봇 카드 1~3(FX Blue·Myfxbook·QuantConnect 17셀) 목차는 2026-11-04 사용자 지시로 내림.
+  const fs = FXB.strategies || [];
+  const tocFx = fs.map((s, i) => ({ id: `${FXB.id_prefix}-${s.id.toLowerCase()}`, n: i + 1, src: `${s.side} · 자체 엔진 · 환율 CFD 1분봉`, title: `${s.id} ${s.name}`, level: "자체 엔진 · 공개 데이터 · 독립 검증 구간 없음(6쌍 교차 확인)", color: "var(--warn)",
+    fact: [`${s.stats.basket.window.replace(/ /g, "")} ${s.stats.basket.n}건 · 바스켓 건당 ${pct(s.stats.basket.exp_pct)}`, `승률 ${s.stats.basket.win_rate}%`, `GBPUSD 단독 건당 ${pct(s.stats.single.exp_pct)}`, `낙폭 −${s.stats.basket.mdd_pct}% · 양수 ${s.stats.basket.pos_years}/${s.stats.basket.years}년`] }));
   const tocKospi = [
     { id: "v-kospi-pgs", n: 1, src: hasPgsQc ? "QuantConnect" : "자체 엔진 · 크레온 1분봉", title: `선물 전략 1 — ${KPG.name}`, level: hasPgsQc ? "외부 엔진 · 자체 데이터" : "자체 엔진 · 자체 데이터", color: "var(--warn)",
       fact: hasPgsQc ? [kp.period, `${QCP.three_way?.qc?.n}건 · 건당 ${pct(QCP.three_way?.qc?.mean)}`, `순이익 ${pct(QCP.stats.net_profit_pct)}`, `낙폭 −${QCP.stats.max_dd_pct}%`]
@@ -232,14 +228,7 @@ export default function VerifiedPage() {
       <div style={{ padding: "0 8px 12px" }}><VerifiedTabs tab={tab} /></div>
       {tab === "index" && <div style={{ padding: "0 8px 12px" }}><IndexTabs idx={idx} /></div>}
 
-      {tab === "fx" && (
-        <p style={{ ...p, padding: "0 8px" }}>
-          1~3번은 {V.account.label}에서 돌아가는 봇의 기록입니다.
-          사이트의 <Link href="/reports" style={{ color: "var(--cyan)" }}>보고서</Link>와{" "}
-          <Link href="/fx" style={{ color: "var(--cyan)" }}>FX 현황</Link>은 자체 장부 기준이고, 이 페이지는 그 장부를 바깥에서 대조하는 용도입니다.
-          {" "}{V.account.note} 가동 {V.account.live_since}~.
-        </p>
-      )}
+      {/* 예전 환율 봇 안내문(데모 계좌·FX 현황 대조)은 2026-11-04 사용자 지시로 내림 */}
       {/* 수치 출처: reversion_research/backtests/kospi_universe_profile.py (2026-11-02, 선물 1분봉 2016-08~2026-10) */}
       {kospi && (
         <ul style={{ ...p, padding: "0 8px 0 28px", display: "grid", gap: 2 }}>
@@ -254,33 +243,9 @@ export default function VerifiedPage() {
         {tab === "commodity" && <CommodityTabs cm={cm} />}
         {toc.length > 0 && <Toc items={toc} />}
 
-        {tab === "fx" && (
-          <>
-            {/* 1. FX Blue */}
-            <Panel id="v-fxblue" icon="📡" title="1. 실시간 현황판 — FX Blue" meta={`공개 사용자명 ${V.fxblue.user} · 발행 시작 ${V.fxblue.since}`}
-              footer={<><Ext href={V.fxblue.stats_url}>FX Blue 통계 페이지</Ext><Ext href={V.fxblue.page_url}>거래 내역</Ext></>}>
-              <p style={p}>{V.fxblue.how}</p>
-              <iframe src={V.fxblue.chart_embed} title="FX Blue 누적 손익 차트" loading="lazy" style={{ ...frame, height: 240 }} />
-            </Panel>
-
-            {/* 2. Myfxbook */}
-            <Panel id="v-myfxbook" icon="🛡️" title="2. 검증 배지 — Myfxbook" meta={`연결 ${V.myfxbook.since}`}
-              badge={<div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>{V.myfxbook.badges.map((b) => <Chip key={b} color="var(--ok)">✓ {b}</Chip>)}</div>}
-              footer={<Ext href={V.myfxbook.url}>Myfxbook 계좌 페이지</Ext>}>
-              <p style={{ ...p, margin: 0 }}>{V.myfxbook.how} 거래 이력은 연결 뒤 동기화된 분부터 쌓입니다.</p>
-            </Panel>
-
-            {/* 3. QuantConnect — 자체 호스팅 */}
-            <SectionHead id="v-qc-fx" aside={<TopLink />} kicker="INDEPENDENT BACKTEST" title="3. 독립 엔진·데이터 재현 — QuantConnect"
-              desc="같은 규칙(환율 셀 17개, 라이브와 동일한 사이징)을 LEAN 엔진용으로 다시 구현해 다른 데이터·다른 엔진·다른 체결 모델로 돌린 결과" />
-            <p style={p}>
-              {q.cell_match}. 기간 {q.period}, 실행 {q.run_at}, {q.engine}. 결과 원본(자본곡선·월별 통계·청산 거래 {QC.stats.closed_trades}건)은
-              QuantConnect API에서 내려받아 이 사이트가 직접 그립니다 — 외부 공개 페이지가 접속되지 않아도 아래는 그대로 봅니다.
-              {q.code_note ? ` ${q.code_note}` : ""}
-            </p>
-            <QcBacktestView data={QC} caveats={q.caveats} expectation={q.expectation} />
-          </>
-        )}
+        {/* 환율 — 연준 결정 뒤 달러 바스켓(FX1). 예전 카드 1~3(FX Blue 현황판·Myfxbook 배지·QuantConnect 17셀 재현)은 2026-11-04 사용자 지시로 내림
+            (QcBacktestView·qc_backtest.json·verified.json 의 fxblue/myfxbook/quantconnect 항목은 보존). */}
+        {tab === "fx" && <FxBookView data={FXB} />}
 
         {kospi && (
           <>
@@ -329,7 +294,7 @@ export default function VerifiedPage() {
       </div>
 
       <p className="meta" style={{ padding: "16px 8px 0", lineHeight: 1.7 }}>
-        이 페이지는 투자 권유가 아닙니다. 환율 기록은 데모 계좌이고, 코스피 선물 전략은 실거래 전의 자체 백테스트(QuantConnect 재현 포함)이고, 코스피 ETF 전용 책은 같은 신호를 ETF 시세로 다시 계산한 기록이며 2026-11-02부터 소액 실계좌에서 돌아갑니다. 나스닥100 기록과 크립토 기록은 실거래 전의 자체 백테스트입니다. 원자재(금) 기록은 개발 구간과 독립 검증 구간을 나눈 자체 백테스트이며, 실거래 전에 페이퍼로 체결을 확인하는 중입니다.
+        이 페이지는 투자 권유가 아닙니다. 환율(연준 결정 뒤 달러 바스켓) 기록은 독립 검증 구간이 없는 자체 백테스트(2015~2026 전 구간을 보고 찾은 규칙, 여섯 쌍 교차 확인만)이며 페이퍼로 관찰하는 중입니다. 코스피 선물 전략은 실거래 전의 자체 백테스트(QuantConnect 재현 포함)이고, 코스피 ETF 전용 책은 같은 신호를 ETF 시세로 다시 계산한 기록이며 2026-11-02부터 소액 실계좌에서 돌아갑니다. 나스닥100 기록과 크립토 기록은 실거래 전의 자체 백테스트입니다. 원자재(금) 기록은 개발 구간과 독립 검증 구간을 나눈 자체 백테스트이며, 실거래 전에 페이퍼로 체결을 확인하는 중입니다.
         실제 성과·수수료·슬리피지는 다를 수 있습니다.
         월간·주간 자체 보고서는 <Link href="/reports" style={{ color: "var(--cyan)" }}>보고서</Link>에서 볼 수 있습니다.
       </p>
