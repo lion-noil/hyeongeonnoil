@@ -7,6 +7,8 @@
 // 크립토 탭(2026-11-02): ?tab=crypto[&sym=ETHUSDT…] — 종목 탭, BTCUSDT 책(숏 C1·C2 + 11/3 롱 L1·L2) = src/data/crypto_btc_book.json (reversion_research/backtests/build_crypto_btc_site.py), CryptoBookView.
 // 지수 탭(2026-11-03): 코스피200 탭을 '지수' 아래로 옮기고 나스닥100 추가 — ?tab=index[&idx=ndx]. 예전 ?tab=kospi 링크는 지수 › 코스피200으로 연결.
 //   나스닥100 책(N1~N6) = src/data/index_ndx_book.json (reversion_research/backtests/build_ndx_site.py), CryptoBookView 재사용(종목별 문구는 데이터에서).
+// 원자재 탭(2026-11-04): ?tab=commodity[&cm=gold] — 금(XAUUSD) 책 G1 = src/data/commodity_gold_book.json (reversion_research/backtests/build_gold_site.py), CommodityBookView.
+//   금은 '개발 2015-02~2022-12 / 독립 검증 2023-01~2026-10(규칙 확정 뒤 한 번만 개방, 사전 기준 P1~P4)' 분리가 핵심이라 결과 카드가 두 구간을 나눠 보여 준다.
 // 숫자·링크·주의문은 src/data/verified.json (publish_site.py 가 갱신). 정적 페이지.
 import React from "react";
 import Head from "next/head";
@@ -27,6 +29,8 @@ import EtfBookView from "../src/components/EtfBookView";
 import CRB from "../src/data/crypto_btc_book.json";
 import CryptoBookView, { CryptoSymbolTabs, CRYPTO_SYMBOLS } from "../src/components/CryptoBookView";
 import NDXB from "../src/data/index_ndx_book.json";
+import GOLD from "../src/data/commodity_gold_book.json";
+import CommodityBookView from "../src/components/CommodityBookView";
 import { ldJson, ORG } from "../src/lib/jsonLd";
 import SectionHead from "../src/components/ui/SectionHead";
 import Panel, { Chip, LiveBadge } from "../src/components/ui/Panel";
@@ -36,7 +40,7 @@ import StrategyRecord from "../src/components/StrategyRecord";
 
 const SITE = "https://hyeongeonnoil.com";
 const TITLE = "검증 기록 — 자동매매 봇의 제3자 검증(FX Blue·Myfxbook·QuantConnect)과 코스피200·나스닥100·금 전략 검증 | NewsInsight";
-const DESC = "환율 7종 자동매매 봇(MT5 데모), 지수(코스피200·나스닥100) 시간대 전략, 크립토(BTCUSDT) 시간대 전략의 검증 기록입니다. FX Blue 실시간 현황판, Myfxbook 검증 배지, QuantConnect 독립 백테스트, 그리고 코스피200 선물 전략과 나스닥100 여섯 전략의 1분봉 검증 결과와 그 한계를 함께 적었습니다.";
+const DESC = "환율 7종 자동매매 봇(MT5 데모), 지수(코스피200·나스닥100) 시간대 전략, 크립토(BTCUSDT) 시간대 전략, 원자재(금 XAUUSD) 시간대 전략의 검증 기록입니다. FX Blue 실시간 현황판, Myfxbook 검증 배지, QuantConnect 독립 백테스트, 그리고 코스피200 선물 전략·나스닥100 여섯 전략·금 뉴욕 마감 반등 전략의 1분봉 검증 결과(금은 개발 구간과 독립 검증 구간을 나눠서)와 그 한계를 함께 적었습니다.";
 
 const PAGE_LD = {
   "@context": "https://schema.org",
@@ -59,7 +63,7 @@ const TABS = [
   { key: "crypto", label: "크립토", icon: "₿" },
   { key: "commodity", label: "원자재", icon: "🥇" },
 ];
-// 원자재 탭(2026-11-04): ?tab=commodity[&cm=gold] — 금(XAUUSD)부터. 전략은 연구 중이라 지금은 "검증 예정" 안내만.
+// 원자재 탭(2026-11-04): ?tab=commodity[&cm=gold] — 금(XAUUSD) 책 G1. 은·원유는 검증에서 탈락해 아직 없음(COMMOD_SESSION.md).
 const COMMODITIES = [
   { key: "gold", label: "금 (XAUUSD)" },
 ];
@@ -206,7 +210,10 @@ export default function VerifiedPage() {
     { id: `${NDXB.id_prefix}-book`, n: ns.length + 1, src: `${ns.length}개 전략 합산`, title: "한 계좌 운용 · 레버리지", level: "자체 엔진 · 공개 데이터", color: "var(--cyan)",
       fact: [`${NDXB.book.n}건`, ...(NDXB.book.leverage || []).slice(0, 2).map((r) => `${r.lev}배 연 ${pct(r.cagr_pct)} · 낙폭 −${r.mdd_pct}%`)] },
   ];
-  const toc = tab === "index" ? (idx === "ndx" ? tocNdx : tocKospi) : tab === "crypto" ? tocCrypto : tab === "commodity" ? [] : tocFx;
+  const gs = GOLD.strategies || [];
+  const tocGold = gs.map((s, i) => ({ id: `${GOLD.id_prefix}-${s.id.toLowerCase()}`, n: i + 1, src: `${s.side} · 자체 엔진 · 금 CFD 1분봉`, title: `${s.id} ${s.name}`, level: "자체 엔진 · 공개 데이터 · 독립 검증 구간 통과", color: "var(--warn)",
+    fact: [`검증 ${s.stats.oos.window.replace(/ /g, "")} ${s.stats.oos.n}건 · 건당 +${s.stats.oos.exp_pct.toFixed(3)}%`, `승률 ${s.stats.oos.win_rate}%`, `개발 ${s.stats.dev.n}건 · 건당 +${s.stats.dev.exp_pct.toFixed(3)}%`, `1배 연 +${s.stats.oos.annual_pct.toFixed(1)}%`] }));
+  const toc = tab === "index" ? (idx === "ndx" ? tocNdx : tocKospi) : tab === "crypto" ? tocCrypto : tab === "commodity" ? tocGold : tocFx;
   const kospi = tab === "index" && idx === "kospi";
   return (
     <div style={wrap}>
@@ -318,18 +325,11 @@ export default function VerifiedPage() {
 
         {tab === "crypto" && <CryptoBookView data={CRB} sym={sym} />}
 
-        {tab === "commodity" && (
-          <Panel icon="⏳" title="금 (XAUUSD) — 검증 예정" meta="MT5(HFM) 1분봉 · 자체 엔진" hover={false}>
-            <p style={{ ...p, margin: 0 }}>
-              금 시간대 전략을 만드는 중입니다. 코스피200·나스닥100·BTCUSDT 책과 같은 방식으로 장중 움직임의 특징을 먼저 살핀 뒤,
-              변동폭·매물대·달력 같은 단순한 조건으로 규칙을 정하고 10년 이상 1분봉으로 검증해 여기에 기록합니다.
-            </p>
-          </Panel>
-        )}
+        {tab === "commodity" && cm === "gold" && <CommodityBookView data={GOLD} />}
       </div>
 
       <p className="meta" style={{ padding: "16px 8px 0", lineHeight: 1.7 }}>
-        이 페이지는 투자 권유가 아닙니다. 환율 기록은 데모 계좌이고, 코스피 선물 전략은 실거래 전의 자체 백테스트(QuantConnect 재현 포함)이고, 코스피 ETF 전용 책은 같은 신호를 ETF 시세로 다시 계산한 기록이며 2026-11-02부터 소액 실계좌에서 돌아갑니다. 나스닥100 기록과 크립토 기록은 실거래 전의 자체 백테스트입니다. 원자재(금)는 전략을 만드는 중이라 아직 기록이 없습니다.
+        이 페이지는 투자 권유가 아닙니다. 환율 기록은 데모 계좌이고, 코스피 선물 전략은 실거래 전의 자체 백테스트(QuantConnect 재현 포함)이고, 코스피 ETF 전용 책은 같은 신호를 ETF 시세로 다시 계산한 기록이며 2026-11-02부터 소액 실계좌에서 돌아갑니다. 나스닥100 기록과 크립토 기록은 실거래 전의 자체 백테스트입니다. 원자재(금) 기록은 개발 구간과 독립 검증 구간을 나눈 자체 백테스트이며, 실거래 전에 페이퍼로 체결을 확인하는 중입니다.
         실제 성과·수수료·슬리피지는 다를 수 있습니다.
         월간·주간 자체 보고서는 <Link href="/reports" style={{ color: "var(--cyan)" }}>보고서</Link>에서 볼 수 있습니다.
       </p>
